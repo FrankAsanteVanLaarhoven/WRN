@@ -14,7 +14,8 @@ import {
   LogIn,
   User,
   LogOut,
-  Shield
+  Shield,
+  Download
 } from 'lucide-react';
 import { TopNavTab, ILLUMINATION_OPTIONS, IlluminationColor } from '../types/console';
 
@@ -206,6 +207,22 @@ export const TopNav: React.FC = () => {
             <Headphones className="w-4 h-4" />
           </button>
         </div>
+
+        {/* Install PWA / Desktop App Pill */}
+        <button
+          onClick={() => {
+            if ((window as any).deferredPrompt) {
+              (window as any).deferredPrompt.prompt();
+            } else {
+              alert('WRN Cloud PWA is active! To install as a standalone native app, tap "Add to Home Screen" or use the browser install icon.');
+            }
+          }}
+          className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg border border-border bg-surface-elevated/70 hover:border-illum text-xs font-mono text-slate-300 hover:text-white transition-all cursor-pointer"
+          title="Install WRN Cloud as PWA or Native Desktop App"
+        >
+          <Download className="w-3.5 h-3.5 text-illum" />
+          <span>Install PWA</span>
+        </button>
 
         {/* Upgrade Button - Sleek at rest, neon tube on hover */}
         <button

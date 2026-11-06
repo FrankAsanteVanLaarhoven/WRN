@@ -287,3 +287,4 @@ func (e *GitEngine) GetCommits() []Commit {
 	defer e.mu.RUnlock()
 	return e.commits
 }
+

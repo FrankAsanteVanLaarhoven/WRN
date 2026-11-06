@@ -1,0 +1,20 @@
+{
+  "name": "WRN Cloud Console",
+  "short_name": "WRN Cloud",
+  "description": "Enterprise Platform for Human-Agent Coexistence, Step Functions Orchestration & Green Edge Compute",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0D0E15",
+  "theme_color": "#00E5FF",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/wrn-passport-icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["developer", "productivity", "utilities"],
+  "screenshots": []
+}

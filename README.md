@@ -6,8 +6,13 @@
 [![Cloudflare CDN](https://img.shields.io/badge/Cloudflare%20Enterprise-310%20PoPs-amber?style=flat-square)](file:///Users/favl/Downloads/WRN_Passport_Contracts/console/src/views/SitesView.tsx)
 [![Rust Kernel](https://img.shields.io/badge/Rust%20Kernel-v0.2.0%20Active-crimson?style=flat-square)](file:///Users/favl/Downloads/WRN_Passport_Contracts/backend/rust-kernel)
 [![Go Edge](https://img.shields.io/badge/Go%20Edge%20Gateway-v0.2.0%20Online-cyan?style=flat-square)](file:///Users/favl/Downloads/WRN_Passport_Contracts/backend/go-edge)
+[![Solidity Contracts](https://img.shields.io/badge/Solidity%20Contracts-EVM%20Verified-blueviolet?style=flat-square)](file:///Users/favl/Downloads/WRN_Passport_Contracts/contracts)
+[![Desktop & PWA](https://img.shields.io/badge/Desktop%20%26%20PWA-Active-success?style=flat-square)](file:///Users/favl/Downloads/WRN_Passport_Contracts/desktop)
+[![Multi-Language SDKs](https://img.shields.io/badge/SDKs-TypeScript%20%7C%20Python%20%7C%20Go-blue?style=flat-square)](file:///Users/favl/Downloads/WRN_Passport_Contracts/sdk)
 
-> **Enterprise-grade cloud platform engineered specifically for deterministic human-agent coexistence, bounded delegation, ASL-compliant Step Functions orchestration, and verifiable execution sealing.**
+> **Enterprise-grade cloud platform engineered specifically for deterministic human-agent coexistence, bounded delegation, ASL-compliant Step Functions orchestration, cryptographic Merkle sealing, and on-chain blockchain settlement.**
+>
+> 📖 **Comprehensive Step-by-Step Manual**: See [docs/ENTERPRISE_REFERENCE_MANUAL.md](file:///Users/favl/Downloads/WRN_Passport_Contracts/docs/ENTERPRISE_REFERENCE_MANUAL.md) for full functional reference and real-world analogies.
 
 ---
 

@@ -1,0 +1,17 @@
+{
+  "name": "@wrn/sdk",
+  "version": "0.2.0",
+  "description": "Official TypeScript & JavaScript SDK for WRN Cloud, Bounded Human-Agent Passports, Step Functions & Edge Infrastructure",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": ["wrn", "agent-passport", "rfc9421", "step-functions", "edge-cloud", "merkle-settlement"],
+  "author": "Frank Van Laarhoven <frank@wrn.network>",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

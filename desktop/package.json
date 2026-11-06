@@ -1,0 +1,17 @@
+{
+  "name": "wrn-cloud-desktop",
+  "version": "0.2.0",
+  "description": "WRN Cloud • Native Desktop Console & Offline Edge Gateway Runner",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "author": "Frank Van Laarhoven <frank@wrn.network>",
+  "license": "Proprietary",
+  "dependencies": {},
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

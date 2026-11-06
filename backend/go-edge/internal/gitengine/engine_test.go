@@ -44,3 +44,4 @@ func TestGitEngine(t *testing.T) {
 		t.Fatalf("expected feature/test-branch")
 	}
 }
+
