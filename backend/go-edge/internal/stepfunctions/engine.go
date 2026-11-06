@@ -358,3 +358,4 @@ func ExecuteAll(ctx *StateMachineContext, firewall *waf.Firewall, rCache *cache.
 
 	return results, totalMs, nil
 }
+

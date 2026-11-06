@@ -409,6 +409,96 @@ func main() {
 		})
 	}))
 
+	// 7. Step Functions State Machine API (ASL Engine with Live Step Execution)
+	mux.HandleFunc("/api/v1/step-functions/definitions", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		ctx := stepfunctions.NewDefaultContext()
+		nodes, _, _ := stepfunctions.ExecuteAll(ctx, firewall, redisCache)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"id":         "sm_merkle_seal_v2",
+			"name":       "Agent Passport Coexistence & Merkle Settlement Pipeline",
+			"comment":    "ASL-compliant Step Function orchestrating agent cryptographic qualification and DAG settlement",
+			"version":    "2.1.0",
+			"startAt":    "VerifyAgentEnvelope",
+			"states":     nodes,
+			"timeoutSec": 300,
+		})
+	}))
+
+	// Execute an individual step by state ID (e.g. VerifyAgentEnvelope, EvaluateZonePolicy, ParallelSecurityChecks)
+	mux.HandleFunc("/api/v1/step-functions/step", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var body struct {
+			StateID string `json:"stateId"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.StateID == "" {
+			body.StateID = "VerifyAgentEnvelope"
+		}
+
+		ctx := stepfunctions.NewDefaultContext()
+		node, err := stepfunctions.ExecuteStep(body.StateID, ctx, firewall, redisCache)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
+			return
+		}
+
+		state.mu.Lock()
+		state.logs = append([]map[string]interface{}{{
+			"id":          fmt.Sprintf("log_%d", time.Now().UnixNano()),
+			"timestamp":   time.Now().Format(time.RFC3339),
+			"level":       "INFO",
+			"service":     "step_functions",
+			"action":      fmt.Sprintf("step.%s", strings.ToLower(node.Name)),
+			"duration_ms": float64(node.DurationMs),
+			"status":      200,
+		}}, state.logs...)
+		state.mu.Unlock()
+
+		json.NewEncoder(w).Encode(node)
+	}))
+
+	// Execute full state machine pipeline (all 6 steps with concurrent parallel evaluation)
+	mux.HandleFunc("/api/v1/step-functions/execute", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		ctx := stepfunctions.NewDefaultContext()
+
+		nodes, totalDur, err := stepfunctions.ExecuteAll(ctx, firewall, redisCache)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
+			return
+		}
+
+		state.mu.Lock()
+		state.logs = append([]map[string]interface{}{
+			{
+				"id":          fmt.Sprintf("log_%d", time.Now().UnixNano()),
+				"timestamp":   time.Now().Format(time.RFC3339),
+				"level":       "INFO",
+				"service":     "step_functions",
+				"action":      "pipeline.merkle_seal.completed",
+				"duration_ms": float64(totalDur),
+				"merkle_root": ctx.MerkleRoot,
+				"status":      200,
+			},
+		}, state.logs...)
+		state.mu.Unlock()
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"executionId": ctx.ExecutionID,
+			"status":      "SUCCEEDED",
+			"durationMs":  totalDur,
+			"stepCount":   len(nodes),
+			"states":      nodes,
+			"output": map[string]interface{}{
+				"merkleRoot":  ctx.MerkleRoot,
+				"blockHeight": ctx.BlockHeight,
+				"status":      "COMPLETED_AND_SEALED",
+			},
+		})
+	}))
+
 	// 7. Activity Audit Stream
 	mux.HandleFunc("/api/v1/activity/stream", withWAF(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
