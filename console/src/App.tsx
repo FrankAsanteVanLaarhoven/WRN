@@ -29,6 +29,7 @@ import { ProjectSettingsView } from './views/ProjectSettingsView';
 import { DomainsView } from './views/DomainsView';
 import { ComputeCostAnalysisView } from './views/ComputeCostAnalysisView';
 import { AgentHarnessView } from './views/AgentHarnessView';
+import { VelvetParticleGrid } from './components/ui/VelvetParticleGrid';
 
 // WRN Passport Coexistence & Foundry Views
 import { OntologyView } from './views/OntologyView';
@@ -74,7 +75,10 @@ const MainLayout: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-slate-100">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-slate-100 relative">
+      {/* Subtle Velvet Feel Premium Grid Particle Backdrop */}
+      <VelvetParticleGrid />
+
       <TopNav />
 
       {/* Full-width views for TopNav */}

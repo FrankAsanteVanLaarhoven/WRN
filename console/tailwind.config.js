@@ -8,7 +8,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#0A0B10',
+        background: '#07080C',
         surface: '#0F121C',
         'surface-elevated': '#151926',
         'surface-card': '#111420',
