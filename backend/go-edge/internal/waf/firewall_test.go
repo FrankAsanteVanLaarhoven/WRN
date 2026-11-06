@@ -28,3 +28,4 @@ func TestFirewallBlockMalicious(t *testing.T) {
 		t.Fatalf("Expected ActionChallenge for exceeded rate limit, got %v", action)
 	}
 }
+

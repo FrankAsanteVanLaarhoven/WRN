@@ -40,3 +40,4 @@ clean:
 	cd backend/rust-kernel && cargo clean
 	cd backend/go-edge && make clean
 	rm -rf console/dist
+

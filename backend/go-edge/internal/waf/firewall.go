@@ -98,3 +98,4 @@ func (f *Firewall) GetMetrics() (allowed, challenged, blocked uint64) {
 		atomic.LoadUint64(&f.metrics.ChallengedRequests),
 		atomic.LoadUint64(&f.metrics.BlockedRequests)
 }
+

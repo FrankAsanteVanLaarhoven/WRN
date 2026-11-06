@@ -30,16 +30,30 @@ func main() {
 
 	mux := http.NewServeMux()
 
-	// Middleware for WAF evaluation
+	// Middleware for WAF evaluation and CORS
 	withWAF := func(next http.HandlerFunc) http.HandlerFunc {
 		return func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", "*")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+			w.Header().Set("Access-Control-Allow-Headers", "*")
+			if r.Method == "OPTIONS" {
+				w.WriteHeader(http.StatusOK)
+				return
+			}
+
 			ip := r.RemoteAddr
 			bodyBytes, _ := io.ReadAll(r.Body)
 			bodyStr := string(bodyBytes)
 
 			action := firewall.EvaluateRequest(ip, r.URL.Path, r.UserAgent(), bodyStr)
 			if action == waf.ActionBlock {
-				http.Error(w, `{"error":"WAF_BLOCKED","reason":"Security policy violation"}`, http.StatusForbidden)
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusForbidden)
+				json.NewEncoder(w).Encode(map[string]interface{}{
+					"error":  "WAF_BLOCKED",
+					"reason": "Security policy violation: malicious payload pattern detected",
+					"status": "BLOCKED",
+				})
 				return
 			}
 			if action == waf.ActionChallenge {
@@ -85,6 +99,16 @@ func main() {
 			"protocol": "RFC 9421",
 			"key_id":   "key_wrn_agent_01",
 			"status":   "BOUNDED_AND_QUALIFIED",
+		})
+	}))
+
+	mux.HandleFunc("/api/v1/waf/evaluate", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":  "ALLOWED",
+			"action":  "ActionAllow",
+			"code":    200,
+			"message": "Clean request passed to upstream",
 		})
 	}))
 

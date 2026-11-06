@@ -78,3 +78,4 @@ func (rc *RedisCache) GetStats() (hits, misses uint64, totalKeys int) {
 	defer rc.mu.RUnlock()
 	return rc.hits, rc.misses, len(rc.items)
 }
+

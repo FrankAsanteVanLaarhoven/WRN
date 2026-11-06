@@ -35,3 +35,4 @@ export const animateClick = (element: HTMLElement | null) => {
     { scale: 1, duration: 0.2, ease: 'back.out(2)' }
   );
 };
+

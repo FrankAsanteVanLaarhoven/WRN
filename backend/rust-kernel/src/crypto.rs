@@ -102,3 +102,4 @@ mod tests {
         assert_eq!(canonicalize_json(&v1), r#"{"a":1,"b":2}"#);
     }
 }
+

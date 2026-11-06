@@ -16,3 +16,4 @@ run:
 
 clean:
 	cargo clean
+
