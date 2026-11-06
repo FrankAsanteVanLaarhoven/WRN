@@ -6,6 +6,7 @@ import { CommandPalette } from './components/CommandPalette';
 import { CommissionModal } from './components/CommissionModal';
 import { NewGrantModal } from './components/NewGrantModal';
 import { NewSealModal } from './components/NewSealModal';
+import { ClientAuthModal } from './components/ClientAuthModal';
 
 // Appwrite UI Views
 import { AppwriteOverviewView } from './views/AppwriteOverviewView';
@@ -108,7 +109,7 @@ const MainLayout: React.FC = () => {
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md transition-all ${
                           isActive
-                            ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 shadow-neon-tube font-semibold'
+                            ? 'active-tube-pill font-semibold'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
@@ -158,6 +159,8 @@ const MainLayout: React.FC = () => {
         isOpen={isNewSealOpen}
         onClose={() => setIsNewSealOpen(false)}
       />
+
+      <ClientAuthModal />
     </div>
   );
 };

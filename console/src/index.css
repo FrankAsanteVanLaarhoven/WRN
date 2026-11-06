@@ -5,6 +5,9 @@
 @layer base {
   :root {
     color-scheme: dark;
+    --illum-color: #00E5FF;
+    --illum-rgb: 0, 229, 255;
+    --illum-glow: rgba(0, 229, 255, 0.35);
   }
   
   body {
@@ -26,34 +29,89 @@
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #00E5FF44;
+    background: var(--illum-color);
   }
 }
 
 @layer utilities {
-  .neon-halo-glow {
-    box-shadow: 0 0 20px -3px rgba(0, 229, 255, 0.4), 0 0 40px -6px rgba(0, 176, 255, 0.2);
+  /* Dynamic Illumination Utility Classes */
+  .text-illum {
+    color: var(--illum-color) !important;
   }
+  .bg-illum {
+    background-color: var(--illum-color) !important;
+  }
+  .border-illum {
+    border-color: var(--illum-color) !important;
+  }
+  .bg-illum-muted {
+    background-color: rgba(var(--illum-rgb), 0.12) !important;
+  }
+  .border-illum-muted {
+    border-color: rgba(var(--illum-rgb), 0.35) !important;
+  }
+
+  /* Sleek Minimalist Tube Card - Clean at rest, illuminates ONLY when hovered */
   .neon-tube-card {
     position: relative;
-    border: 1px solid rgba(0, 229, 255, 0.25);
-    box-shadow: 0 0 15px -3px rgba(0, 229, 255, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: #111420;
+    box-shadow: none;
+    transition: border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s ease;
   }
   .neon-tube-card:hover {
-    border-color: rgba(0, 229, 255, 0.55);
-    box-shadow: 0 0 25px -2px rgba(0, 229, 255, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+    border-color: var(--illum-color);
+    box-shadow: 0 0 16px -2px rgba(var(--illum-rgb), 0.4), inset 0 0 10px rgba(var(--illum-rgb), 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
+
+  /* Sleek Tube Button - Clean resting state, neon tube illumination on hover */
   .neon-tube-button {
-    background: linear-gradient(135deg, #00E5FF 0%, #0091EA 100%);
-    box-shadow: 0 0 16px rgba(0, 229, 255, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.6);
+    background: rgba(var(--illum-rgb), 0.12);
+    border: 1px solid rgba(var(--illum-rgb), 0.4);
+    color: var(--illum-color);
+    box-shadow: none;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .neon-tube-button:hover {
-    background: linear-gradient(135deg, #38BDF8 0%, #00B0FF 100%);
-    box-shadow: 0 0 24px rgba(0, 229, 255, 0.75), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+    background: var(--illum-color);
+    color: #0A0B10;
+    border-color: var(--illum-color);
+    box-shadow: 0 0 20px rgba(var(--illum-rgb), 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.7);
   }
-  .neon-halo-badge {
-    box-shadow: 0 0 10px rgba(0, 229, 255, 0.35);
+
+  /* Sleek Tube Badge - Clean at rest, tube glow on hover */
+  .neon-tube-badge {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    color: #94A3B8;
+    box-shadow: none;
+    transition: all 0.2s ease;
+  }
+  .neon-tube-badge:hover {
+    border-color: var(--illum-color);
+    color: var(--illum-color);
+    box-shadow: 0 0 12px rgba(var(--illum-rgb), 0.35);
+  }
+
+  /* Hover Tube class for general items */
+  .hover-tube {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .hover-tube:hover {
+    border-color: var(--illum-color) !important;
+    box-shadow: 0 0 14px -2px rgba(var(--illum-rgb), 0.45) !important;
+  }
+
+  /* Active item styling - Clean, precise accent indicator without muddy static halo */
+  .active-tube-tab {
+    color: #FFFFFF !important;
+    border-bottom: 2px solid var(--illum-color) !important;
+    background-color: rgba(var(--illum-rgb), 0.1) !important;
+  }
+
+  .active-tube-pill {
+    color: var(--illum-color) !important;
+    background-color: rgba(var(--illum-rgb), 0.15) !important;
+    border-color: rgba(var(--illum-rgb), 0.45) !important;
   }
 }
-
-

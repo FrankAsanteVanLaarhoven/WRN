@@ -51,7 +51,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
       <div className="p-4 border-b border-border bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center space-x-2">
-            <Boxes className="w-5 h-5 text-neon-blue" />
+            <Boxes className="w-5 h-5 text-illum" />
             <h1 className="text-lg font-bold text-white tracking-tight">Appwrite & Agent Marketplace</h1>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -61,7 +61,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
 
         <button
           onClick={() => setProjectServiceTab('grok-agents')}
-          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg neon-tube-button text-slate-950 text-xs font-bold transition-all shadow-neon-tube"
+          className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg neon-tube-button text-xs font-bold transition-all"
         >
           <Sparkles className="w-3.5 h-3.5 fill-current" />
           <span>Launch Grok Bot Harness</span>
@@ -79,7 +79,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
               placeholder="Search apps..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full bg-surface-elevated border border-border rounded-md pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
+              className="w-full bg-surface-elevated border border-border rounded-md pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-illum font-mono transition-colors"
             />
           </div>
 
@@ -89,7 +89,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
               onClick={() => setActiveCategory('Explore')}
               className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md transition-all ${
                 activeCategory === 'Explore'
-                  ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 shadow-neon-tube font-semibold'
+                  ? 'active-tube-pill font-semibold'
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -106,7 +106,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
                 onClick={() => setActiveCategory(cat.name)}
                 className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md transition-all ${
                   activeCategory === cat.name
-                    ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 shadow-neon-tube font-semibold'
+                    ? 'active-tube-pill font-semibold'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -147,7 +147,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <div className="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-neon-blue font-bold font-mono">
+                      <div className="w-8 h-8 rounded-lg bg-surface border border-border flex items-center justify-center text-illum font-bold font-mono">
                         {tool.name.slice(0, 2).toUpperCase()}
                       </div>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-surface border border-border text-slate-400">
@@ -170,7 +170,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
                       className={`px-3 py-1 rounded-md text-[11px] font-mono font-semibold transition-all ${
                         isInstalled
                           ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
-                          : 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 hover:bg-cyan-500/30 shadow-neon-tube'
+                          : 'neon-tube-button'
                       }`}
                     >
                       {isInstalled ? 'Connected ✓' : 'Connect'}
@@ -193,9 +193,9 @@ export const AppwriteMarketplaceView: React.FC = () => {
                 { name: 'Agent Harnesses', apps: '4 apps' },
                 { name: 'Dev Tools', apps: '15 apps' }
               ].map(c => (
-                <div key={c.name} className="p-3.5 rounded-xl bg-surface border border-border hover:border-cyan-500/40 transition-all text-xs">
+                <div key={c.name} className="p-3.5 rounded-xl neon-tube-card text-xs cursor-pointer">
                   <div className="font-semibold text-white">{c.name}</div>
-                  <div className="text-[11px] text-neon-blue font-mono mt-0.5">{c.apps}</div>
+                  <div className="text-[11px] text-illum font-mono mt-0.5">{c.apps}</div>
                 </div>
               ))}
             </div>
@@ -205,3 +205,4 @@ export const AppwriteMarketplaceView: React.FC = () => {
     </div>
   );
 };
+

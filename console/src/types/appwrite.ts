@@ -17,6 +17,25 @@ export type ProjectServiceTab =
   | 'grok-agents'
   | 'passport-foundry';
 
+export type IlluminationColor = 'cyan' | 'white' | 'green' | 'purple' | 'amber' | 'rose';
+
+export interface IlluminationOption {
+  id: IlluminationColor;
+  label: string;
+  hex: string;
+  rgb: string;
+  twClass: string;
+}
+
+export const ILLUMINATION_OPTIONS: IlluminationOption[] = [
+  { id: 'cyan', label: 'Neon Blue', hex: '#00E5FF', rgb: '0, 229, 255', twClass: 'bg-[#00E5FF]' },
+  { id: 'white', label: 'Laser White', hex: '#FFFFFF', rgb: '255, 255, 255', twClass: 'bg-white' },
+  { id: 'green', label: 'Cyber Green', hex: '#10B981', rgb: '16, 185, 129', twClass: 'bg-[#10B981]' },
+  { id: 'purple', label: 'Amethyst', hex: '#A855F7', rgb: '168, 85, 247', twClass: 'bg-[#A855F7]' },
+  { id: 'amber', label: 'Solar Amber', hex: '#F59E0B', rgb: '245, 158, 11', twClass: 'bg-[#F59E0B]' },
+  { id: 'rose', label: 'Appwrite Rose', hex: '#FD366E', rgb: '253, 54, 110', twClass: 'bg-[#FD366E]' }
+];
+
 export interface DomainItem {
   id: string;
   domain: string;
@@ -68,3 +87,4 @@ export interface DatabaseRow {
   $id: string;
   [key: string]: any;
 }
+

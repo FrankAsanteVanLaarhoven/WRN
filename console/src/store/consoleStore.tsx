@@ -21,7 +21,15 @@ import {
   sourceRegister
 } from '../data/mockDb';
 import { computeQualifiedDigest, computeGrantTermsDigest } from '../utils/crypto';
-import { TopNavTab, ProjectServiceTab, DomainItem, ComputePlan, GrokAgentInstance } from '../types/appwrite';
+import {
+  TopNavTab,
+  ProjectServiceTab,
+  DomainItem,
+  ComputePlan,
+  GrokAgentInstance,
+  IlluminationColor,
+  ILLUMINATION_OPTIONS
+} from '../types/appwrite';
 import {
   INITIAL_DOMAINS,
   COMPUTE_PLANS,
@@ -43,7 +51,27 @@ export type ActiveTab =
   | 'evaluation'
   | 'sources';
 
+interface ClientUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'Owner' | 'Developer' | 'Security Officer' | 'Viewer';
+  avatarInitials: string;
+  organization: string;
+}
+
 interface ConsoleContextType {
+  // Client Authentication
+  clientUser: ClientUser | null;
+  loginClient: (email: string, name?: string, role?: ClientUser['role']) => void;
+  logoutClient: () => void;
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: (open: boolean) => void;
+
+  // Illumination & Accent
+  illuminationColor: IlluminationColor;
+  setIlluminationColor: (color: IlluminationColor) => void;
+
   // Appwrite Top Navigation
   topNavTab: TopNavTab;
   setTopNavTab: (tab: TopNavTab) => void;
@@ -120,6 +148,74 @@ interface ConsoleContextType {
 const ConsoleContext = createContext<ConsoleContextType | null>(null);
 
 export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [clientUser, setClientUser] = useState<ClientUser | null>(() => {
+    const saved = localStorage.getItem('wrn_client_user');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {
+        // fallback
+      }
+    }
+    // Default logged in client profile
+    return {
+      id: 'usr_client_01',
+      name: 'Frank Van Laarhoven',
+      email: 'frank@openmeta.io',
+      role: 'Owner',
+      avatarInitials: 'FL',
+      organization: 'Personal projects'
+    };
+  });
+
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const loginClient = (email: string, name?: string, role: ClientUser['role'] = 'Developer') => {
+    const displayName = name || email.split('@')[0];
+    const initials = displayName
+      .split(' ')
+      .map(p => p[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2) || displayName.slice(0, 2).toUpperCase();
+
+    const user: ClientUser = {
+      id: `usr_${Date.now()}`,
+      name: displayName,
+      email,
+      role,
+      avatarInitials: initials,
+      organization: 'Personal projects'
+    };
+    setClientUser(user);
+    localStorage.setItem('wrn_client_user', JSON.stringify(user));
+  };
+
+  const logoutClient = () => {
+    setClientUser(null);
+    localStorage.removeItem('wrn_client_user');
+  };
+
+  const [illuminationColor, setIlluminationColorState] = useState<IlluminationColor>(() => {
+    const saved = localStorage.getItem('wrn_illumination_color');
+    if (saved && ['cyan', 'white', 'green', 'purple', 'amber', 'rose'].includes(saved)) {
+      return saved as IlluminationColor;
+    }
+    return 'cyan';
+  });
+
+  const setIlluminationColor = (color: IlluminationColor) => {
+    setIlluminationColorState(color);
+    localStorage.setItem('wrn_illumination_color', color);
+  };
+
+  useEffect(() => {
+    const opt = ILLUMINATION_OPTIONS.find(o => o.id === illuminationColor) || ILLUMINATION_OPTIONS[0];
+    document.documentElement.style.setProperty('--illum-color', opt.hex);
+    document.documentElement.style.setProperty('--illum-rgb', opt.rgb);
+    document.documentElement.style.setProperty('--illum-glow', `rgba(${opt.rgb}, 0.35)`);
+  }, [illuminationColor]);
+
   const [topNavTab, setTopNavTab] = useState<TopNavTab>('projects');
   const [projectServiceTab, setProjectServiceTab] = useState<ProjectServiceTab>('overview');
   const [domains, setDomains] = useState<DomainItem[]>(INITIAL_DOMAINS);
@@ -595,6 +691,13 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
   return (
     <ConsoleContext.Provider
       value={{
+        clientUser,
+        loginClient,
+        logoutClient,
+        isAuthModalOpen,
+        setIsAuthModalOpen,
+        illuminationColor,
+        setIlluminationColor,
         topNavTab,
         setTopNavTab,
         projectServiceTab,

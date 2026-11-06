@@ -158,3 +158,4 @@ export const AI_ARENA_BENCHMARK = [
   { model: 'Claude Opus 4.8', costPer1M: '$5.00', overall: '97.1%', auth: '99.3%', tablesDb: '96.1%', functions: '95.0%', storage: '94.3%', sites: '100%', messaging: '100%' },
   { model: 'Claude Opus 4.7', costPer1M: '$5.00', overall: '97.1%', auth: '99.0%', tablesDb: '91.3%', functions: '100%', storage: '94.8%', sites: '100%', messaging: '100%' }
 ];
+

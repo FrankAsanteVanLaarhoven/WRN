@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useConsole } from '../store/consoleStore';
 import {
   Settings,
   Copy,
@@ -7,10 +8,14 @@ import {
   ShieldCheck,
   Key,
   AlertTriangle,
-  CheckCircle2
+  CheckCircle2,
+  Palette,
+  Check
 } from 'lucide-react';
+import { ILLUMINATION_OPTIONS, IlluminationColor } from '../types/appwrite';
 
 export const AppwriteSettingsView: React.FC = () => {
+  const { illuminationColor, setIlluminationColor } = useConsole();
   const [activeSub, setActiveSub] = useState<'General' | 'Members' | 'Billing' | 'Compliance' | 'OAuth apps'>('General');
   const [orgName, setOrgName] = useState('Personal projects');
   const [copied, setCopied] = useState(false);
@@ -35,10 +40,10 @@ export const AppwriteSettingsView: React.FC = () => {
       {/* Header */}
       <div className="p-4 border-b border-border bg-surface flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Settings className="w-5 h-5 text-neon-blue" />
+          <Settings className="w-5 h-5 text-illum" />
           <h1 className="text-lg font-bold text-white tracking-tight">Organization Settings</h1>
         </div>
-        <span className="text-xs font-mono text-neon-blue bg-cyan-950/60 px-2.5 py-1 rounded-full border border-cyan-500/40 shadow-neon-tube">
+        <span className="text-xs font-mono text-illum bg-illum-muted px-2.5 py-1 rounded-full border border-illum-muted">
           Free Tier • Personal Workspace
         </span>
       </div>
@@ -62,7 +67,7 @@ export const AppwriteSettingsView: React.FC = () => {
                 onClick={() => setActiveSub(item.id as any)}
                 className={`w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-left transition-all ${
                   isSelected
-                    ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 shadow-neon-tube font-semibold'
+                    ? 'active-tube-pill font-semibold'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -75,16 +80,63 @@ export const AppwriteSettingsView: React.FC = () => {
 
         {/* Right Content */}
         <div className="flex-1 p-6 overflow-y-auto space-y-6 max-w-3xl">
+          {/* Changeable Illumination & Tube Glow Theme */}
+          <div className="p-5 rounded-xl neon-tube-card space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Palette className="w-4 h-4 text-illum" />
+                <h2 className="text-xs font-bold text-white font-mono uppercase tracking-wider">
+                  Illumination & Tube Glow Accent
+                </h2>
+              </div>
+              <span className="text-[10px] font-mono text-slate-400">
+                Hover Tube Mode: Active
+              </span>
+            </div>
+            <p className="text-xs text-slate-400">
+              Customize the platform illumination color (White, Green, Neon Blue, Purple, Amber, Rose). Clean and minimalist at rest; the neon tube glows dynamically on hover.
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 pt-1">
+              {ILLUMINATION_OPTIONS.map(opt => {
+                const isSelected = illuminationColor === opt.id;
+                return (
+                  <button
+                    key={opt.id}
+                    type="button"
+                    onClick={() => setIlluminationColor(opt.id as IlluminationColor)}
+                    className={`p-2.5 rounded-lg border text-left flex items-center justify-between transition-all ${
+                      isSelected
+                        ? 'bg-surface border-illum text-white font-semibold'
+                        : 'bg-surface/50 border-border text-slate-300 hover:border-illum-muted'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-2.5 min-w-0">
+                      <span
+                        className="w-3.5 h-3.5 rounded-full shrink-0"
+                        style={{
+                          backgroundColor: opt.hex,
+                          boxShadow: isSelected ? `0 0 10px ${opt.hex}` : 'none'
+                        }}
+                      />
+                      <span className="text-xs truncate">{opt.label}</span>
+                    </div>
+                    {isSelected && <Check className="w-3.5 h-3.5 text-illum shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Organization ID Card */}
-          <div className="p-5 rounded-xl bg-surface-card border border-border/80 space-y-2">
+          <div className="p-5 rounded-xl neon-tube-card space-y-2">
             <h2 className="text-xs font-bold text-white font-mono uppercase tracking-wider">Organization ID</h2>
             <p className="text-xs text-slate-400">
               Use this ID when integrating with the Appwrite API, webhooks, or SDKs. Support may also ask for this ID when assisting with issues.
             </p>
             <div className="flex items-center space-x-2 pt-1">
-              <div className="p-2.5 rounded-lg bg-surface border border-border font-mono text-xs text-neon-blue flex items-center justify-between flex-1">
+              <div className="p-2.5 rounded-lg bg-surface border border-border font-mono text-xs text-illum flex items-center justify-between flex-1">
                 <span>{orgId}</span>
-                <button onClick={handleCopy} className="text-slate-400 hover:text-white">
+                <button onClick={handleCopy} className="text-slate-400 hover:text-white" aria-label="Copy Org ID">
                   <Copy className="w-3.5 h-3.5" />
                 </button>
               </div>
@@ -93,7 +145,7 @@ export const AppwriteSettingsView: React.FC = () => {
           </div>
 
           {/* Organization Name Card */}
-          <form onSubmit={handleUpdate} className="p-5 rounded-xl bg-surface-card border border-border/80 space-y-3">
+          <form onSubmit={handleUpdate} className="p-5 rounded-xl neon-tube-card space-y-3">
             <h2 className="text-xs font-bold text-white font-mono uppercase tracking-wider">Organization Name</h2>
             <p className="text-xs text-slate-400">
               Update your organization's display name. This will be visible to all organization members and collaborators.
@@ -104,12 +156,12 @@ export const AppwriteSettingsView: React.FC = () => {
               type="text"
               value={orgName}
               onChange={e => setOrgName(e.target.value)}
-              className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-mono"
+              className="w-full bg-surface border border-border rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-illum font-mono transition-colors"
             />
             <div className="flex items-center space-x-3 pt-1">
               <button
                 type="submit"
-                className="px-4 py-1.5 rounded-lg bg-surface-elevated hover:bg-cyan-500/20 border border-border hover:border-cyan-400/40 text-neon-blue text-xs font-bold font-mono transition-all"
+                className="px-4 py-1.5 rounded-lg neon-tube-button text-xs font-bold font-mono transition-all"
               >
                 Update
               </button>

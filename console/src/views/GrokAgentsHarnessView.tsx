@@ -40,13 +40,13 @@ export const GrokAgentsHarnessView: React.FC = () => {
       {/* Header */}
       <div className="p-4 border-b border-border bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-lg bg-surface-elevated border border-cyan-400/50 flex items-center justify-center shadow-neon-tube">
-            <Bot className="w-5 h-5 text-neon-blue" />
+          <div className="w-9 h-9 rounded-lg bg-surface-elevated border border-border flex items-center justify-center hover-tube">
+            <Bot className="w-5 h-5 text-illum" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
               <h1 className="text-base font-bold text-white tracking-tight">Grok Bot & Agent Harness</h1>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-cyan-950/60 text-neon-blue border border-cyan-500/40 shadow-neon-tube">
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-illum-muted text-illum border border-illum-muted">
                 MCP Client v2.4 Active
               </span>
             </div>
@@ -68,7 +68,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
               onClick={() => setActiveTab(t.id as any)}
               className={`px-3 py-1 rounded transition-all ${
                 activeTab === t.id
-                  ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 shadow-neon-tube font-semibold'
+                  ? 'active-tube-pill font-semibold'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -85,10 +85,10 @@ export const GrokAgentsHarnessView: React.FC = () => {
             {/* Left 2 Cols: Task Prompt & Live Execution Feed */}
             <div className="lg:col-span-2 space-y-6">
               {/* Prompt Execution Card */}
-              <form onSubmit={handleLaunch} className="p-5 rounded-xl bg-surface-card border border-border/80 space-y-4 neon-tube-card">
+              <form onSubmit={handleLaunch} className="p-5 rounded-xl neon-tube-card space-y-4">
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-neon-blue" />
+                    <Sparkles className="w-3.5 h-3.5 text-illum" />
                     <span>Create & Launch Agent Work</span>
                   </span>
                   <div className="flex items-center space-x-1 text-xs font-mono">
@@ -99,7 +99,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                         onClick={() => setSelectedModel(m)}
                         className={`px-2.5 py-0.5 rounded transition-all ${
                           selectedModel === m
-                            ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 font-semibold shadow-neon-tube'
+                            ? 'active-tube-pill font-semibold'
                             : 'text-slate-400 hover:text-white'
                         }`}
                       >
@@ -114,19 +114,19 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   value={taskPrompt}
                   onChange={e => setTaskPrompt(e.target.value)}
                   placeholder="Tell your agent what to query, chart, or deploy on Appwrite..."
-                  className="w-full bg-surface border border-border rounded-lg p-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
+                  className="w-full bg-surface border border-border rounded-lg p-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-illum font-mono transition-colors"
                 />
 
                 <div className="flex items-center justify-between pt-1">
                   <div className="text-[11px] font-mono text-slate-400 flex items-center space-x-2">
-                    <span className="text-neon-blue">MCP: mcp.appwrite.io</span>
+                    <span className="text-illum">MCP: mcp.appwrite.io</span>
                     <span>•</span>
                     <span>Skill: appwrite-postgres</span>
                   </div>
                   <button
                     type="submit"
                     disabled={isExecuting}
-                    className="px-4 py-2 rounded-lg neon-tube-button text-slate-950 font-bold text-xs flex items-center space-x-1.5 shadow-neon-tube transition-all cursor-pointer"
+                    className="px-4 py-2 rounded-lg neon-tube-button font-bold text-xs flex items-center space-x-1.5 transition-all cursor-pointer"
                   >
                     <Play className="w-3.5 h-3.5 fill-current" />
                     <span>{isExecuting ? 'Executing Agent Harness...' : 'Execute Task'}</span>
@@ -139,12 +139,12 @@ export const GrokAgentsHarnessView: React.FC = () => {
                 <div className="p-5 rounded-xl bg-surface-card border border-border/80 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      <Terminal className="w-4 h-4 text-neon-blue" />
+                      <Terminal className="w-4 h-4 text-illum" />
                       <h3 className="text-xs font-bold text-white font-mono uppercase tracking-wider">
                         {activeAgent.name} • Execution Trace
                       </h3>
                     </div>
-                    <span className="text-[10px] font-mono text-neon-blue bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
+                    <span className="text-[10px] font-mono text-illum bg-illum-muted px-2 py-0.5 rounded border border-illum-muted">
                       Tokens/sec: {activeAgent.tokensPerSec}
                     </span>
                   </div>
@@ -152,7 +152,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   <div className="space-y-2.5 font-mono text-xs">
                     {activeAgent.steps.map((st, i) => (
                       <div key={i} className="p-3 rounded-lg bg-surface border border-border/80 flex items-start space-x-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-neon-blue shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                         <div className="flex-1">
                           <div className="flex items-center justify-between text-[10px] text-slate-500 mb-0.5">
                             <span className="uppercase text-slate-400 font-semibold">{st.type}</span>
@@ -169,14 +169,14 @@ export const GrokAgentsHarnessView: React.FC = () => {
 
             {/* Right Col: MCP Connected Status & Sandbox Boundaries */}
             <div className="space-y-4">
-              <div className="p-4 rounded-xl bg-surface-card border border-border/80 space-y-3">
+              <div className="p-4 rounded-xl neon-tube-card space-y-3">
                 <span className="text-xs font-bold text-white font-mono uppercase tracking-wider">
                   Appwrite MCP Hub
                 </span>
                 <div className="p-3 rounded-lg bg-surface border border-border space-y-2 text-xs font-mono">
                   <div className="flex items-center justify-between">
                     <span className="text-slate-300">mcp.appwrite.io</span>
-                    <span className="text-neon-blue font-bold">Connected ✓</span>
+                    <span className="text-emerald-400 font-bold">Connected ✓</span>
                   </div>
                   <div className="text-[11px] text-slate-500">
                     Protocol: OAuth 2.0 with DPoP Key Binding
@@ -212,7 +212,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   onClick={() => setActiveDbView('lap_times')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all ${
                     activeDbView === 'lap_times'
-                      ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 shadow-neon-tube'
+                      ? 'active-tube-pill'
                       : 'bg-surface border border-border text-slate-400 hover:text-white'
                   }`}
                 >
@@ -222,7 +222,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   onClick={() => setActiveDbView('postgres_users')}
                   className={`px-3 py-1.5 rounded-lg text-xs font-mono font-semibold transition-all ${
                     activeDbView === 'postgres_users'
-                      ? 'bg-cyan-500/20 text-neon-blue border border-cyan-400/40 shadow-neon-tube'
+                      ? 'active-tube-pill'
                       : 'bg-surface border border-border text-slate-400 hover:text-white'
                   }`}
                 >
@@ -230,7 +230,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                 </button>
               </div>
 
-              <span className="text-xs font-mono text-neon-blue">
+              <span className="text-xs font-mono text-illum">
                 Query: {activeDbView === 'lap_times' ? 'Query.equal("session_id", "Q3_MON")' : 'SELECT * FROM users WHERE created_at >= "2026-08-21"'}
               </span>
             </div>
@@ -252,7 +252,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   <tbody className="divide-y divide-border/60">
                     {lapTimes.map(row => (
                       <tr key={row.$id} className="hover:bg-surface-elevated/40 text-slate-200">
-                        <td className="p-3 text-neon-blue">{row.$id}</td>
+                        <td className="p-3 text-illum">{row.$id}</td>
                         <td className="p-3 font-bold text-white">{row.driver}</td>
                         <td className="p-3 text-slate-400">{row.code}</td>
                         <td className="p-3 capitalize">{row.team}</td>
@@ -281,7 +281,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   <tbody className="divide-y divide-border/60">
                     {postgresUsers.map(u => (
                       <tr key={u.id} className="hover:bg-surface-elevated/40 text-slate-200">
-                        <td className="p-3 text-neon-blue">{u.id}</td>
+                        <td className="p-3 text-illum">{u.id}</td>
                         <td className="p-3 font-bold text-white">{u.name}</td>
                         <td className="p-3 text-slate-300">{u.email}</td>
                         <td className="p-3">{u.role}</td>
@@ -339,7 +339,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   {AI_ARENA_BENCHMARK.map(b => (
                     <tr key={b.model} className="hover:bg-surface-elevated/40 text-slate-200">
                       <td className="p-3 font-bold text-white flex items-center space-x-1.5">
-                        <span className="text-neon-blue">{b.model}</span>
+                        <span className="text-illum">{b.model}</span>
                       </td>
                       <td className="p-3 text-emerald-400 font-bold">{b.costPer1M}</td>
                       <td className="p-3 font-bold text-white">{b.overall}</td>
@@ -360,3 +360,4 @@ export const GrokAgentsHarnessView: React.FC = () => {
     </div>
   );
 };
+

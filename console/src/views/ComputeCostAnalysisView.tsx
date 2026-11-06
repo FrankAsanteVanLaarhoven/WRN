@@ -30,7 +30,7 @@ export const ComputeCostAnalysisView: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border gap-3">
         <div>
           <div className="flex items-center space-x-2">
-            <Cpu className="w-5 h-5 text-neon-blue" />
+            <Cpu className="w-5 h-5 text-illum" />
             <h1 className="text-lg font-bold text-white tracking-tight">
               Server & Compute Architecture • Real Cost Analysis
             </h1>
@@ -48,11 +48,11 @@ export const ComputeCostAnalysisView: React.FC = () => {
       </div>
 
       {/* Interactive Cost Comparison Calculator */}
-      <div className="p-6 rounded-xl bg-surface-card border border-border/80 space-y-5 neon-tube-card">
+      <div className="p-6 rounded-xl neon-tube-card space-y-5">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <h2 className="text-sm font-bold text-white font-mono uppercase tracking-wider flex items-center space-x-2">
-              <BarChart2 className="w-4 h-4 text-neon-blue" />
+              <BarChart2 className="w-4 h-4 text-illum" />
               <span>Interactive Compute Sizing & Cost Benchmark</span>
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -60,9 +60,9 @@ export const ComputeCostAnalysisView: React.FC = () => {
             </p>
           </div>
 
-          <div className="p-3 rounded-xl bg-cyan-950/40 border border-cyan-500/40 text-center font-mono">
+          <div className="p-3 rounded-xl bg-surface border border-border text-center font-mono">
             <div className="text-[10px] text-slate-400 uppercase">Your Monthly Bill</div>
-            <div className="text-2xl font-bold text-neon-blue">${ourMonthlyCost.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-illum">${ourMonthlyCost.toFixed(2)}</div>
             <div className="text-[11px] text-emerald-400 font-semibold">
               Save ${savingsMonthly.toFixed(2)}/mo ({savingsPercent}%) vs DO
             </div>
@@ -74,7 +74,7 @@ export const ComputeCostAnalysisView: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-slate-300">
               <span>Dedicated vCPUs:</span>
-              <strong className="text-neon-blue">{vCpuCount} Cores</strong>
+              <strong className="text-illum">{vCpuCount} Cores</strong>
             </div>
             <input
               type="range"
@@ -89,7 +89,7 @@ export const ComputeCostAnalysisView: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-slate-300">
               <span>RAM Allocation:</span>
-              <strong className="text-neon-blue">{ramCount} GB</strong>
+              <strong className="text-illum">{ramCount} GB</strong>
             </div>
             <input
               type="range"
@@ -104,7 +104,7 @@ export const ComputeCostAnalysisView: React.FC = () => {
           <div className="space-y-2">
             <div className="flex justify-between text-slate-300">
               <span>High-IOPS NVMe:</span>
-              <strong className="text-neon-blue">{storageGb} GB</strong>
+              <strong className="text-illum">{storageGb} GB</strong>
             </div>
             <input
               type="range"
@@ -120,9 +120,9 @@ export const ComputeCostAnalysisView: React.FC = () => {
 
         {/* Direct Provider Comparison Bar */}
         <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/80 text-center font-mono text-xs">
-          <div className="p-3 rounded-lg bg-cyan-950/30 border border-cyan-500/40">
+          <div className="p-3 rounded-lg bg-surface border border-border">
             <div className="text-slate-400 text-[11px]">WRN × Appwrite OS</div>
-            <div className="text-lg font-bold text-neon-blue mt-0.5">${ourMonthlyCost.toFixed(2)}</div>
+            <div className="text-lg font-bold text-illum mt-0.5">${ourMonthlyCost.toFixed(2)}</div>
             <div className="text-[10px] text-emerald-400">Included Agent Mesh</div>
           </div>
 
@@ -189,3 +189,4 @@ export const ComputeCostAnalysisView: React.FC = () => {
     </div>
   );
 };
+

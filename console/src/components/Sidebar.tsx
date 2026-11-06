@@ -123,10 +123,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
           <div className="p-3 rounded-xl bg-surface-card border border-border/80 space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="font-semibold text-slate-200">Get started</span>
-              <span className="text-neon-blue font-bold">4 / 16</span>
+              <span className="text-illum font-bold">4 / 16</span>
             </div>
             <div className="w-full h-1.5 rounded-full bg-surface border border-border overflow-hidden">
-              <div className="w-1/4 h-full bg-neon-blue shadow-neon-tube rounded-full" />
+              <div className="w-1/4 h-full bg-illum rounded-full transition-all" />
             </div>
           </div>
 
@@ -151,17 +151,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
                       }}
                       className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                         isActive
-                          ? 'bg-cyan-500/15 text-white border border-cyan-400/40 shadow-neon-tube font-semibold'
+                          ? 'active-tube-pill font-semibold'
                           : 'text-slate-400 hover:text-slate-200 hover:bg-surface-elevated/40'
                       }`}
                     >
                       <div className="flex items-center space-x-2.5 min-w-0">
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-neon-blue' : 'text-slate-400'}`} />
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-illum' : 'text-slate-400'}`} />
                         <span className="truncate">{item.label}</span>
                       </div>
                       {item.badge && (
                         <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded border ${
-                          isActive ? 'bg-cyan-950/80 text-neon-blue border-cyan-500/40' : 'bg-surface text-slate-500 border-border'
+                          isActive ? 'bg-illum-muted text-illum border-illum-muted' : 'bg-surface text-slate-500 border-border'
                         }`}>
                           {item.badge}
                         </span>
@@ -178,10 +178,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
         <div className="p-3 border-t border-border/80 bg-surface-card">
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
             <span className="flex items-center space-x-1">
-              <Radio className="w-3 h-3 text-neon-blue animate-pulse" />
+              <Radio className="w-3 h-3 text-illum animate-pulse" />
               <span className="text-slate-200">Appwrite OS 1.6</span>
             </span>
-            <span className="text-neon-blue font-semibold">ONLINE</span>
+            <span className="text-illum font-semibold">ONLINE</span>
           </div>
           <div className="text-[10px] text-slate-500 font-mono truncate">
             Edge Proxy • Realtime Sync • MCP

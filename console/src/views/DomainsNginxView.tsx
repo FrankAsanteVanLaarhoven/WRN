@@ -62,7 +62,7 @@ export const DomainsNginxView: React.FC = () => {
       <div className="p-4 border-b border-border bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center space-x-2">
-            <Globe className="w-5 h-5 text-neon-blue" />
+            <Globe className="w-5 h-5 text-illum" />
             <h1 className="text-lg font-bold text-white tracking-tight">Domains & Built-in NGINX Engine</h1>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
@@ -71,7 +71,7 @@ export const DomainsNginxView: React.FC = () => {
         </div>
 
         <div className="flex items-center space-x-2">
-          <span className="text-xs font-mono text-neon-blue bg-cyan-950/60 px-3 py-1 rounded-full border border-cyan-500/40 shadow-neon-tube">
+          <span className="text-xs font-mono text-illum bg-illum-muted px-3 py-1 rounded-full border border-illum-muted">
             Edge DNS & Auto SSL Active
           </span>
         </div>
@@ -82,13 +82,13 @@ export const DomainsNginxView: React.FC = () => {
         {/* Left: Domain Search & Registered Domains */}
         <div className="w-full lg:w-96 border-b lg:border-b-0 lg:border-r border-border p-4 bg-surface/50 overflow-y-auto space-y-5">
           {/* Real-time Domain Search / Buy Box */}
-          <div className="p-4 rounded-xl bg-surface-card border border-border/80 space-y-3 neon-tube-card">
+          <div className="p-4 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-white font-mono uppercase tracking-wider flex items-center space-x-1.5">
-                <ShoppingCart className="w-3.5 h-3.5 text-neon-blue" />
+                <ShoppingCart className="w-3.5 h-3.5 text-illum" />
                 <span>Buy & Register Domains</span>
               </span>
-              <span className="text-[10px] text-neon-blue font-mono">Live WHOIS API</span>
+              <span className="text-[10px] text-illum font-mono">Live WHOIS API</span>
             </div>
 
             <form onSubmit={handleSearch} className="relative">
@@ -99,21 +99,21 @@ export const DomainsNginxView: React.FC = () => {
                 placeholder="Search domain (e.g. my-agent.io)..."
                 value={searchDomainInput}
                 onChange={e => setSearchDomainInput(e.target.value)}
-                className="w-full bg-surface border border-border rounded-lg pl-3 pr-9 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
+                className="w-full bg-surface border border-border rounded-lg pl-3 pr-9 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-illum font-mono transition-colors"
               />
               <button
                 type="submit"
                 disabled={searching}
-                className="absolute right-2 top-2 text-neon-blue hover:text-white"
+                className="absolute right-2 top-2 text-illum hover:text-white"
               >
                 {searching ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
               </button>
             </form>
 
             {searchResult && (
-              <div className="p-3 rounded-lg bg-cyan-950/40 border border-cyan-500/40 space-y-2 text-xs font-mono animate-in fade-in">
+              <div className="p-3 rounded-lg bg-surface border border-border space-y-2 text-xs font-mono animate-in fade-in">
                 <div className="flex items-center justify-between text-white font-bold">
-                  <span className="text-neon-blue">{searchResult.domain}</span>
+                  <span className="text-illum">{searchResult.domain}</span>
                   <span className="text-emerald-400">${searchResult.price.toFixed(2)}/yr</span>
                 </div>
                 <div className="text-[11px] text-slate-300">
@@ -121,7 +121,7 @@ export const DomainsNginxView: React.FC = () => {
                 </div>
                 <button
                   onClick={handleBuy}
-                  className="w-full py-1.5 rounded-lg neon-tube-button text-slate-950 font-bold text-xs flex items-center justify-center space-x-1.5"
+                  className="w-full py-1.5 rounded-lg neon-tube-button font-bold text-xs flex items-center justify-center space-x-1.5 transition-all"
                 >
                   <Zap className="w-3.5 h-3.5 fill-current" />
                   <span>Purchase & Provision Instantly</span>
@@ -144,7 +144,7 @@ export const DomainsNginxView: React.FC = () => {
                   onClick={() => setSelectedDomain(dom)}
                   className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                     isSelected
-                      ? 'bg-surface-elevated border-cyan-500/60 shadow-neon-tube'
+                      ? 'bg-surface-elevated border-illum'
                       : 'bg-surface-card border-border hover:border-slate-600'
                   }`}
                 >
@@ -168,7 +168,7 @@ export const DomainsNginxView: React.FC = () => {
         {/* Right: Live DNS Records & NGINX Auto-Generator */}
         <div className="flex-1 p-6 overflow-y-auto space-y-6 bg-background">
           {/* Top Domain Info */}
-          <div className="p-5 rounded-xl bg-surface-card border border-border/80 space-y-3">
+          <div className="p-5 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-base font-bold text-white font-mono">{selectedDomain.domain}</h2>
@@ -176,7 +176,7 @@ export const DomainsNginxView: React.FC = () => {
               </div>
               <button
                 onClick={() => verifyDomainDns(selectedDomain.id)}
-                className="px-3 py-1.5 rounded-lg bg-surface-elevated hover:bg-cyan-500/20 border border-border hover:border-cyan-400/40 text-neon-blue text-xs font-mono font-bold flex items-center space-x-1.5 transition-all"
+                className="px-3 py-1.5 rounded-lg neon-tube-button text-xs font-mono font-bold flex items-center space-x-1.5 transition-all"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
                 <span>Verify DNS Live</span>
@@ -189,7 +189,7 @@ export const DomainsNginxView: React.FC = () => {
               <div className="divide-y divide-border/60 rounded-lg border border-border overflow-hidden font-mono text-xs">
                 {selectedDomain.dnsRecords.map((rec, i) => (
                   <div key={i} className="p-2.5 bg-surface flex items-center justify-between">
-                    <span className="w-16 font-bold text-neon-blue">{rec.type}</span>
+                    <span className="w-16 font-bold text-illum">{rec.type}</span>
                     <span className="w-24 text-slate-300">{rec.host}</span>
                     <span className="flex-1 text-slate-400 truncate">{rec.value}</span>
                     <span className="text-emerald-400 text-[11px] flex items-center space-x-1">
@@ -203,17 +203,17 @@ export const DomainsNginxView: React.FC = () => {
           </div>
 
           {/* Auto Built-in NGINX Engine Output */}
-          <div className="p-5 rounded-xl bg-surface-card border border-border/80 space-y-3">
+          <div className="p-5 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Server className="w-4 h-4 text-neon-blue" />
+                <Server className="w-4 h-4 text-illum" />
                 <h3 className="text-xs font-bold text-white font-mono uppercase tracking-wider">
                   Auto Built-in NGINX Reverse Proxy Specification
                 </h3>
               </div>
               <button
                 onClick={copyNginx}
-                className="flex items-center space-x-1.5 text-xs text-neon-blue hover:underline font-mono"
+                className="flex items-center space-x-1.5 text-xs text-illum hover:underline font-mono"
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>{copiedConfig ? 'Copied!' : 'Copy Config'}</span>
