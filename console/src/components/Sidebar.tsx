@@ -18,7 +18,8 @@ import {
   Boxes,
   Sparkles,
   GitFork,
-  Radio
+  Radio,
+  Zap
 } from 'lucide-react';
 import { ProjectServiceTab } from '../types/console';
 
@@ -68,7 +69,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
     {
       title: 'BUILD',
       items: [
-        { id: 'ai-experience', label: 'AI Experience Studio', icon: Sparkles, badge: 'AI & Flex' },
         { id: 'auth', label: 'Auth', icon: Users },
         { id: 'databases', label: 'Databases', icon: Database, badge: 'Postgres/MySQL' },
         { id: 'storage', label: 'Storage', icon: HardDrive },
@@ -83,6 +83,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
       ]
     },
     {
+      title: 'AUTOMATION',
+      items: [
+        { id: 'workflows', label: 'Workflows & Jobs', icon: Zap, badge: 'Live' }
+      ]
+    },
+    {
       title: 'OBSERVE',
       items: [
         { id: 'activity', label: 'Activity', icon: Activity },
@@ -92,7 +98,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
     {
       title: 'PROTECT',
       items: [
-        { id: 'firewall', label: 'Firewall', icon: ShieldAlert, badge: 'Edge Rules' }
+        { id: 'firewall', label: 'Firewall', icon: ShieldAlert, badge: 'WAF Active' }
       ]
     },
     {

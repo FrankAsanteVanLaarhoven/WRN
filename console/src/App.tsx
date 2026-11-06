@@ -8,15 +8,23 @@ import { NewGrantModal } from './components/NewGrantModal';
 import { NewSealModal } from './components/NewSealModal';
 import { ClientAuthModal } from './components/ClientAuthModal';
 
-// WRN Console Views
+// WRN Production Console Views with Live Data & Workflows
 import { ConsoleOverviewView } from './views/ConsoleOverviewView';
+import { AuthView } from './views/AuthView';
+import { DatabasesView } from './views/DatabasesView';
+import { StorageView } from './views/StorageView';
+import { FunctionsView } from './views/FunctionsView';
+import { MessagingView } from './views/MessagingView';
+import { SitesView } from './views/SitesView';
+import { WorkflowsView } from './views/WorkflowsView';
+import { FirewallView } from './views/FirewallView';
+import { ActivityView } from './views/ActivityView';
 import { ApiPlaygroundView } from './views/ApiPlaygroundView';
 import { AgentMarketplaceView } from './views/AgentMarketplaceView';
 import { ProjectSettingsView } from './views/ProjectSettingsView';
 import { DomainsNginxView } from './views/DomainsNginxView';
 import { ComputeCostAnalysisView } from './views/ComputeCostAnalysisView';
 import { GrokAgentsHarnessView } from './views/GrokAgentsHarnessView';
-import { AiExperienceStudioView } from './views/AiExperienceStudioView';
 
 // WRN Passport Coexistence & Foundry Views
 import { OntologyView } from './views/OntologyView';
@@ -65,8 +73,8 @@ const MainLayout: React.FC = () => {
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-slate-100">
       <TopNav />
 
-      {/* Full-width views for AI Experience, Marketplace, Domains & NGINX, Compute, Settings */}
-      {topNavTab === 'ai-experience' && <AiExperienceStudioView />}
+      {/* Full-width views for TopNav */}
+      {topNavTab === 'workflows' && <WorkflowsView />}
       {topNavTab === 'marketplace' && <AgentMarketplaceView />}
       {topNavTab === 'domains' && <DomainsNginxView />}
       {topNavTab === 'compute' && <ComputeCostAnalysisView />}
@@ -82,19 +90,19 @@ const MainLayout: React.FC = () => {
 
           <main className="flex-1 flex flex-col overflow-hidden relative">
             {projectServiceTab === 'overview' && <ConsoleOverviewView />}
-            {projectServiceTab === 'ai-experience' && <AiExperienceStudioView />}
             {projectServiceTab === 'apps' && <ConsoleOverviewView />}
             {projectServiceTab === 'api-keys' && <ConsoleOverviewView />}
             {projectServiceTab === 'playground' && <ApiPlaygroundView />}
-            {projectServiceTab === 'auth' && <ConsoleOverviewView />}
-            {projectServiceTab === 'databases' && <GrokAgentsHarnessView />}
-            {projectServiceTab === 'storage' && <ConsoleOverviewView />}
-            {projectServiceTab === 'functions' && <ConsoleOverviewView />}
-            {projectServiceTab === 'messaging' && <ConsoleOverviewView />}
-            {projectServiceTab === 'sites' && <DomainsNginxView />}
-            {projectServiceTab === 'activity' && <DevinConsoleView />}
+            {projectServiceTab === 'auth' && <AuthView />}
+            {projectServiceTab === 'databases' && <DatabasesView />}
+            {projectServiceTab === 'storage' && <StorageView />}
+            {projectServiceTab === 'functions' && <FunctionsView />}
+            {projectServiceTab === 'messaging' && <MessagingView />}
+            {projectServiceTab === 'sites' && <SitesView />}
+            {projectServiceTab === 'workflows' && <WorkflowsView />}
+            {projectServiceTab === 'activity' && <ActivityView />}
             {projectServiceTab === 'usage' && <ComputeCostAnalysisView />}
-            {projectServiceTab === 'firewall' && <RequestVerifierView />}
+            {projectServiceTab === 'firewall' && <FirewallView />}
             {projectServiceTab === 'grok-agents' && <GrokAgentsHarnessView />}
 
             {/* WRN Passport Coexistence & Foundry Mode */}

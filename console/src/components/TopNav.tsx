@@ -52,9 +52,9 @@ export const TopNav: React.FC = () => {
 
   const navLinks: { id: TopNavTab; label: string }[] = [
     { id: 'projects', label: 'Projects' },
-    { id: 'ai-experience', label: 'AI Experience & Security' },
+    { id: 'workflows', label: 'Workflows & Automation' },
     { id: 'marketplace', label: 'Marketplace' },
-    { id: 'domains', label: 'Domains & NGINX' },
+    { id: 'domains', label: 'Domains & DNS' },
     { id: 'compute', label: 'Compute & Costs' },
     { id: 'settings', label: 'Settings' }
   ];
