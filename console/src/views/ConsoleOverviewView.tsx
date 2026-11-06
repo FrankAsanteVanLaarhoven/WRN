@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useConsole } from '../store/consoleStore';
+import { useStaggerEntrance } from '../hooks/useGsapAnimation';
 import {
   Database,
   Globe,
@@ -17,21 +18,22 @@ import {
   Sparkles,
   Bot
 } from 'lucide-react';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
 
 export const ConsoleOverviewView: React.FC = () => {
+  const containerRef = useStaggerEntrance();
   const { telemetry, setProjectServiceTab, setActiveTab } = useConsole();
   const [timeRange, setTimeRange] = useState('24h');
 
   return (
-    <div className="flex-1 flex flex-col h-full overflow-y-auto bg-background p-6 space-y-6">
+    <div ref={containerRef} className="flex-1 flex flex-col h-full overflow-y-auto bg-background p-6 space-y-6">
       {/* Top Project Bar with Neon Tube Accent */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border/80 gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-border/80 gap-3 gsap-fade-in">
         <div>
           <div className="flex items-center space-x-2">
             <h1 className="text-xl font-bold text-white tracking-tight">DAC</h1>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-illum-muted text-illum border border-illum-muted">
-              6aed448b00010a9c93f6
-            </span>
+            <Badge variant="tube">6aed448b00010a9c93f6</Badge>
             <span className="text-xs text-slate-400 font-mono">fra.cloud.wrn.network</span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
@@ -58,7 +60,7 @@ export const ConsoleOverviewView: React.FC = () => {
       </div>
 
       {/* Top 5 Metrics Strip with Neon Tube Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3 gsap-fade-in">
         {[
           { label: 'Bandwidth', value: telemetry.bandwidth, sub: '0% limit' },
           { label: 'Requests', value: telemetry.requests, sub: 'All routes' },
@@ -78,7 +80,7 @@ export const ConsoleOverviewView: React.FC = () => {
       </div>
 
       {/* Bandwidth Chart Box */}
-      <div className="p-4 rounded-xl bg-surface-card border border-border/80 space-y-3">
+      <div className="p-4 rounded-xl bg-surface-card border border-border/80 space-y-3 gsap-fade-in">
         <div className="flex items-center justify-between text-xs font-mono text-slate-400">
           <span className="text-slate-200 font-semibold flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-illum" />
@@ -103,7 +105,7 @@ export const ConsoleOverviewView: React.FC = () => {
       </div>
 
       {/* Your Resources Grid */}
-      <div className="space-y-3">
+      <div className="space-y-3 gsap-fade-in">
         <h2 className="text-sm font-semibold text-slate-200 uppercase font-mono tracking-wider">
           Your Resources
         </h2>
@@ -141,10 +143,10 @@ export const ConsoleOverviewView: React.FC = () => {
           </div>
 
           {/* Sites / Deployment */}
-          <div className="p-4 rounded-xl bg-surface-card border border-border hover:border-cyan-500/40 transition-all space-y-3">
+          <div className="p-4 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 text-sm font-bold text-white">
-                <Globe className="w-4 h-4 text-cyan-400" />
+                <Globe className="w-4 h-4 text-illum" />
                 <span>Sites & Hosting</span>
               </div>
             </div>
@@ -164,7 +166,7 @@ export const ConsoleOverviewView: React.FC = () => {
             </div>
             <button
               onClick={() => setProjectServiceTab('sites')}
-              className="w-full py-1.5 rounded-lg bg-surface-elevated hover:bg-cyan-500/10 border border-border hover:border-cyan-500/40 text-xs text-cyan-300 font-medium flex items-center justify-center space-x-1 transition-all"
+              className="w-full py-1.5 rounded-lg neon-tube-button text-xs font-medium flex items-center justify-center space-x-1 transition-all"
             >
               <span>+ Create Site</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -172,10 +174,10 @@ export const ConsoleOverviewView: React.FC = () => {
           </div>
 
           {/* Serverless Functions */}
-          <div className="p-4 rounded-xl bg-surface-card border border-border hover:border-cyan-500/40 transition-all space-y-3">
+          <div className="p-4 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 text-sm font-bold text-white">
-                <Cpu className="w-4 h-4 text-sky-400" />
+                <Cpu className="w-4 h-4 text-illum" />
                 <span>Functions</span>
               </div>
             </div>
@@ -195,7 +197,7 @@ export const ConsoleOverviewView: React.FC = () => {
             </div>
             <button
               onClick={() => setProjectServiceTab('functions')}
-              className="w-full py-1.5 rounded-lg bg-surface-elevated hover:bg-cyan-500/10 border border-border hover:border-cyan-500/40 text-xs text-sky-300 font-medium flex items-center justify-center space-x-1 transition-all"
+              className="w-full py-1.5 rounded-lg neon-tube-button text-xs font-medium flex items-center justify-center space-x-1 transition-all"
             >
               <span>+ Create Function</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -203,10 +205,10 @@ export const ConsoleOverviewView: React.FC = () => {
           </div>
 
           {/* Storage */}
-          <div className="p-4 rounded-xl bg-surface-card border border-border hover:border-cyan-500/40 transition-all space-y-3">
+          <div className="p-4 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 text-sm font-bold text-white">
-                <HardDrive className="w-4 h-4 text-emerald-400" />
+                <HardDrive className="w-4 h-4 text-illum" />
                 <span>Storage</span>
               </div>
             </div>
@@ -226,7 +228,7 @@ export const ConsoleOverviewView: React.FC = () => {
             </div>
             <button
               onClick={() => setProjectServiceTab('storage')}
-              className="w-full py-1.5 rounded-lg bg-surface-elevated hover:bg-cyan-500/10 border border-border hover:border-cyan-500/40 text-xs text-emerald-300 font-medium flex items-center justify-center space-x-1 transition-all"
+              className="w-full py-1.5 rounded-lg neon-tube-button text-xs font-medium flex items-center justify-center space-x-1 transition-all"
             >
               <span>+ Create Bucket</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -234,10 +236,10 @@ export const ConsoleOverviewView: React.FC = () => {
           </div>
 
           {/* Auth */}
-          <div className="p-4 rounded-xl bg-surface-card border border-border hover:border-cyan-500/40 transition-all space-y-3">
+          <div className="p-4 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 text-sm font-bold text-white">
-                <Users className="w-4 h-4 text-indigo-400" />
+                <Users className="w-4 h-4 text-illum" />
                 <span>Auth & Users</span>
               </div>
             </div>
@@ -257,7 +259,7 @@ export const ConsoleOverviewView: React.FC = () => {
             </div>
             <button
               onClick={() => setProjectServiceTab('auth')}
-              className="w-full py-1.5 rounded-lg bg-surface-elevated hover:bg-cyan-500/10 border border-border hover:border-cyan-500/40 text-xs text-indigo-300 font-medium flex items-center justify-center space-x-1 transition-all"
+              className="w-full py-1.5 rounded-lg neon-tube-button text-xs font-medium flex items-center justify-center space-x-1 transition-all"
             >
               <span>+ Create User</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -265,10 +267,10 @@ export const ConsoleOverviewView: React.FC = () => {
           </div>
 
           {/* Messaging */}
-          <div className="p-4 rounded-xl bg-surface-card border border-border hover:border-cyan-500/40 transition-all space-y-3">
+          <div className="p-4 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2 text-sm font-bold text-white">
-                <Send className="w-4 h-4 text-amber-400" />
+                <Send className="w-4 h-4 text-illum" />
                 <span>Messaging</span>
               </div>
             </div>
@@ -288,7 +290,7 @@ export const ConsoleOverviewView: React.FC = () => {
             </div>
             <button
               onClick={() => setProjectServiceTab('messaging')}
-              className="w-full py-1.5 rounded-lg bg-surface-elevated hover:bg-cyan-500/10 border border-border hover:border-cyan-500/40 text-xs text-amber-300 font-medium flex items-center justify-center space-x-1 transition-all"
+              className="w-full py-1.5 rounded-lg neon-tube-button text-xs font-medium flex items-center justify-center space-x-1 transition-all"
             >
               <span>+ Add Provider</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -298,7 +300,7 @@ export const ConsoleOverviewView: React.FC = () => {
       </div>
 
       {/* Connect Apps & API Keys */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 gsap-fade-in">
         {/* Apps */}
         <div className="p-5 rounded-xl neon-tube-card space-y-3">
           <div className="flex items-center justify-between">
@@ -321,13 +323,13 @@ export const ConsoleOverviewView: React.FC = () => {
         </div>
 
         {/* API Keys */}
-        <div className="p-5 rounded-xl bg-surface-card border border-border space-y-3">
+        <div className="p-5 rounded-xl neon-tube-card space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold text-white flex items-center space-x-2">
-              <Key className="w-4 h-4 text-indigo-400" />
+              <Key className="w-4 h-4 text-illum" />
               <span>Server API Keys & Scopes</span>
             </span>
-            <span className="text-xs text-slate-500 font-mono">Scoped Access</span>
+            <Badge variant="outline">Scoped Access</Badge>
           </div>
           <p className="text-xs text-slate-400">
             Give backend microservices, Grok agents, and CI/CD pipelines scoped authority under WRN grants.

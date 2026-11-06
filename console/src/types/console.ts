@@ -1,8 +1,9 @@
-export type TopNavTab = 'projects' | 'ai-experience' | 'marketplace' | 'domains' | 'compute' | 'settings';
+export type TopNavTab = 'projects' | 'ai-experience' | 'backend-architecture' | 'marketplace' | 'domains' | 'compute' | 'settings';
 
 export type ProjectServiceTab =
   | 'overview'
   | 'ai-experience'
+  | 'backend-architecture'
   | 'apps'
   | 'api-keys'
   | 'playground'

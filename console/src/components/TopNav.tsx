@@ -53,6 +53,7 @@ export const TopNav: React.FC = () => {
   const navLinks: { id: TopNavTab; label: string }[] = [
     { id: 'projects', label: 'Projects' },
     { id: 'ai-experience', label: 'AI Experience & Security' },
+    { id: 'backend-architecture', label: 'Backend Architecture' },
     { id: 'marketplace', label: 'Marketplace' },
     { id: 'domains', label: 'Domains & NGINX' },
     { id: 'compute', label: 'Compute & Costs' },
@@ -109,11 +110,10 @@ export const TopNav: React.FC = () => {
               <button
                 key={link.id}
                 onClick={() => setTopNavTab(link.id)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${
-                  isActive
-                    ? 'active-tube-tab'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-surface-elevated/40'
-                }`}
+                className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-all ${isActive
+                  ? 'active-tube-tab'
+                  : 'text-slate-400 hover:text-slate-200 hover:bg-surface-elevated/40'
+                  }`}
               >
                 {link.label}
               </button>
@@ -158,11 +158,10 @@ export const TopNav: React.FC = () => {
                         setIlluminationColor(opt.id as IlluminationColor);
                         setIsColorMenuOpen(false);
                       }}
-                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-left transition-colors ${
-                        isSelected
-                          ? 'bg-surface font-semibold text-white'
-                          : 'text-slate-300 hover:bg-surface/60 hover:text-white'
-                      }`}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs text-left transition-colors ${isSelected
+                        ? 'bg-surface font-semibold text-white'
+                        : 'text-slate-300 hover:bg-surface/60 hover:text-white'
+                        }`}
                     >
                       <div className="flex items-center space-x-2">
                         <span

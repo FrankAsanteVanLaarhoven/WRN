@@ -17,6 +17,7 @@ import { DomainsNginxView } from './views/DomainsNginxView';
 import { ComputeCostAnalysisView } from './views/ComputeCostAnalysisView';
 import { GrokAgentsHarnessView } from './views/GrokAgentsHarnessView';
 import { AiExperienceStudioView } from './views/AiExperienceStudioView';
+import { BackendArchitectureView } from './views/BackendArchitectureView';
 
 // WRN Passport Coexistence & Foundry Views
 import { OntologyView } from './views/OntologyView';
@@ -67,6 +68,7 @@ const MainLayout: React.FC = () => {
 
       {/* Full-width views for AI Experience, Marketplace, Domains & NGINX, Compute, Settings */}
       {topNavTab === 'ai-experience' && <AiExperienceStudioView />}
+      {topNavTab === 'backend-architecture' && <BackendArchitectureView />}
       {topNavTab === 'marketplace' && <AgentMarketplaceView />}
       {topNavTab === 'domains' && <DomainsNginxView />}
       {topNavTab === 'compute' && <ComputeCostAnalysisView />}
@@ -83,6 +85,7 @@ const MainLayout: React.FC = () => {
           <main className="flex-1 flex flex-col overflow-hidden relative">
             {projectServiceTab === 'overview' && <ConsoleOverviewView />}
             {projectServiceTab === 'ai-experience' && <AiExperienceStudioView />}
+            {projectServiceTab === 'backend-architecture' && <BackendArchitectureView />}
             {projectServiceTab === 'apps' && <ConsoleOverviewView />}
             {projectServiceTab === 'api-keys' && <ConsoleOverviewView />}
             {projectServiceTab === 'playground' && <ApiPlaygroundView />}

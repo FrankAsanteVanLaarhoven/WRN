@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  wrn-kernel:
+    build:
+      context: ./rust-kernel
+      dockerfile: Dockerfile
+    container_name: wrn-kernel-core
+    environment:
+      - RUST_LOG=info
+      - WRN_SECURITY_LEVEL=MILITARY_GRADE
+    volumes:
+      - ../schemas:/etc/wrn/schemas:ro
+    restart: unless-stopped
+    networks:
+      - wrn-mesh
+
+  wrn-edge:
+    build:
+      context: ./go-edge
+      dockerfile: Dockerfile
+    container_name: wrn-edge-gateway
+    ports:
+      - "8080:8080"
+      - "443:443"
+    environment:
+      - PORT=8080
+      - REDIS_ADDR=wrn-redis:6379
+      - WAF_MODE=STRICT
+    depends_on:
+      - wrn-kernel
+      - wrn-redis
+    restart: unless-stopped
+    networks:
+      - wrn-mesh
+
+  wrn-redis:
+    image: redis:7-alpine
+    container_name: wrn-redis-cache
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    networks:
+      - wrn-mesh
+
+networks:
+  wrn-mesh:
+    driver: bridge

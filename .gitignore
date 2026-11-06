@@ -4,6 +4,11 @@ console/node_modules/
 
 # Build artifacts
 dist/
+console/dist/
+backend/rust-kernel/target/
+backend/go-edge/bin/
+target/
+bin/
 
 # OS and Environment
 .DS_Store
