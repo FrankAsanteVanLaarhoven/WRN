@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+console/node_modules/
+
+# Build artifacts
+dist/
+
+# OS and Environment
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+blueprint_extracted.txt

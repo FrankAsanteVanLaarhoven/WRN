@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <linearGradient id="shieldGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="50%" stop-color="#06B6D4"/>
+      <stop offset="100%" stop-color="#10B981"/>
+    </linearGradient>
+    <linearGradient id="innerGrad" x1="16" y1="16" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#1E2333"/>
+      <stop offset="100%" stop-color="#0F111A"/>
+    </linearGradient>
+  </defs>
+  <!-- Base Shield Contour -->
+  <path d="M32 6L10 16V30C10 44 19 54 32 58C45 54 54 44 54 30V16L32 6Z" fill="url(#innerGrad)" stroke="url(#shieldGrad)" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Key Node Rings -->
+  <circle cx="32" cy="24" r="7" stroke="#06B6D4" stroke-width="2" fill="#090A0F" />
+  <circle cx="32" cy="24" r="3" fill="#6366F1" />
+  <!-- Cryptographic Lineage Nodes -->
+  <path d="M32 31V44M24 38H40" stroke="#10B981" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="24" cy="38" r="2" fill="#06B6D4" />
+  <circle cx="40" cy="38" r="2" fill="#06B6D4" />
+  <circle cx="32" cy="45" r="2.5" fill="#6366F1" />
+</svg>
+

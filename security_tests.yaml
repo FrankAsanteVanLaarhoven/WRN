@@ -1,0 +1,150 @@
+profile: WRN-PASSPORT-COEXISTENCE-0.2
+profile_status: proposed_not_established_standard
+artifact_status: design_only
+execution_enabled: false
+status: not_run
+results: null
+tests_executed: 0
+operational_security_claims_supported: false
+scope: Proposed enforcement fixtures, not executable tests or evidence of protection.
+
+harness_contract:
+  implementation: null
+  clock: '2026-11-05T12:00:00Z'
+  clock_skew_seconds: 0
+  services: local_simulators_only
+  real_credentials_data_payments_and_external_actions: prohibited
+  symbols: >-
+    O=owner; A=commissioned agent instance; B=unrelated principal; S1/S2=distinct
+    complete seals; P1/P2=policy revisions; G1=owner grant; C1/C2=checkpoints.
+    These are labels, not hashes or signatures. A future harness must generate actual
+    canonical bytes, test keys, nonces, encryption and proofs before running cases.
+  deterministic_material: test_seed_and_fixture_bytes_to_be_frozen_before_implementation
+  test_material_limit: deterministic_keys_and_nonces_are_for_local_fixtures_only
+  common_setup: >-
+    O controls a private branch; A is granted only named seal S1, specified operations
+    and artifact V1 until 12:05Z. Receiver trust, witness quorum and retention policy
+    are explicit test configurations. No fixture may adopt trust from its input record.
+  assertions: expected_behaviors_only_not_observed_results
+
+fixtures:
+  - id: SEC-01
+    status: not_run
+    name: Complete authorized submission and read
+    arrange: O grants A submission and read scopes; exact code/data bytes and all required proofs exist.
+    stimulus: Finalize the manifest and request an authorized S1 read within the grant interval.
+    expected: Admit the byte-bound seal and permit that read; do not infer independent acceptance or execution permission.
+    enforce: [schema, ingestion, signature_verifier, policy_kernel, storage]
+
+  - id: SEC-02
+    status: not_run
+    name: Missing or mutable submitted bytes
+    arrange: A declares required code/data in its scope.
+    stimulus: Separately omit a blob, change one byte, duplicate an artifact ID, or replace its versioned locator with latest or a URL.
+    expected: Reject completeness/admission; keep candidate pending or failed with a precise cause. A restricted partial export cannot masquerade as a complete submission.
+    enforce: [schema, manifest_validator, storage]
+
+  - id: SEC-03
+    status: not_run
+    name: Request body binding and nonce replay
+    arrange: A valid proof binds action, S1, destination, policy revision and an unused nonce.
+    stimulus: Change body/destination while retaining method and URI; separately resend an already consumed nonce.
+    expected: Reject tampering and replay with zero additional effect. A fresh valid request is permitted once; DPoP alone is not treated as body integrity.
+    enforce: [request_verifier, replay_store, policy_kernel, effect_adapter]
+
+  - id: SEC-04
+    status: not_run
+    name: Revoked delegation and stale cache
+    arrange: G1 was valid; O revokes G1 or an ancestor before the protected operation.
+    stimulus: Use an old cached allow decision and an otherwise valid signature.
+    expected: Deny key release and new operation after the required current check; record freshness unknown when that check is unavailable.
+    enforce: [authorization_graph, revocation_service, key_broker, tool_gateway]
+
+  - id: SEC-05
+    status: not_run
+    name: Stale head or policy revision
+    arrange: A prepared approval for S1/P1; the branch or policy now points to S2/P2.
+    stimulus: Attempt the old transition against expected S1/P1.
+    expected: Reject compare-and-swap or revision mismatch; no head movement. New review and an authorized matching transition can advance once.
+    enforce: [policy_kernel, transactional_head_store]
+
+  - id: SEC-06
+    status: not_run
+    name: Cross-branch references do not grant access
+    arrange: S1 references a confidential object on another branch; G1 excludes that object.
+    stimulus: Follow the reference or request its hidden path, metadata, search snippet or key.
+    expected: Deny disclosure through every route without confirming protected existence to an unauthorized requester.
+    enforce: [object_gateway, discovery_search, key_broker, export_adapter]
+
+  - id: SEC-07
+    status: not_run
+    name: Named seal excludes history and future
+    arrange: G1 names S1 only; S0 is an ancestor and S2 a later version.
+    stimulus: Request S0 history/diff and S2 through the same branch alias; then request S1.
+    expected: Deny S0/S2 and associated discovery; permit the explicitly authorized S1 read. Branch membership does not expand G1.
+    enforce: [authorization_graph, history_api, discovery_search]
+
+  - id: SEC-08
+    status: not_run
+    name: Derived data and shared memory leak
+    arrange: A derives a summary, embedding and cache entry from restricted S1; another tenant has no S1 grant.
+    stimulus: Retrieve derivatives from the other tenant or export them as supposedly harmless metadata.
+    expected: Preserve restrictions and deny release. Permit only an independently authorized exact-output declassification; no implicit shared-agent memory.
+    enforce: [lineage_labels, retrieval, memory_store, export_policy]
+
+  - id: SEC-09
+    status: not_run
+    name: Agent update and permission drift
+    arrange: G1 binds A to artifact V1; an update V2 requests more tools or changes code.
+    stimulus: Reuse G1 for V2, then repeat under a fresh owner-approved grant bound to V2.
+    expected: Deny old-grant use; allow only the newly granted V2 scope after required evaluation. Publisher signature and paid licence cannot expand scope.
+    enforce: [commissioning, artifact_binding, policy_kernel]
+
+  - id: SEC-10
+    status: not_run
+    name: Agent transfer ends old grants
+    arrange: Ownership/assignment transfers under an explicit policy; old A retains cached tokens and private task memory.
+    stimulus: Old A requests access; the new holder presents a purchase receipt and asks for prior-owner memory.
+    expected: Deny both; revoke the old lineage and commission a separate instance. Permit a new minimal grant only for the new owner's authorized objects.
+    enforce: [lifecycle, revocation_service, session_store, memory_store]
+
+  - id: SEC-11
+    status: not_run
+    name: Forked history and rollback distinction
+    arrange: Receiver pins C2; a log returns an inconsistent fork or an older C1, even with a valid log signature.
+    stimulus: Present these as current; separately append an authorized later event selecting an older work seal.
+    expected: Reject fork/stale-current reliance under witness and freshness policy; accept a valid explicit rollback event without rewinding the audit log.
+    enforce: [checkpoint_verifier, witness_policy, monotonic_client_state, head_store]
+
+  - id: SEC-12
+    status: not_run
+    name: Restore must recover usable bytes
+    arrange: Encrypted backup and manifests exist; first retain the approved recovery keys, then remove required key material in a separate case.
+    stimulus: Restore, decrypt and compare code/data digests under current recovery authorization.
+    expected: Positive case reconstructs exactly; missing-key case reports unavailable/unrecoverable, never successful recovery from ciphertext presence alone. Revoked grants stay revoked.
+    enforce: [backup_restore, key_recovery, digest_verifier, current_policy]
+
+  - id: SEC-13
+    status: not_run
+    name: Retention, disposal and explicit omissions
+    arrange: A payload has an active retention restriction; a separate case has expired retention and approved disposal.
+    stimulus: Request early deletion; later perform authorized disposal and export history.
+    expected: Deny early disposal; record later deletion and missing payload explicitly. Do not rewrite signed history or claim complete reconstruction from the partial export.
+    enforce: [retention_adapter, key_lifecycle, lifecycle_log, export_validator]
+
+  - id: SEC-14
+    status: not_run
+    name: Inclusion, identity and licence are not authority
+    arrange: B has a valid passport, agent purchase receipt and genuine ledger inclusion proof but no resource grant.
+    stimulus: Request S1 decryption or export; then supply an explicitly scoped owner grant in a separate case.
+    expected: Deny the ungranted request. Permit only the newly authorized operation; admission proof never supplies trust roots or data authority.
+    enforce: [receiver_trust, entitlement_service, policy_kernel, key_broker]
+
+validation_boundary:
+  schema_and_yaml_parse_checks: structural_only
+  cryptographic_verification: not_run
+  authorization_and_isolation_tests: not_run
+  witness_consensus_and_fault_tests: not_run
+  retention_and_restore_tests: not_run
+  actual_pass_count: null
+  actual_fail_count: null

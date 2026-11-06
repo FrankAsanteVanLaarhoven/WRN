@@ -1,0 +1,219 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:wrn:proposed:passport:0.2",
+  "title": "Proposed WRN Passport 0.2: typed identity and credential references",
+  "description": "Design-only proposed WRN Passport 0.2 extension to WRN 0.1. This schema is not an established standard, credential issuer, cryptographic implementation or access-control runtime.",
+  "x-status": "design_only",
+  "x-execution-enabled": false,
+  "x-profile-family": "WRN-PASSPORT-COEXISTENCE-0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "content_digest": {"$ref": "#/$defs/digest"},
+    "canonicalization": {"const": "RFC8785-June2020"},
+    "digest_domain": {"const": "WRNPC0.2-PASSPORT\n"},
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "profile": {"const": "wrn.passport"},
+        "profile_version": {"const": "0.2"},
+        "profile_status": {"const": "proposed_not_established_standard"},
+        "passport_id": {"$ref": "#/$defs/identifier"},
+        "revision": {"type": "integer","minimum": 1},
+        "created_at": {"type": "string","format": "date-time"},
+        "supersedes_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+        "subject": {"$ref": "#/$defs/subject"},
+        "controllers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {"controller_principal_id": {"$ref": "#/$defs/identifier"},"control_evidence_refs": {"type": "array","items": {"$ref": "#/$defs/evidence_ref"},"minItems": 1,"uniqueItems": true}},
+            "required": ["controller_principal_id","control_evidence_refs"]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "verification_methods": {"type": "array","items": {"$ref": "#/$defs/verification_method"},"minItems": 0,"uniqueItems": true},
+        "issuer_assertions": {"type": "array","items": {"$ref": "#/$defs/issuer_assertion"},"minItems": 0,"uniqueItems": true},
+        "assurance": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "identity_proofing_basis": {"enum": ["unassessed","self_asserted","issuer_evidence","independent_verification"]},
+            "assurance_policy_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+            "evidence_refs": {"type": "array","items": {"$ref": "#/$defs/evidence_ref"},"minItems": 0,"uniqueItems": true},
+            "current_authentication": {"const": "not_asserted_by_passport"},
+            "claim_truth": {"const": "not_established_by_signature_alone"}
+          },
+          "required": ["identity_proofing_basis","assurance_policy_ref","evidence_refs","current_authentication","claim_truth"]
+        },
+        "status_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {"enum": ["unassessed","active","suspended","revoked","expired","superseded","retired","unknown"]},
+            "as_of": {"type": "string","format": "date-time"},
+            "status_authority_principal_id": {"$ref": "#/$defs/identifier"},
+            "status_ref": {"$ref": "#/$defs/evidence_ref"},
+            "freshness_policy_ref": {"$ref": "#/$defs/digest"},
+            "current_validity_effect": {"const": "historical_snapshot_recheck_before_use"}
+          },
+          "required": ["state","as_of","status_authority_principal_id","status_ref","freshness_policy_ref","current_validity_effect"]
+        },
+        "recovery_and_rotation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "recovery_policy_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+            "recovery_authority_principal_ids": {"type": "array","items": {"$ref": "#/$defs/identifier"},"minItems": 0,"uniqueItems": true},
+            "key_rotation_event_refs": {"type": "array","items": {"$ref": "#/$defs/evidence_ref"},"minItems": 0,"uniqueItems": true},
+            "retired_verification_method_ids": {"type": "array","items": {"$ref": "#/$defs/identifier"},"minItems": 0,"uniqueItems": true},
+            "private_key_transfer_allowed": {"const": false}
+          },
+          "required": ["recovery_policy_ref","recovery_authority_principal_ids","key_rotation_event_refs","retired_verification_method_ids","private_key_transfer_allowed"]
+        },
+        "privacy": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "disclosure_class": {"enum": ["public_minimal","restricted"]},
+            "compartment_policy_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+            "raw_secrets_in_passport": {"const": false},
+            "referenced_payloads_may_be_restricted": {"const": true}
+          },
+          "required": ["disclosure_class","compartment_policy_ref","raw_secrets_in_passport","referenced_payloads_may_be_restricted"]
+        },
+        "authority_effect": {"const": "identity_and_claim_references_only_no_automatic_authorization"}
+      },
+      "required": [
+        "profile",
+        "profile_version",
+        "profile_status",
+        "passport_id",
+        "revision",
+        "created_at",
+        "supersedes_ref",
+        "subject",
+        "controllers",
+        "verification_methods",
+        "issuer_assertions",
+        "assurance",
+        "status_snapshot",
+        "recovery_and_rotation",
+        "privacy",
+        "authority_effect"
+      ]
+    },
+    "detached_signature_refs": {"type": "array","items": {"$ref": "#/$defs/evidence_ref"},"minItems": 0,"uniqueItems": true},
+    "recipient_trust": {"const": "externally_configured_never_derived_from_this_record"}
+  },
+  "required": ["content_digest","canonicalization","digest_domain","content","detached_signature_refs","recipient_trust"],
+  "$defs": {
+    "identifier": {"type": "string","format": "uri","minLength": 1,"maxLength": 1024,"description": "Namespaced logical identifier. Resolving it never establishes trust or grants access."},
+    "digest": {"type": "string","pattern": "^(sha256:[0-9a-f]{64}|sha512:[0-9a-f]{128})$"},
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"content_digest": {"$ref": "#/$defs/digest"},"availability": {"enum": ["included","retrievable","restricted","missing","deleted"]},"locator": {"anyOf": [{"$ref": "#/$defs/identifier"},{"type": "null"}]}},
+      "required": ["content_digest","availability","locator"],
+      "description": "Digest of an identified evidence object; format, authenticity, availability and relevance require independent checks. A locator is not authority to fetch."
+    },
+    "subject": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "principal_id": {"$ref": "#/$defs/identifier"},
+            "principal_type": {"const": "human"},
+            "display_name": {"type": "string","minLength": 1,"maxLength": 256},
+            "pairwise_scope_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]}
+          },
+          "required": ["principal_id","principal_type","pairwise_scope_ref"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "principal_id": {"$ref": "#/$defs/identifier"},
+            "principal_type": {"const": "organization"},
+            "display_name": {"type": "string","minLength": 1,"maxLength": 256},
+            "pairwise_scope_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]}
+          },
+          "required": ["principal_id","principal_type","pairwise_scope_ref"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "principal_id": {"$ref": "#/$defs/identifier"},
+            "principal_type": {"const": "agent"},
+            "display_name": {"type": "string","minLength": 1,"maxLength": 256},
+            "pairwise_scope_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+            "agent_instance_id": {"$ref": "#/$defs/identifier"},
+            "owner_principal_id": {"$ref": "#/$defs/identifier"},
+            "agent_artifact_digest": {"$ref": "#/$defs/digest"},
+            "commissioning_record_ref": {"$ref": "#/$defs/evidence_ref"},
+            "entitlement_ref": {"anyOf": [{"$ref": "#/$defs/evidence_ref"},{"type": "null"}]}
+          },
+          "required": ["principal_id","principal_type","pairwise_scope_ref","agent_instance_id","owner_principal_id","agent_artifact_digest","commissioning_record_ref","entitlement_ref"]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "principal_id": {"$ref": "#/$defs/identifier"},
+            "principal_type": {"const": "service"},
+            "display_name": {"type": "string","minLength": 1,"maxLength": 256},
+            "pairwise_scope_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+            "service_provider_principal_id": {"$ref": "#/$defs/identifier"}
+          },
+          "required": ["principal_id","principal_type","pairwise_scope_ref","service_provider_principal_id"]
+        }
+      ],
+      "description": "Type is a declared role, not proof of legal identity, personhood, ownership or authority. Agent instance identity differs from its publisher, package and service entitlement."
+    },
+    "verification_method": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "verification_method_id": {"$ref": "#/$defs/identifier"},
+        "controller_principal_id": {"$ref": "#/$defs/identifier"},
+        "purpose": {"enum": ["authentication","workload_authentication","request_signing","credential_assertion","encryption_key_agreement"]},
+        "public_material_ref": {"$ref": "#/$defs/evidence_ref"},
+        "public_material_format": {"enum": ["JWK","COSE_Key","X509_certificate","WebAuthn_credential_record","DID_verification_method"]},
+        "valid_from": {"type": "string","format": "date-time"},
+        "valid_until": {"anyOf": [{"type": "string","format": "date-time"},{"type": "null"}]},
+        "status_ref": {"$ref": "#/$defs/evidence_ref"}
+      },
+      "required": ["verification_method_id","controller_principal_id","purpose","public_material_ref","public_material_format","valid_from","valid_until","status_ref"],
+      "description": "References only public verification material. No private keys, bearer credentials, passkey secrets or recovery secrets. Inspect referenced payloads at runtime for private key parameters; schema shape cannot establish that they are public."
+    },
+    "issuer_assertion": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "issuer_principal_id": {"$ref": "#/$defs/identifier"},
+        "subject_principal_id": {"$ref": "#/$defs/identifier"},
+        "credential_ref": {"$ref": "#/$defs/evidence_ref"},
+        "claim_schema_ref": {"$ref": "#/$defs/digest"},
+        "status_ref": {"anyOf": [{"$ref": "#/$defs/evidence_ref"},{"type": "null"}]},
+        "authority_effect": {"const": "none_without_independent_resource_policy"}
+      },
+      "required": ["issuer_principal_id","subject_principal_id","credential_ref","claim_schema_ref","status_ref","authority_effect"],
+      "description": "Issuer claims may be represented by VC 2.0 using a pinned securing mechanism. A holder need not be the credential subject. Issuer trust, proof, status and claim relevance are independently evaluated."
+    }
+  },
+  "$comment": "content_digest = qualified SHA-256 or SHA-512 over UTF8(digest_domain) || RFC8785(content). Domain ends with a literal LF. Digest excludes outer content_digest, canonicalization metadata, signature references and trust marker; the profile fixes the permitted encoding/domain. Signatures use a separately pinned established envelope/profile and must bind the digest algorithm, domain and content. Empty or unverified signatures cannot authorize use. Do not invent a signature algorithm. JSON Schema cannot verify hashes, signatures, trust, dates against current time or live authority.",
+  "x-runtime-invariants": [
+    "Resolve trust anchors and permitted issuer/key profiles from recipient configuration, never from self-declared passport fields or a ledger inclusion code.",
+    "Validate unique principal/key identifiers, public-only key material, signature/key-purpose bindings, time ordering and status freshness independently.",
+    "An agent package, publisher, acquisition entitlement, commissioned instance and owner are different entities; acquiring an agent grants no resource permission.",
+    "Commission or reassign with fresh instance identity, keys and separately authorized memory; old credentials and grants do not transfer.",
+    "Identity proofing, authenticator control, credential authenticity, current authority and task correctness are separate decisions.",
+    "A WebAuthn assertion authenticates a relying-party ceremony; its relationship to exact displayed grant/action terms is an application-level binding that needs a trusted confirmation surface.",
+    "Rotation or recovery preserves historical references but does not automatically preserve current grants; record explicit policy decisions."
+  ]
+}

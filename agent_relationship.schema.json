@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/wrn-passport/0.2/agent-relationship.schema.json",
+  "x-status": "design_only",
+  "x-execution-enabled": false,
+  "x-profile-status": "proposed_not_established_standard",
+  "title": "Proposed WRN Passport 0.2 human–agent relationship",
+  "description": "Design-only record for a separately identified agent operating for an owner. Acquisition, identity, data authority and representation are distinct. It does not purchase, commission, deploy or authorize a real agent.",
+  "$comment": "JSON Schema validates shape and fixed policy declarations only. Signatures, actor bindings, current revocation state, manifest semantics, effective permissions, isolation and enforcement require independent runtime checks. URI references are not access credentials. No key material belongs in this record.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol", "status", "execution_performed", "relationship_id", "owner", "operator", "publisher", "acquisition", "registered_artifact", "commissioned_instance", "memory", "delegation", "update_policy", "lifecycle_policy"],
+  "properties": {
+    "protocol": {"const": "WRN-PASSPORT-COEXISTENCE-0.2"},
+    "status": {"const": "design_not_implemented"},
+    "execution_performed": {"const": false},
+    "relationship_id": {"$ref": "#/$defs/ref"},
+    "owner": {"$ref": "#/$defs/humanOrOrganization", "description": "Controller of this relationship; ownership of this record does not confer rights to every person mentioned in its data."},
+    "operator": {"$ref": "#/$defs/principal", "description": "Party operating the instance. May differ from its owner and publisher. Its operational role does not imply access to owner data."},
+    "publisher": {"$ref": "#/$defs/humanOrOrganization", "description": "Party publishing the artifact. Publisher provenance is distinct from artifact correctness and data-access authority."},
+    "acquisition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode", "entitlement_ref", "implies_data_access", "implies_owner_impersonation", "cost_terms_ref"],
+      "properties": {
+        "mode": {"enum": ["licence", "subscription", "lease", "invitation"]},
+        "entitlement_ref": {"$ref": "#/$defs/ref"},
+        "cost_terms_ref": {"$ref": "#/$defs/ref", "description": "Reviewable price, metering, budget limits and termination terms, including an explicit zero-cost agreement where applicable."},
+        "implies_data_access": {"const": false},
+        "implies_owner_impersonation": {"const": false},
+        "catalog_offer_ref": {"$ref": "#/$defs/ref"}
+      }
+    },
+    "registered_artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "manifest_ref", "agent_artifact_digest", "immutable_manifest_required", "provenance_refs", "inspection_fields", "verification_status"],
+      "properties": {
+        "artifact_id": {"$ref": "#/$defs/ref"},
+        "manifest_ref": {"$ref": "#/$defs/ref"},
+        "agent_artifact_digest": {"$ref": "#/$defs/digest"},
+        "immutable_manifest_required": {"const": true},
+        "provenance_refs": {"type": "array", "items": {"$ref": "#/$defs/ref"}, "uniqueItems": true},
+        "inspection_fields": {"const": ["publisher", "artifact_version", "capabilities", "models_and_providers", "data_recipients", "execution_locations", "memory_and_retention", "outputs_and_destinations", "cost_and_budget", "known_limits", "evidence_status"]},
+        "verification_status": {"const": "not_run"}
+      }
+    },
+    "commissioned_instance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["principal", "agent_instance_id", "instance_key_ref", "fresh_identity_required", "reuse_owner_private_key", "representation", "human_identity_substitution", "commissioning_status"],
+      "properties": {
+        "principal": {"$ref": "#/$defs/agentPrincipal"},
+        "agent_instance_id": {"$ref": "#/$defs/ref", "description": "Fresh commissioned instance identifier; runtime must bind it to the principal, key, artifact and grants."},
+        "instance_key_ref": {"$ref": "#/$defs/ref", "description": "Reference for a future instance verification key; this design creates no key. Key possession and binding must be verified separately."},
+        "fresh_identity_required": {"const": true},
+        "reuse_owner_private_key": {"const": false},
+        "representation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["role", "disclosure", "agent_label", "assent_from_inference"],
+          "properties": {
+            "role": {"enum": ["assistant", "worker", "representative"]},
+            "agent_label": {"type": "string", "minLength": 1, "maxLength": 160, "description": "Human-readable label visibly identifying the acting party as an AI agent."},
+            "disclosure": {"const": "always_identify_ai_actor"},
+            "assent_from_inference": {"const": "prohibited"},
+            "represented_principal_ref": {"$ref": "#/$defs/ref"}
+          },
+          "allOf": [{"if": {"properties": {"role": {"const": "representative"}}}, "then": {"required": ["represented_principal_ref"]}}]
+        },
+        "human_identity_substitution": {"const": "prohibited"},
+        "commissioning_status": {"const": "not_run"}
+      }
+    },
+    "memory": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["namespaces", "partition_by", "cross_owner_reuse", "read_before_model_input", "derived_output_rule", "training_requires_separate_grant", "isolation_verification_status"],
+      "properties": {
+        "namespaces": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/memoryNamespace"}},
+        "partition_by": {"const": ["owner_principal_id", "relationship_id", "scope_id"]},
+        "cross_owner_reuse": {"const": "prohibited_without_separate_joint_scope_grant"},
+        "read_before_model_input": {"const": "authorize_each_source_at_current_required_policy_version"},
+        "derived_output_rule": {"const": "retain_all_source_restrictions_unless_authorized_declassification"},
+        "training_requires_separate_grant": {"const": true},
+        "isolation_verification_status": {"const": "not_run"}
+      }
+    },
+    "delegation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grant_refs", "authority_source", "actor_chain_required", "authority_chain_required", "actor_history_is_authority_chain", "attenuation_required", "implicit_redelegation", "required_bounds", "receipt_is_bearer_secret", "revocation_lineage_required", "verification_status"],
+      "properties": {
+        "grant_refs": {"type": "array", "items": {"$ref": "#/$defs/signedGrantRef"}, "uniqueItems": true, "description": "May be empty after acquisition. Protected operations require a separately verified, live grant. References alone grant nothing."},
+        "authority_source": {"const": "explicit_owner_approval_or_existing_bounded_delegation"},
+        "actor_chain_required": {"const": true},
+        "authority_chain_required": {"const": true},
+        "actor_history_is_authority_chain": {"const": false},
+        "attenuation_required": {"const": true},
+        "implicit_redelegation": {"const": false},
+        "required_bounds": {"const": ["owner_principal_id", "agent_instance_id", "agent_artifact_digest", "resource_and_branch_version_selector", "actions", "audience", "declared_purpose", "output_destinations", "expiry", "budget", "memory_scope", "redelegation", "revocation_epoch"]},
+        "receipt_is_bearer_secret": {"const": false},
+        "revocation_lineage_required": {"const": true},
+        "verification_status": {"const": "not_run"}
+      }
+    },
+    "update_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bind_grant_to_manifest_digest", "compare_fields", "widening_rule", "activation_rule", "approval_refs", "verification_status"],
+      "properties": {
+        "bind_grant_to_manifest_digest": {"const": true},
+        "compare_fields": {"const": ["capabilities", "models_and_providers", "data_recipients", "execution_locations", "memory_and_retention", "outputs_and_destinations", "cost_and_budget", "delegation_policy"]},
+        "widening_rule": {"const": "new_owner_approval_required_before_activation"},
+        "activation_rule": {"const": "block_until_manifest_and_current_grant_checks_pass"},
+        "approval_refs": {"type": "array", "items": {"$ref": "#/$defs/ref"}, "uniqueItems": true},
+        "verification_status": {"const": "not_run"}
+      }
+    },
+    "lifecycle_policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["journey", "pause", "revoke", "retire", "reassign", "access_review_surface"],
+      "properties": {
+        "journey": {"const": ["acquire_entitlement", "inspect_artifact_and_terms", "commission_fresh_instance", "approve_bounded_grant", "collaborate", "pause_revoke_retire_or_reassign"]},
+        "pause": {"const": "block_new_protected_operations_and_check_inflight_cancellation_policy"},
+        "revoke": {"const": "revoke_grant_and_dependent_delegations_at_defined_online_barrier"},
+        "retire": {"const": "revoke_instance_grants_stop_new_jobs_apply_retention_and_record_receipt"},
+        "reassign": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["revoke_old_grants", "fresh_relationship_required", "fresh_instance_key_required", "automatic_memory_transfer", "transfer_authority"],
+          "properties": {
+            "revoke_old_grants": {"const": true},
+            "fresh_relationship_required": {"const": true},
+            "fresh_instance_key_required": {"const": true},
+            "automatic_memory_transfer": {"const": false},
+            "transfer_authority": {"const": "separate_export_and_import_grants_from_all_required_controllers"}
+          }
+        },
+        "access_review_surface": {"const": "persistent_accessible_inspect_pause_revoke_and_receipt_view"}
+      }
+    }
+  },
+  "$defs": {
+    "ref": {"type": "string", "format": "uri", "minLength": 1},
+    "digest": {
+      "type": "string",
+      "pattern": "^(sha256:[0-9a-f]{64}|sha512:[0-9a-f]{128})$"
+    },
+    "humanOrOrganization": {
+      "type": "object", "additionalProperties": false,
+      "required": ["principal_id", "principal_type", "display_name"],
+      "properties": {"principal_id": {"$ref": "#/$defs/ref"}, "principal_type": {"enum": ["human", "organization"]}, "display_name": {"type": "string", "minLength": 1, "maxLength": 160}}
+    },
+    "agentPrincipal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["principal_id", "principal_type", "display_name"],
+      "properties": {"principal_id": {"$ref": "#/$defs/ref"}, "principal_type": {"const": "agent"}, "display_name": {"type": "string", "minLength": 1, "maxLength": 160}}
+    },
+    "servicePrincipal": {
+      "type": "object", "additionalProperties": false,
+      "required": ["principal_id", "principal_type", "display_name"],
+      "properties": {"principal_id": {"$ref": "#/$defs/ref"}, "principal_type": {"const": "service"}, "display_name": {"type": "string", "minLength": 1, "maxLength": 160}}
+    },
+    "principal": {"oneOf": [{"$ref": "#/$defs/humanOrOrganization"}, {"$ref": "#/$defs/agentPrincipal"}, {"$ref": "#/$defs/servicePrincipal"}]},
+    "memoryNamespace": {
+      "type": "object", "additionalProperties": false,
+      "required": ["namespace_id", "owner_principal_id", "relationship_id", "scope_ref", "source_branch_refs", "retention_policy_ref"],
+      "properties": {
+        "namespace_id": {"$ref": "#/$defs/ref"},
+        "owner_principal_id": {"$ref": "#/$defs/ref"},
+        "relationship_id": {"$ref": "#/$defs/ref"},
+        "scope_ref": {"$ref": "#/$defs/ref"},
+        "source_branch_refs": {"type": "array", "items": {"$ref": "#/$defs/ref"}, "uniqueItems": true},
+        "retention_policy_ref": {"$ref": "#/$defs/ref"}
+      },
+      "description": "Runtime must bind owner_principal_id and relationship_id to this relationship, enforce scope in every retrieval/cache/log path, and prevent silent cross-owner reuse. A namespace name alone proves no isolation."
+    },
+    "signedGrantRef": {
+      "type": "object", "additionalProperties": false,
+      "required": ["authority_grant_ref", "signed_envelope_ref", "content_digest", "root_authority_ref"],
+      "properties": {
+        "authority_grant_ref": {"$ref": "#/$defs/ref"},
+        "signed_envelope_ref": {"$ref": "#/$defs/ref"},
+        "content_digest": {"$ref": "#/$defs/digest"},
+        "root_authority_ref": {"$ref": "#/$defs/ref"}
+      },
+      "description": "Signature validation and current owner/agent/key/manifest/resource/action/audience bindings are mandatory external checks. Token exchange must not hide revocation ancestry."
+    }
+  }
+}

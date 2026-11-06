@@ -1,0 +1,289 @@
+profile: WRN-PASSPORT-COEXISTENCE-0.2
+profile_status: proposed_not_established_standard
+artifact_status: design_only
+execution_enabled: false
+implementation_status: not_implemented
+purpose: Proposed owner-approved human/agent access to immutable submissions; no deployed protection or certification
+  is claimed.
+configuration:
+  owner_principal_id: null
+  authorization_service: null
+  storage_adapter: null
+  key_broker: null
+  trust_policy_ref: null
+  retention_policy_ref: null
+  revocation_freshness_bound_seconds: null
+  checkpoint_freshness_bound_seconds: null
+  maximum_grant_lifetime_seconds: null
+  clock_uncertainty_bound_seconds: null
+  replay_store: null
+  execution_environment: null
+  on_missing_required_configuration: deny_protected_operation
+authority_model:
+  decision_rule: Permit only the intersection of current owner grant, role, resource relationship and every
+    attribute condition. Explicit denial prevails.
+  rbac:
+    roles:
+    - owner
+    - delegated_contributor
+    - agent_worker
+    - independent_reviewer
+    - auditor
+    - witness
+    - recovery_delegate
+    - publisher
+    source: owner-controlled_role_assignments_not_caller_claimed_strings
+  rebac:
+    relations:
+    - owns
+    - granted_for
+    - member_of_project
+    - assigned_to_task
+    - evaluates
+    - recovery_for
+    source: current_authorization_graph_bound_to_policy_revision
+    membership_rule: membership_alone_never_grants_all_project_objects_or_history
+  abac:
+    required_checks:
+    - owner_and_tenant_match
+    - grantee_and_acting_on_behalf_of_chain_match
+    - exact_resource_and_operation_scope
+    - agent_instance_and_approved_artifact_digest_match_when_applicable
+    - classification_and_purpose_constraints
+    - audience_time_expiry_and_current_revocation
+    - parent_delegation_attenuation_and_all_ancestor_revocations
+    - expected_policy_revision_and_branch_head_when_state_changes
+    - allowed_tools_destinations_budget_and_execution_context
+    untrusted_inputs: Prompts, retrieved content, marketplace claims and agent self-reports cannot change policy.
+  independent_facts:
+    passport: identity_or_attribute_evidence_subject_to_receiver_trust
+    signature: evidence_of_key_control_and_byte_binding_not_permission
+    commercial_entitlement: licence_subscription_or_purchase_evidence_not_resource_authority
+    ledger_membership_or_inclusion: historical_evidence_not_authorization_or_confidentiality
+    acceptance: separate_policy_bound_decision_not_inferred_from_upload_or_execution
+  current_state: Current grants, revocations, policy, heads, keys and acceptance derive from authorized events.
+    Historical records never freeze present authority.
+operations:
+  discover: reveal_names_paths_existence_counts_or_other_metadata_only_with_discovery_scope
+  read: retrieve_named_authorized_bytes_without_implying_derivation_export_or_sharing
+  write: append_a_new_immutable_submitted_version_never_overwrite_a_previous_seal
+  derive: transform_specified_inputs_into_classification_inheriting_outputs
+  share: propose_or_create_a_recipient_grant_only_with_separate_delegation_authority
+  export: disclose_a_specific_projection_to_a_specific_destination_under_explicit_scope
+  decrypt: release_or_use_keys_only_after_current_resource_and_purpose_checks
+  execute: run_only_an_approved_artifact_with_separately_scoped_tools_and_egress
+  advance_head: append_an_authorized_transition_with_expected_head_compare_and_swap
+  approve: evaluate_and_record_a_decision_for_exact_seal_intent_and_policy_revisions
+  dispose: perform_owner_approved_retention_compatible_deletion_with_an_explicit_event
+  non_equivalence: Each operation requires its own permission. Write need not permit read. Platform export
+    rules cannot stop a recipient copying plaintext already disclosed.
+grant_defaults:
+  target: named_current_sealed_submission_digest
+  history_access: false
+  future_versions_access: false
+  ancestor_or_descendant_access: false
+  cross_branch_access: false
+  transitive_reference_access: false
+  redelegation: false
+  export: false
+  sharing: false
+  marketplace_publisher_access: false
+  lifetime: explicit_bounded_interval_required
+  scope_expansion: new_owner_approved_grant_required
+  purpose_change: fresh_policy_check_and_owner_approval_when_outside_existing_grant
+  historical_grants: retained_as_evidence_but_not_reactivated_by_restore_or_transfer
+branch_access_matrix:
+- zone: owner_control
+  readers: owner or named recovery delegates
+  writers: protected owner control plane
+  permitted:
+  - manage_policy
+  - issue_scoped_grants
+  - revoke
+  - approve_recovery
+  boundary: no agent, publisher, auditor or witness policy/key authority by default
+- zone: personal_vault
+  readers: owner or exact-object grantee
+  writers: owner or scoped ingestion service
+  permitted:
+  - discover
+  - read
+  - write
+  - decrypt
+  boundary: no full-vault or lifetime-history access by default
+- zone: project_workspace
+  readers: explicitly scoped humans/instances
+  writers: contributors on assigned candidate branches
+  permitted:
+  - discover
+  - read
+  - write
+  - derive
+  boundary: membership and shared ancestry confer no implicit object access
+- zone: agent_task
+  readers: named instance and allowlisted inputs
+  writers: named instance task outputs
+  permitted:
+  - read
+  - write
+  - derive
+  - execute
+  boundary: no root keys, other-tenant memory or accepted-head updates
+- zone: review_quarantine
+  readers: independent reviewer, minimal evidence
+  writers: authorized evaluator records
+  permitted:
+  - read
+  - approve
+  boundary: opening signed submissions never implicitly executes code
+- zone: accepted_release
+  readers: named consumers of selected releases
+  writers: authorized promotion service
+  permitted:
+  - read
+  - advance_head
+  boundary: author cannot self-promote by pointer or receipt edits
+- zone: shared_exchange
+  readers: named recipients or approved public projection
+  writers: authorized export service
+  permitted:
+  - read
+  - share
+  - export
+  boundary: no implicit export of keys, history or personal memory
+- zone: audit_log
+  readers: auditor projections; witness checkpoints/proofs
+  writers: log service and distinct witnesses
+  permitted:
+  - verify_inclusion
+  - verify_consistency
+  - cosign_checkpoint
+  boundary: no personal payloads, plaintext hashes or data keys for witnesses
+- zone: recovery_archive
+  readers: owner or preapproved recovery quorum
+  writers: encrypted backup service
+  permitted:
+  - restore
+  - verify_recovery
+  boundary: restore rechecks current policy; revoked grants stay revoked
+sealed_admission:
+  schema: sealed_submission.schema.json
+  staged_uploads: mutable_untrusted_until_explicit_finalization
+  checks:
+  - validate schema; reject unknown critical semantics
+  - resolve unique artifact IDs; match declared code/data scope
+  - verify actual bytes, lengths and qualified digests
+  - verify immutable versions and retention receipts
+  - reject missing submitted bytes and floating locator substitutes
+  - verify declared private plaintext digest after authorized decryption
+  - verify detached signatures with external receiver trust and current grant
+  - check DAG, parents, namespace, owner and expected head
+  - declare external model/service limits without replacing submitted bytes
+  - encrypt signed core; log only ciphertext commitment
+  - verify required inclusion, consistency and witness evidence
+  pending_state: candidate_pending_required_evidence
+  incomplete_candidate: not_admitted_as_a_complete_sealed_submission
+  admitted_meaning: exact_submitted_bytes_recorded_under_policy_not_correct_safe_or_accepted_work
+  partial_export: Declare restricted/missing payloads explicitly. Partial exports cannot qualify as complete
+    submissions or claim full reconstruction.
+branch_transitions:
+  model: immutable_signed_nodes_plus_append_only_transition_DAG
+  head: current_projection_of_valid_transitions_not_an_immutable_alias
+  atomic_boundary: At the final admission/promotion boundary, recheck current policy, grant lineage, revocation
+    and expected head; commit transition/head under specified atomic or linearizable semantics. Not implemented.
+  conflict: stale_expected_head_or_policy_revision_requires_new_review_and_transition
+  merge: content_merge_preserves_all_input_restrictions_and_requires_its_own_semantic_decision
+  rollback: new_authorized_transition_to_an_older_seal_with_a_later_audit_position
+  forbidden: silently_rewind_log_delete_failed_attempts_or_rewrite_previous_signed_records
+  external_effects: External effects are not made atomic by a database. Bind idempotency where supported; reconcile
+    ambiguous outcomes; never infer success or reversibility.
+derived_data_and_discovery:
+  enforcement_surfaces:
+  - object_bytes_and_decryption
+  - hidden_paths_names_object_existence_and_metadata
+  - search_results_snippets_counts_and_citations
+  - embeddings_vector_indexes_and_retrieval_context
+  - prompts_outputs_traces_caches_and_agent_memory
+  - branch_ancestors_history_diffs_and_export_archives
+  output_policy: intersection_of_input_permissions_and_union_of_input_restrictions
+  mixed_owner_inputs: all_applicable_owners_or_their_authorized_policies_must_permit_release
+  declassification: Separate owner approval binds exact output digest, recipient, purpose, removed restrictions
+    and evidence. Summaries, embeddings and responses remain sensitive until justified release.
+  memory_partition: owner_tenant_project_instance_and_task_scopes_with_read_time_authorization
+  retrieval: filter_authorization_before_materializing_context_and_check_output_destinations
+  external_model_provider: separate_approved_recipient_with_explicit_retention_and_processing_terms
+  residual_limit: plaintext_already_seen_by_an_authorized_or_compromised_recipient_cannot_be_recalled_by_a_ledger
+agent_acquisition_and_lifecycle:
+  catalogue_artifact: immutable_package_digest_publisher_identity_signature_and_declared_dependencies
+  commercial_entitlement: purchase_licence_or_subscription_scoped_to_terms_without_data_permissions
+  commissioning: new_owner_bound_instance_identity_and_initially_empty_resource_grants
+  runtime: Bind instance, artifact digest, resources, actions, audience, purpose, expiry, delegation and revocation
+    lineage.
+  update: New code or policy-relevant dependency means a new declared version. Old pinned grants do not cover
+    it. Evaluate changed behavior; approve expanded authority anew.
+  shared_agent_service: no_cross_customer_memory_context_credentials_or_implicit_publisher_read_access
+  transfer: End old instance grants, sessions and key access; commission the recipient separately. Prior personal
+    memory/history require separate approval.
+  cancellation: Terms may end new execution. Proposed product policy preserves owner-work access/export, subject
+    to actual third-party rights and licence terms.
+  nft_or_ledger_receipt: may_evidence_entitlement_but_cannot_install_roles_or_unlock_personal_data
+ledger_architecture:
+  baseline:
+    topology: owner_controlled_append_log_plus_private_encrypted_object_storage
+    purpose: auditable_ordered_evidence_and_detectable_history_inconsistency
+    checkpoint_payload: opaque_log_identity_tree_size_root_and_required_protocol_metadata
+    private_log_entries: ciphertext_commitments_only_without_raw_personal_fields_or_plaintext_hashes
+    witnessed_checkpoint_policy: null
+    trusted_log_keys: []
+    trusted_witness_keys: []
+    bootstrap_checkpoint_ref: null
+    receiver_trust_source: external_owner_approved_configuration_never_imported_record_self_assertion
+    quorum_failure: remain_pending_or_deny_operations_requiring_witnessed_evidence
+    independence: distinct_governance_and_credentials_not_merely_several_VMs_in_one_account
+    residual_limits: Witnesses check consistent history under explicit trust assumptions, not truth, access
+      or availability. Growth/timing may leak activity. Development witness endpoints are not production assurance.
+  optional_permissioned_consortium:
+    enabled: false
+    admission_trigger: independently_governed_parties_need_joint_state_updates_and_shared_validation
+    member_organizations: []
+    consensus_implementation: null
+    fault_model: null
+    tolerated_faults: null
+    quorum: null
+    endorsement_policy_ref: null
+    governance_and_exit_policy_ref: null
+    privacy_model_ref: null
+    on_unconfigured_fault_or_privacy_model: prohibit_consensus_security_claims_and_execution
+    cautions: Membership alone implies neither secrecy nor Byzantine tolerance. Keep private payloads off broadly
+      replicated ledgers; approved recipients can retain copies.
+retention_recovery_and_export:
+  record_vs_payload: keep_minimal_integrity_evidence_separate_from_personal_payload_lifetimes
+  before_locking: owner_approves_classification_scope_retention_period_and_recovery_policy
+  worm: specific_versions_only_provider_and_mode_guarantees_must_be_checked
+  no_indefinite_default: true
+  key_loss: immutable_ciphertext_without_a_usable_key_is_not_recoverable_work
+  key_rotation: rewrap_or_reencrypt_by_approved_profile_and_append_key_lifecycle_events
+  compromised_keys: rotation_does_not_revoke_plaintext_or_keys_already_copied
+  deletion: Check retention/holds, append explicit disposal/unavailability events, preserve signed history.
+    Cryptographic erasure must address all relevant keys/copies and cannot attest erasure by external recipients.
+  recovery: preapproved_recovery_authority_and_periodic_actual_restore_decrypt_digest_checks
+  export_contents: Authorized objects, manifests, signatures, policy/grant evidence, decisions, lineage and
+    log/witness proofs, with explicit omissions. No implicit private-key export; recovery packaging needs separate
+    approval.
+  offline_result: historical_integrity_may_be_verified_current_revocation_and_freshness_may_be_unknown
+verification_limits:
+  structural_schema_checks: necessary_but_insufficient
+  enforcement_implementation: null
+  tests: security_tests.yaml
+  tests_executed: 0
+  operational_security_claims_supported: false
+source_basis:
+- https://www.rfc-editor.org/rfc/rfc9162.html
+- https://c2sp.org/tlog-witness@v1.1.0
+- https://www.usenix.org/conference/atc19/presentation/pang
+- https://www.ndss-symposium.org/wp-content/uploads/2017/09/04_3_1.pdf
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html
+- https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html
+- https://hyperledger-fabric.readthedocs.io/en/latest/orderer/ordering_service.html
+- https://hyperledger-fabric.readthedocs.io/en/latest/private-data-arch.html
+- https://csrc.nist.gov/pubs/sp/800/88/r2/final

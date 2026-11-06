@@ -1,0 +1,221 @@
+protocol: WRN-PASSPORT-COEXISTENCE-0.2
+profile_status: proposed_not_established_standard
+status: design_not_implemented
+execution_performed: false
+study_status: not_run
+conformance_status: not_run
+security_validation_status: not_run
+observed_results: null
+interpretation: Design only; no agent purchase, deployment, key generation, valid grant, security result or human-study result is claimed. File validation is not runtime assurance.
+
+research:
+  question: Can people acquire and work with separately identified agents while retaining useful, understandable, portable and revocable control of evolving personal branches?
+  hypotheses:
+    H1: Separating acquisition from data grants reduces wrong approvals while preserving legitimate completion.
+    H2: Current version-bound authority rejects stale membership, replay, update widening and cross-owner disclosure.
+    H3: A persistent accessible consent ledger enables accurate inspection, revocation and recovery despite generated task views.
+  status: not_run
+  five_w_one_h:
+    who: Consenting adults; distinct owner, operator, publisher, human collaborator and agent principals.
+    what: Synthetic branches, agent relationships, bounded grants, derived artifacts and receipts.
+    where: Controlled prototype and two independent reader or service adapters.
+    when: Six relative weeks after staffing and prototype readiness; dates may move.
+    why: Test benefit and authority semantics rather than assume them from product intent.
+    how: Independent conformance oracle, formative sessions, then a bounded randomized usability pilot.
+  initial_results: No implementation, conformance, security or human-study results exist for this extension.
+  failures_and_challenges: Google Scholar direct access failed; publishers, proceedings and author copies were used. Broad product concepts overlap substantial prior art.
+  refinement: Focus contribution on instance, branch, derivation, revocation, update and transfer semantics verified across implementations.
+  further_experiments: Use pilot variability and meaningful effect size to preregister a later powered study; separately test provider differences and long-term recovery.
+  new_insights: Personal stores, app stores, granular consent and AI-over-Pods are prior art; interoperable enforcement and human benefit need testing.
+  conclusion: Falsifiable proposal; effectiveness and security remain unproven.
+
+boundaries:
+  data: Fabricated people and secrets; no real passport scans or contact graph in fixtures.
+  history: Seal historical bytes; evolve current heads and append corrections. Historical assertions do not freeze the person or automatically remain readable.
+  person_model: Separate observations, owner assertions, third-party claims and AI interpretations. An agent is explicitly AI, not the authentic human.
+  authority: Explicit approval or existing bounded delegation; inferred preferences never create assent. Entitlement purchases no data access.
+  derivation: Summaries, embeddings, memories and exports retain all source restrictions unless separately authorized declassification is verified.
+  credential_limit: A valid signature establishes integrity and issuer association under a trust model, not universal factual truth.
+  revocation_limit: No claim to retract downloaded plaintext, screenshots, uncontrolled provider copies or already trained model effects.
+  privacy_limit: Finite tests do not prove absence of every inference or timing channel; owner data can also concern other people.
+  purpose_limit: Declared purpose supports controlled operation/destination checks and audit; it cannot prove a recipient's internal intent.
+  secret_handling: No credentials or private keys in public logs, receipts or reports.
+
+comparison:
+  baseline: Competently configured personal-data-store and contemporary agent workflow with scoped authorization, provider controls, logs and owner review.
+  proposed: Same agent, tools, tasks, modality and budget with the proposed branch/instance/grant contract and consent ledger.
+  controls: Freeze model version/settings where possible; differing models, tools or provider guarantees make this a pragmatic comparison and must be reported.
+  generated_ui: Optional later condition; keep authority semantics fixed and preserve pinnable accessible review controls.
+
+online_revocation:
+  status: not_run
+  candidate_p95_seconds: 60
+  candidate_only: true
+  scope: New server-mediated protected reads and operations at declared enforcement points.
+  clock_start: Owner revocation accepted by the authoritative policy service.
+  clock_end: Verified effective denial across declared paths for the grant and its descendants.
+  paths: [resource_api, historical_download, search, preview, vector_retrieval, export, delegated_tool_call]
+  freshness: Check latest required grant state at or after the revocation/content consistency barrier. An unexpired token or stale allow-cache is insufficient.
+  partition_rule: Deny protected access when required freshness cannot be established.
+  inflight_rule: Define cancellation and bytes-already-sent behavior before execution; report separately from new requests.
+  measurement: Repeated timestamped probes with declared resolution; report P50, P95, maximum, outliers and never-enforced failures.
+  limitation: P95 is not a hard bound; any path that never denies fails. Already delivered copies are outside this server-mediated claim.
+
+kpis:
+  - id: K1
+    name: Legitimate access completion and false denial
+    status: not_run
+    measures: [authorized operations completed / authorized attempts, false denials / authorized attempts, independently accepted tasks / assigned legitimate tasks]
+    tracking: Report counts by operation, principal, branch and adapter; include failures and abandonment. Zero denominators are undefined.
+    gate: All critical positive fixtures pass; pilot estimates have uncertainty, with no invented effect target.
+  - id: K2
+    name: Unauthorized or widened operations
+    status: not_run
+    measures: [false permits / forbidden attempts, correct denials / forbidden attempts]
+    tracking: Include no-grant purchase, wrong actor/audience, expiry, replay, widened updates, undeclared recipients, redelegation and reassignment; pair with K1.
+    gate: Zero false permits in declared critical negative fixtures and matched positive controls pass. Deny-all fails; finite zero errors is not universal assurance.
+  - id: K3
+    name: Online revocation
+    status: not_run
+    measures: [P50 and P95 denial delay, maximum delay, never-enforced revocations, post-barrier false permits / post-barrier attempts]
+    candidate_goal: P95 <= 60 seconds in the declared scope; zero post-barrier false permits in critical fixtures.
+    candidate_only: true
+    tracking: Latest grant/content consistency checked across all paths; previously cached plaintext explicitly excluded.
+  - id: K4
+    name: Sealed integrity and valid-history availability
+    status: not_run
+    measures: [invalid histories rejected / negative cases, valid histories verified and read / authorized positive cases, correct append-only supersessions / correction cases]
+    tracking: Independent verifier checks tampering, substitution, reordering, signer changes and valid historical reads.
+    gate: All critical negative and positive cases pass; signatures are not factual-truth proofs.
+  - id: K5
+    name: Cross-branch and cross-owner disclosure
+    status: not_run
+    measures: [prohibited content disclosures / adversarial attempts, prohibited metadata disclosures / discovery probes, complete source lineage with retained restrictions / sampled derivations]
+    tracking: Seeded canaries in search, counts, preview, autocomplete, vectors, memory, logs, tools, shared-service caches and update/transfer paths.
+    gate: No prohibited content/metadata disclosure in critical fixtures; required lineage and legitimate retrieval controls pass.
+  - id: K6
+    name: Independent recovery and compromised keys
+    status: not_run
+    measures: [successful authorized recoveries / eligible attempts, wrongly accepted old or attacker keys / such probes, preserved required semantics / independent export-import cases, active human minutes and elapsed recovery time]
+    tracking: Verify owner evidence and key transition; ensure revoked delegates stay revoked and prior-owner memory does not transfer automatically.
+    gate: Critical valid recovery/export cases pass and attacker cases fail. Report irrecoverable encryption-key loss honestly.
+  - id: K7
+    name: Human comprehension and control
+    status: not_run
+    measures: [correct scope and consequence answers / scored questions, unintended approvals / mismatched requests, intended grants completed / legitimate requests, successful inspect-pause-revoke-recovery journeys / assigned journeys]
+    tracking: Score acquisition versus grant, recipients, branch versions, AI identity, expiry and revocation limits; separate delayed reconstruction and accessibility modes.
+    gate: Establish pilot estimates and error patterns before selecting a powered-study primary endpoint or numerical effect goal. Neither blanket acceptance nor blanket refusal succeeds.
+
+fixtures:
+  status: not_run
+  execution_performed: false
+  oracle: Independent expected allow/deny, integrity and lineage decisions prepared before execution; the worker never grades itself.
+  positive_controls: Every negative family has valid actor, audience, scope, version and live-grant controls that must work.
+  evidence: Minimal redacted request/decision IDs, synthetic principals, artifact digest, grant ancestry, policy revision, branch version and timestamps.
+  cases:
+    C01_acquisition: An acquired licence/subscription/lease/invitation permits entitlement inspection but no protected read or owner-representative action without a grant.
+    C02_revocation: Old token, hash or historical URL cannot bypass current authority on reads, previews, search or export; another authorized reader still succeeds.
+    C03_stale_membership: Remove a member before advancing a branch or moving new content into an inherited ACL. Old ACLs cannot authorize newer content; bind expected head and required policy freshness.
+    C04_discovery: Excluded content and disallowed metadata do not appear in list/count/autocomplete/vector/preview/log/receipt paths. Authorized discovery works; document residual timing limits.
+    C05_replay: Receipt codes confer no bearer rights. Reject wrong-key, wrong-audience, wrong-action, expired and replayed transaction proofs; allow a valid fresh request.
+    C06_derivations: A private-plus-open summary, embedding, cached answer or memory retains all source restrictions; separately authorized release is a distinct positive case.
+    C07_shared_agent: Two owners at one hosted agent provider cannot retrieve each other's caches, memories, logs or tool outputs. Explicit joint scope is a separate positive case.
+    C08_update: A new artifact changes recipients, provider, capabilities, retention, output destination or budget. Block widening until manifest diff and new authority pass; allow compatible approved updates.
+    C09_retire_transfer: Retire/reassign and probe old keys, grants and descendants. Require fresh relationship/key; no automatic memory transfer. Verify separately authorized export/import.
+    C10_recovery: Lost or compromised key recovery verifies owner evidence, rotates keys and preserves revocations. Unavailable fresh policy state cannot widen authority.
+    C11_history: Alter payload, manifest, parent, signer or supersession. Independent verifier rejects invalid cases and accepts valid authorized history; current corrections never silently rewrite sealed bytes.
+    C12_representation: An agent cannot infer assent, hide its AI identity or present superseded/excluded evidence as current owner intent. A properly approved scoped statement works.
+    C13_delegation: Revoke a root grant after two agent delegations. Exchanged/refreshed descendants remain subject to authoritative revocation ancestry, distinct from an actor-history trail.
+    C14_portability: Independent adapter preserves supported authority and history semantics; unknown critical extensions fail closed with a recoverable explanation instead of silently broadening access.
+
+human_study:
+  status: not_run
+  execution_performed: false
+  formative:
+    participants: 6-8
+    method: Think-aloud tasks with synthetic data and varied technical experience; include relevant keyboard/assistive-technology needs without subgroup-power claims.
+    tasks: [inspect_offer, acquire_without_grant, approve_scope, inspect_update, invite_human, revoke_agent, recover_access]
+  pilot:
+    participants_planned: 12
+    distinct_matched_tasks_per_person: 6
+    total_task_episodes_planned: 72
+    conditions: 2
+    episodes_per_condition_per_person: 3
+    design: Counterbalanced within-person baseline/proposed comparison; balanced task variants and order; never repeat an identical task for a person.
+    task_families: [acquire_and_scope, invite_human, inspect_update, revoke_and_explain, transfer_without_memory_leak, recover_and_reconstruct]
+    grading: Independent task and consent scoring, blind to condition where practical.
+    delayed_probe: Optional seven-day receipt/reconstruction probe; report attrition and permit extension beyond week six.
+    analysis: Report participant/task clustering, denominators, uncertainty, order effects and failures. No pilot superiority or noninferiority claim.
+    power_plan: Undecided; preregister a later primary endpoint and sample size after pilot variability and meaningful effect size are established.
+    stop_rule: Pause for real-data exposure, participant distress or unresolved critical authority defect; record repairs before resuming.
+
+six_week_relative_plan:
+  status: not_run
+  execution_performed: false
+  production_commitment: false
+  week_1: Freeze threat model, actor definitions, revocation boundary, synthetic corpus and independent expected decisions; every critical family needs positive/negative cases.
+  weeks_2_3: Build minimal reader, enforcement boundary and independent adapter; instrument instance/grant/memory lineage. Readiness may move later phases.
+  week_4: Execute conformance and compromised-key recovery; start formative sessions only after critical authority checks pass.
+  weeks_5_6: Refine notices, freeze pilot configuration and run bounded pilot if ready/recruited; report all failures and select later study scope, not a production launch.
+
+primary_sources:
+  - id: P1
+    citation: Mansour et al. (2016), A Demonstration of the Solid Platform for Social Web Applications, WWW Companion.
+    doi: 10.1145/2872518.2890529
+    url: https://doi.org/10.1145/2872518.2890529
+    type: conference_demo
+    use: Portable owner-controlled personal stores are prior art.
+  - id: P2
+    citation: Crabtree et al. (2018), Building accountability into the Internet of Things, Journal of Reliable Intelligent Environments 4, 39-55.
+    doi: 10.1007/s40860-018-0054-5
+    url: https://link.springer.com/article/10.1007/s40860-018-0054-5
+    type: peer_reviewed_journal
+    use: Databox app store, consent manifest, isolated apps and audit logs are prior art, not proof of this design.
+  - id: P3
+    citation: Vizgirda, Zhao and Goel (2024), SocialGenPod, WWW Companion, 1067-1070.
+    doi: 10.1145/3589335.3651251
+    url: https://vidminas.github.io/publications/vizgirda-2024-socialgenpod/vizgirda-2024-socialgenpod.pdf
+    type: conference_demo
+    use: LLM/RAG-over-Pods prior art; copying retrieval providers remain trusted.
+  - id: P4
+    citation: Pang et al. (2019), Zanzibar, USENIX ATC, 33-46.
+    url: https://www.usenix.org/conference/atc19/presentation/pang
+    type: peer_reviewed_conference
+    use: ACL/content causal consistency supports stale-member fixtures; no transfer of performance claims.
+  - id: P5
+    citation: Myers and Liskov (2000), Protecting privacy using the decentralized label model, ACM TOSEM 9(4), 410-442.
+    doi: 10.1145/363516.363526
+    url: https://www.cs.yale.edu/homes/dsc5/papers/iflow-tosem.pdf
+    type: peer_reviewed_journal_author_copy
+    use: Information-flow restrictions and authorized declassification; not a proof for arbitrary LLMs.
+  - id: P6
+    citation: Schaub et al. (2015), A Design Space for Effective Privacy Notices, SOUPS, 1-17.
+    url: https://www.usenix.org/conference/soups2015/proceedings/presentation/schaub
+    type: peer_reviewed_conference_systematization
+    use: Contextual notices inform the study; comprehension still needs measurement.
+  - id: P7
+    citation: Garcia (2017), Leaking privacy and shadow profiles in online social networks, Science Advances 3(8), e1701172.
+    doi: 10.1126/sciadv.1701172
+    url: https://www.sg.ethz.ch/publications/2017/garcia2017leaking-privacy-and/e1701172.full1.pdf
+    type: peer_reviewed_journal
+    use: Historical Friendster inference about nonusers; not a current-platform accuracy claim.
+  - id: S1
+    citation: W3C Verifiable Credentials Data Model 2.0, Recommendation, 15 May 2025.
+    url: https://www.w3.org/TR/2025/REC-vc-data-model-2.0-20250515/
+    type: normative_standard_not_empirical_study
+    use: Issuer/holder/verifier distinction and data minimization.
+  - id: S2
+    citation: Jones et al. (2020), OAuth 2.0 Token Exchange, RFC 8693.
+    url: https://www.rfc-editor.org/rfc/rfc8693.html
+    type: ietf_standards_track_not_empirical_study
+    use: Explicit delegation; revocation propagation is not automatic.
+  - id: S3
+    citation: Fett et al. (2023), OAuth 2.0 Demonstrating Proof of Possession, RFC 9449.
+    url: https://www.rfc-editor.org/rfc/rfc9449.html
+    type: ietf_proposed_standard_not_empirical_study
+    use: Sender-constrained tokens; application scope/transaction checks still needed.
+  - id: S4
+    citation: Fett, Yasuda and Campbell (2025), Selective Disclosure for JSON Web Tokens, RFC 9901.
+    url: https://www.rfc-editor.org/rfc/rfc9901.html
+    type: ietf_proposed_standard_not_empirical_study
+    use: Selective disclosure and optional key binding; no blanket unlinkability claim.

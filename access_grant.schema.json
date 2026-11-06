@@ -1,0 +1,284 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:wrn:proposed:access-grant:0.2",
+  "title": "Proposed WRN Passport 0.2: scoped access and delegation grant",
+  "description": "Design-only proposed WRN Passport 0.2 extension to WRN 0.1. This schema is not an established standard, credential issuer, cryptographic implementation or access-control runtime.",
+  "x-status": "design_only",
+  "x-execution-enabled": false,
+  "x-profile-family": "WRN-PASSPORT-COEXISTENCE-0.2",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "content_digest": {"$ref": "#/$defs/digest"},
+    "canonicalization": {"const": "RFC8785-June2020"},
+    "digest_domain": {"const": "WRNPC0.2-GRANT\n"},
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "profile": {"const": "wrn.access-grant"},
+        "profile_version": {"const": "0.2"},
+        "profile_status": {"const": "proposed_not_established_standard"},
+        "created_at": {"type": "string","format": "date-time"},
+        "supersedes_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+        "terms": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "grant_id": {"$ref": "#/$defs/identifier"},
+            "revision": {"type": "integer","minimum": 1},
+            "issuer_principal_id": {"$ref": "#/$defs/identifier"},
+            "issuer_authority_evidence_ref": {"$ref": "#/$defs/evidence_ref"},
+            "owner_principal_id": {"$ref": "#/$defs/identifier"},
+            "grantee_principal_id": {"$ref": "#/$defs/identifier"},
+            "grantee_passport_ref": {"$ref": "#/$defs/digest"},
+            "agent_instance_id": {"anyOf": [{"$ref": "#/$defs/identifier"},{"type": "null"}]},
+            "acting_on_behalf_of": {"$ref": "#/$defs/identifier"},
+            "audiences": {"type": "array","items": {"$ref": "#/$defs/audience"},"minItems": 1,"uniqueItems": true},
+            "permissions": {"type": "array","items": {"$ref": "#/$defs/permission"},"minItems": 1,"uniqueItems": true},
+            "policy_revision_digest": {"$ref": "#/$defs/digest"},
+            "permission_semantics_ref": {"$ref": "#/$defs/digest"},
+            "intent_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+            "entitlement_ref": {"anyOf": [{"$ref": "#/$defs/evidence_ref"},{"type": "null"}]},
+            "constraints": {"$ref": "#/$defs/constraints"},
+            "not_before": {"type": "string","format": "date-time"},
+            "expires_at": {"type": "string","format": "date-time"},
+            "max_token_lifetime_seconds": {"type": "integer","minimum": 1},
+            "freshness": {"$ref": "#/$defs/freshness"},
+            "delegation": {"$ref": "#/$defs/delegation"},
+            "revocation": {"$ref": "#/$defs/revocation"},
+            "bound_request_key": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {"verification_method_id": {"$ref": "#/$defs/identifier"},"jwk_sha256_thumbprint": {"type": "string","pattern": "^[A-Za-z0-9_-]{43}$"}},
+              "required": ["verification_method_id","jwk_sha256_thumbprint"]
+            }
+          },
+          "required": [
+            "grant_id",
+            "revision",
+            "issuer_principal_id",
+            "issuer_authority_evidence_ref",
+            "owner_principal_id",
+            "grantee_principal_id",
+            "grantee_passport_ref",
+            "agent_instance_id",
+            "acting_on_behalf_of",
+            "audiences",
+            "permissions",
+            "policy_revision_digest",
+            "permission_semantics_ref",
+            "intent_ref",
+            "entitlement_ref",
+            "constraints",
+            "not_before",
+            "expires_at",
+            "max_token_lifetime_seconds",
+            "freshness",
+            "delegation",
+            "revocation",
+            "bound_request_key"
+          ]
+        },
+        "terms_digest": {"$ref": "#/$defs/digest"},
+        "terms_digest_rule": {"const": "UTF8(WRNPC0.2-GRANT-TERMS followed by LF) || RFC8785(terms)"},
+        "owner_consent": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "basis": {"enum": ["human_surface_decision","organization_owner_policy","delegated_owner_approval"]},
+            "approver_principal_id": {"$ref": "#/$defs/identifier"},
+            "approval_authority_evidence_refs": {"type": "array","items": {"$ref": "#/$defs/evidence_ref"},"minItems": 1,"uniqueItems": true},
+            "owner_consent_record_ref": {"$ref": "#/$defs/evidence_ref"},
+            "surface_approval_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+            "approved_terms_digest": {"$ref": "#/$defs/digest"},
+            "approved_at": {"type": "string","format": "date-time"},
+            "ui_declaration_effect": {"const": "not_authority_until_independently_verified"}
+          },
+          "required": ["basis","approver_principal_id","approval_authority_evidence_refs","owner_consent_record_ref","surface_approval_ref","approved_terms_digest","approved_at","ui_declaration_effect"],
+          "allOf": [{"if": {"properties": {"basis": {"const": "human_surface_decision"}},"required": ["basis"]},"then": {"properties": {"surface_approval_ref": {"$ref": "#/$defs/digest"}}}}]
+        },
+        "status_snapshot": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "state": {"enum": ["draft","active","suspended","revoked","expired","superseded","unknown"]},
+            "as_of": {"type": "string","format": "date-time"},
+            "status_ref": {"$ref": "#/$defs/evidence_ref"},
+            "authority_effect": {"const": "historical_snapshot_not_live_authorization"}
+          },
+          "required": ["state","as_of","status_ref","authority_effect"]
+        },
+        "entitlement_authority_effect": {"const": "none_without_this_separately_approved_grant"},
+        "execution_authority_rule": {"const": "recipient_enforces_live_policy_grant_and_exact_request"}
+      },
+      "required": ["profile","profile_version","profile_status","created_at","supersedes_ref","terms","terms_digest","terms_digest_rule","owner_consent","status_snapshot","entitlement_authority_effect","execution_authority_rule"]
+    },
+    "detached_signature_refs": {"type": "array","items": {"$ref": "#/$defs/evidence_ref"},"minItems": 0,"uniqueItems": true},
+    "recipient_trust": {"const": "externally_configured_never_derived_from_this_record"}
+  },
+  "required": ["content_digest","canonicalization","digest_domain","content","detached_signature_refs","recipient_trust"],
+  "$defs": {
+    "identifier": {"type": "string","format": "uri","minLength": 1,"maxLength": 1024,"description": "Namespaced logical identifier. Resolving it never establishes trust or grants access."},
+    "digest": {"type": "string","pattern": "^(sha256:[0-9a-f]{64}|sha512:[0-9a-f]{128})$"},
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"content_digest": {"$ref": "#/$defs/digest"},"availability": {"enum": ["included","retrievable","restricted","missing","deleted"]},"locator": {"anyOf": [{"$ref": "#/$defs/identifier"},{"type": "null"}]}},
+      "required": ["content_digest","availability","locator"],
+      "description": "Digest of an identified evidence object; format, authenticity, availability and relevance require independent checks. A locator is not authority to fetch."
+    },
+    "resource_selector": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"resource_kind": {"const": "branch"},"project_id": {"$ref": "#/$defs/identifier"},"branch_id": {"$ref": "#/$defs/identifier"},"expected_head_digest": {"$ref": "#/$defs/digest"}},
+          "required": ["resource_kind","project_id","branch_id","expected_head_digest"],
+          "description": "Exact branch and approved head. Future or descendant heads are not implicitly included."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"resource_kind": {"const": "sealed_node"},"project_id": {"$ref": "#/$defs/identifier"},"node_digest": {"$ref": "#/$defs/digest"},"sealed_submission_digest": {"$ref": "#/$defs/digest"}},
+          "required": ["resource_kind","project_id","node_digest","sealed_submission_digest"],
+          "description": "Exact immutable node within the declared sealed submission."
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "resource_kind": {"const": "data_compartment"},
+            "compartment_id": {"$ref": "#/$defs/identifier"},
+            "resource_snapshot_digest": {"$ref": "#/$defs/digest"},
+            "data_labels": {
+              "type": "array",
+              "items": {"type": "object","additionalProperties": false,"properties": {"label": {"type": "string","minLength": 1,"maxLength": 128},"value": {"type": "string","minLength": 1,"maxLength": 256}},"required": ["label","value"]},
+              "minItems": 0,
+              "uniqueItems": true
+            },
+            "label_policy_digest": {"$ref": "#/$defs/digest"}
+          },
+          "required": ["resource_kind","compartment_id","resource_snapshot_digest","data_labels","label_policy_digest"],
+          "description": "Exact resource snapshot plus pinned label semantics. Labels alone do not grant access to future data or imply enforcement."
+        }
+      ]
+    },
+    "permission": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "resource": {"$ref": "#/$defs/resource_selector"},
+        "allowed_actions": {
+          "type": "array",
+          "items": {"enum": ["read_metadata","read_payload","run_sandbox","create_branch","submit_candidate","advance_branch","evaluate_candidate","accept_candidate","challenge_decision","export_payload"]},
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "required": ["resource","allowed_actions"],
+      "description": "Actions apply only to this selector, avoiding an implicit cross-product across unrelated resources."
+    },
+    "audience": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {"audience_principal_id": {"$ref": "#/$defs/identifier"},"resource_server_uri": {"$ref": "#/$defs/identifier"},"tenant_id": {"$ref": "#/$defs/identifier"}},
+      "required": ["audience_principal_id","resource_server_uri","tenant_id"]
+    },
+    "delegation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "parent_grant_ref": {"anyOf": [{"$ref": "#/$defs/digest"},{"type": "null"}]},
+        "ancestor_grant_refs": {"type": "array","items": {"$ref": "#/$defs/digest"},"minItems": 0,"uniqueItems": true},
+        "lineage_id": {"$ref": "#/$defs/identifier"},
+        "depth": {"type": "integer","minimum": 0},
+        "max_depth": {"type": "integer","minimum": 0},
+        "actor_history_refs": {"type": "array","items": {"$ref": "#/$defs/evidence_ref"},"minItems": 0,"uniqueItems": true},
+        "parent_authority_rule": {"const": "validated_grants_not_informational_actor_history"},
+        "attenuation_rule": {"const": "no_expansion_under_pinned_permission_semantics"}
+      },
+      "required": ["parent_grant_ref","ancestor_grant_refs","lineage_id","depth","max_depth","actor_history_refs","parent_authority_rule","attenuation_rule"],
+      "description": "Root depth is zero. Each child increments depth; every ancestor limit remains binding. RFC 8693 nested act history is informational, not an independent chain of authority."
+    },
+    "constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "execution_policy_ref": {"$ref": "#/$defs/digest"},
+        "allowed_destination_principal_ids": {"type": "array","items": {"$ref": "#/$defs/identifier"},"minItems": 0,"uniqueItems": true},
+        "allowed_network_origins": {"type": "array","items": {"$ref": "#/$defs/identifier"},"minItems": 0,"uniqueItems": true},
+        "output_handling": {"enum": ["no_egress","same_compartment","listed_destinations"]},
+        "output_policy_ref": {"$ref": "#/$defs/digest"},
+        "training_use_allowed": {"type": "boolean"},
+        "persistent_memory_write_allowed": {"type": "boolean"},
+        "max_operations": {"type": "integer","minimum": 0},
+        "max_output_bytes": {"type": "integer","minimum": 0},
+        "max_compute_seconds": {"type": "integer","minimum": 0},
+        "max_cost": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {"amount": {"type": "string","pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"},"currency": {"type": "string","pattern": "^[A-Z]{3}$"}},
+          "required": ["amount","currency"]
+        },
+        "external_release_allowed": {"const": false},
+        "physical_actuation_allowed": {"const": false}
+      },
+      "required": [
+        "execution_policy_ref",
+        "allowed_destination_principal_ids",
+        "allowed_network_origins",
+        "output_handling",
+        "output_policy_ref",
+        "training_use_allowed",
+        "persistent_memory_write_allowed",
+        "max_operations",
+        "max_output_bytes",
+        "max_compute_seconds",
+        "max_cost",
+        "external_release_allowed",
+        "physical_actuation_allowed"
+      ],
+      "description": "Constraints require named enforcement controls, resource accounting and output inspection. Declaring a purpose or prohibition does not technically prevent a recipient from copying received plaintext."
+    },
+    "freshness": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "max_status_age_seconds": {"type": "integer","minimum": 0},
+        "max_policy_age_seconds": {"type": "integer","minimum": 0},
+        "allowed_clock_skew_seconds": {"type": "integer","minimum": 0},
+        "on_unknown_or_unavailable": {"const": "deny_new_operation"},
+        "check_immediately_before_effect": {"const": true}
+      },
+      "required": ["max_status_age_seconds","max_policy_age_seconds","allowed_clock_skew_seconds","on_unknown_or_unavailable","check_immediately_before_effect"]
+    },
+    "revocation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "authority_principal_id": {"$ref": "#/$defs/identifier"},
+        "status_service_uri": {"$ref": "#/$defs/identifier"},
+        "status_policy_ref": {"$ref": "#/$defs/digest"},
+        "epoch": {"type": "integer","minimum": 0},
+        "cascade": {"const": "all_descendant_grants"},
+        "propagation_rule": {"const": "explicit_registry_checks_not_implied_by_token_exchange"},
+        "already_disclosed_plaintext": {"const": "cannot_be_recalled_by_revocation"}
+      },
+      "required": ["authority_principal_id","status_service_uri","status_policy_ref","epoch","cascade","propagation_rule","already_disclosed_plaintext"]
+    }
+  },
+  "$comment": "content_digest = qualified SHA-256 or SHA-512 over UTF8(digest_domain) || RFC8785(content). Domain ends with a literal LF. Digest excludes outer content_digest, canonicalization metadata, signature references and trust marker; the profile fixes the permitted encoding/domain. Signatures use a separately pinned established envelope/profile and must bind the digest algorithm, domain and content. Empty or unverified signatures cannot authorize use. Do not invent a signature algorithm. JSON Schema cannot verify hashes, signatures, trust, dates against current time or live authority.",
+  "x-runtime-invariants": [
+    "terms_digest covers the complete terms object. Owner consent binds that digest, avoiding a circular consent/grant self-hash. Its approver must have externally established owner authority.",
+    "Recompute digests and validate detached signatures, live grant/key status, issuer authority and the actual token claims; a schema-valid or logged grant alone authorizes nothing.",
+    "Grant not_before < expires_at; child expiry and permissions stay within all ancestors; current depth <= every applicable max_depth; reject cycles and missing or stale ancestors.",
+    "Use semantic containment defined by permission_semantics_ref; arbitrary JSON/string comparison cannot establish permission attenuation.",
+    "Root parent_grant_ref is null and depth=0; child parent is non-null and depth=parent.depth+1; ordered ancestor references are complete and unique.",
+    "Revoking any ancestor or bound key invalidates future descendant use according to the authoritative registry. Token exchange alone does not establish that propagation.",
+    "No implicit project, tenant, label, branch-descendant, destination or tool expansion. Pin selection snapshots and compare branch head atomically before mutation.",
+    "Track cumulative operations, bytes, time and cost atomically across concurrent workers. Output, egress, training and memory restrictions need enforced technical controls; policy text is not such a control.",
+    "Match grantee, acting_on_behalf_of, owner, agent instance and bound request key against trusted identity/delegation evidence. Commercial entitlement never substitutes for this check.",
+    "Unknown or unsupported critical policy semantics, signatures, status freshness or resource context fail closed. Executable enforcement is outside this schema."
+  ]
+}

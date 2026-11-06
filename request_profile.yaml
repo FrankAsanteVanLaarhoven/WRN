@@ -1,0 +1,269 @@
+profile: wrn.protected-request.http
+profile_version: '0.2'
+profile_family: WRN-PASSPORT-COEXISTENCE-0.2
+profile_status: proposed_not_established_standard
+x-status: design_only
+x-execution-enabled: false
+purpose: >-
+  Proposed request-binding and enforcement contract for humans, organizations,
+  agent instances and services. This is a design document, not a verifier,
+  authorization server, issued credential, signed request or security result.
+execution:
+  enabled: false
+  external_release_enabled: false
+  physical_actuation_enabled: false
+  issued_credentials: 0
+  generated_keys: 0
+  executed_security_tests: 0
+configuration:
+  identity_provider: null
+  authorization_server: null
+  resource_servers: null
+  trust_anchors: null
+  permitted_issuers: null
+  key_resolver: null
+  key_store_or_signing_broker: null
+  algorithm_allowlist: null
+  oauth_library: null
+  http_message_signature_library: null
+  content_digest_library: null
+  jcs_library: null
+  passport_signature_envelope_profile: null
+  grant_signature_envelope_profile: null
+  action_schema_registry: null
+  surface_approval_profile: null
+  grant_registry: null
+  revocation_service: null
+  token_lifetime_seconds: null
+  proof_acceptance_window_seconds: null
+  operation_nonce_lifetime_seconds: null
+  clock_skew_seconds: null
+  maximum_status_age_seconds: null
+  replay_and_idempotency_store: null
+  resource_transaction_adapter: null
+  output_and_egress_enforcer: null
+  credentials: null
+  spending_cap: null
+  deployment_host: null
+  rule: >-
+    Missing choices prohibit execution. Select maintained implementations of
+    established standards; never construct a custom signature algorithm or
+    treat the prose rules here as an implemented enforcement control.
+
+trust_separation:
+  passport: identity_and_issuer_claim_references
+  commercial_entitlement: permission_to_use_agent_product_or_service_only
+  commissioned_instance: distinct_runtime_principal_key_and_memory
+  access_grant: separately_approved_resource_authority
+  human_authentication: control_of_registered_authenticator
+  owner_consent: verified_approval_of_exact_grant_terms_or_action
+  ledger_receipt: evidence_about_recorded_events_not_permission
+  validation: >-
+    Issuer trust, authentication, authorization, signature integrity, task
+    outcome and current validity are independent checks. Imported claims of
+    successful verification never replace recipient verification.
+
+transport:
+  protocol: HTTPS
+  tls_required: true
+  authenticated_resource_endpoint_required: true
+  redirect_policy: reject_unapproved_cross_origin_or_audience_redirects
+  intermediary_policy: >-
+    Define the externally addressed URI and trusted proxy transformations.
+    Never infer target authority from untrusted forwarded headers. Reject
+    ambiguous routing or parsing; do not normalize signed fields ad hoc.
+
+oauth_and_dpop:
+  specifications: [RFC9700, RFC9449, RFC9396, RFC8693]
+  authorization_scheme: DPoP
+  checks:
+    - Validate token issuer, intended resource audience, tenant, validity and granted authorization details.
+    - Use exactly one well-formed DPoP header; require typ dpop+jwt and an allowed asymmetric algorithm.
+    - Verify the proof with its public JWK; reject private key parameters and unacceptable algorithms.
+    - Match htm and the RFC9449-normalized htu; htu excludes query and fragment.
+    - Check iat freshness, required server nonce and jti replay policy.
+    - Recompute ath from the presented access token and match its key binding to cnf.jkt.
+    - Match the bound key to the live grant and commissioned actor; an arbitrary valid self-signature is insufficient.
+  limitations:
+    - DPoP is not independently client authentication or access control.
+    - DPoP does not protect the request body or general headers and excludes the URI query from htu.
+    - A compromised process able to invoke the signing key can generate valid proofs within its access.
+    - Token exchange does not inherently propagate parent-token revocation.
+    - Nested historical act claims are informational; authoritative grant lineage is checked separately.
+
+http_message_signature:
+  specification: RFC9421
+  digest_specification: RFC9530
+  required: true
+  required_covered_components: ['@method', '@target-uri', content-digest, content-type]
+  required_signature_parameters: [created, expires, nonce, keyid, alg, tag]
+  required_tag: wrn-protected-request-0.2
+  target_uri: >-
+    Cover the full HTTP target URI including query under RFC9421 rules.
+    URI fragments are not HTTP request-target content and are rejected in
+    configured/requested resource targets. Critical query values must agree
+    with the signed business action; there is one defined parser per action.
+  body_integrity: >-
+    Compute Content-Digest over the actual HTTP message content according to
+    RFC9530, verify the signature covers that field, and independently
+    recompute the received-content digest. Checking only the signature over
+    a supplied digest is insufficient. Fix permitted content encodings.
+  key_binding: >-
+    Resolve keyid through configured trust. Require the signature public key,
+    DPoP public key, access-token cnf.jkt and grant bound_request_key to identify
+    the same key. Require the correct request-signing purpose and live status.
+    Refuse an unsupported mapping; never fetch arbitrary key URLs as trust roots.
+  freshness: >-
+    created and expires are covered RFC9421 signature parameters, not ordinary
+    HTTP headers. Check the configured time window and match nonce to the
+    server-issued operation nonce and bound request context. Require body times
+    to represent exact whole UTC seconds and match signature times; expiry
+    cannot exceed the nonce, grant or token validity bounds.
+  custody: >-
+    Keep signing credentials outside model context and generated code.
+    A scoped broker must authorize what it signs. Key non-exportability alone
+    does not stop malicious use through a permissive signing interface. A human
+    client binds a separate request key after authentication; WebAuthn is not
+    repurposed as a general HTTP signer.
+
+business_body:
+  media_type: application/json
+  closed_schema_required: true
+  unknown_critical_fields: reject
+  duplicate_json_members: reject
+  non_finite_or_non_IJSON_numbers: reject
+  fields:
+    request_id: namespaced_identifier
+    idempotency_key: opaque_operation_identifier
+    operation_nonce: server_issued_context_bound_value
+    created_at: timestamp
+    expires_at: timestamp
+    canonical_action_digest: algorithm_qualified_digest
+    action:
+      actor_principal_id: authenticated_current_actor
+      acting_on_behalf_of: accountable_human_or_organization_principal
+      agent_instance_id: required_for_agents_otherwise_null
+      authority_grant_ref: exact_grant_content_digest
+      policy_revision_digest: exact_policy_revision
+      intent_ref: exact_intent_revision_when_work_related_otherwise_null
+      resource:
+        kind: branch_or_sealed_node_or_data_compartment
+        project_id: required_for_project_resources_otherwise_null
+        branch_id: required_for_branch_operations_otherwise_null
+        node_digest: required_for_node_operations_otherwise_null
+        sealed_submission_digest: required_for_sealed_node_otherwise_null
+        compartment_id: required_for_personal_or_partitioned_data_otherwise_null
+        resource_snapshot_digest: required_for_compartment_selection_otherwise_null
+        checkpoint_ref: required_if_policy_requires_witnessed_state_otherwise_null
+        expected_head_digest: required_for_branch_operations_otherwise_null
+      operation: registered_typed_action_permitted_by_the_exact_grant
+      parameters_schema_ref: pinned_trusted_schema_and_semantics
+      parameters: closed_typed_object_validated_against_parameters_schema_ref
+      destination_principal_id: exact_authorized_recipient_or_null_for_local_operations
+      destination_uri: exact_authorized_destination_or_null_for_local_operations
+      output_policy_ref: pinned_output_and_egress_policy
+      maximum_cost: explicit_bound_with_currency
+    surface_approval_ref: exact_verified_approval_when_required_otherwise_null
+    owner_consent_ref: evidence_bound_to_grant_terms_or_canonical_action
+  action_digest: >-
+    Qualified SHA-256 or SHA-512 over UTF8("WRNPC0.2-ACTION\n") followed by
+    RFC8785(action); the domain terminates with a literal LF. The action object
+    excludes its own digest, signatures, surface_approval_ref and consent refs,
+    preventing a circular approval hash. The HTTP signature binds the entire
+    business body, including those approval references and request metadata.
+  approval_binding: >-
+    Verify owner/delegator authority and that the approval permits this exact
+    action digest or that the live grant's approved terms unambiguously cover
+    it. Verify displayed material terms, recipient, cost and work revision.
+    Authentication or agent-authored UI text alone never creates consent.
+  legacy_compatibility: >-
+    Existing WRN0.1 surface decisions and command vocabularies are not silently
+    reinterpreted as this profile. A separately pinned, reviewed adapter must
+    map every material field and its digest convention, or verification fails.
+    No such adapter is implemented by these files.
+
+verification_order:
+  - id: authenticate
+    rule: Validate transport, trusted token issuer, audience, actor identity and both request proofs.
+  - id: reconstruct
+    rule: Recompute wire Content-Digest and canonical action digest; reject parser and body/header mismatches.
+  - id: validate_grant
+    rule: Verify grant signature and terms digest, owner consent, issuer authority, bound key and current status.
+  - id: validate_lineage
+    rule: Verify every parent and ancestor, cycle freedom, depth, expiry and semantic narrowing under pinned policy.
+  - id: bind_context
+    rule: Match actor, accountable delegator, instance, audience, tenant, resource, head, action, parameters and destination.
+  - id: check_freshness
+    rule: Obtain sufficiently fresh key, passport, grant, ancestor and policy status; missing or unknown status denies new work.
+  - id: reserve_operation
+    rule: Atomically reserve the operation nonce, idempotency record and required cumulative budget under the authoritative scope.
+  - id: enforce_and_execute
+    rule: Recheck current grant status and expected resource revision immediately before the effect; enforce sandbox, egress and output limits.
+  - id: record_result
+    rule: Append decision and effect receipts; retain exact request commitments and relevant evidence under access controls.
+
+replay_idempotency_and_concurrency:
+  distinct_identifiers:
+    dpop_jti: unique_HTTP_proof_identifier_checked_within_proof_window
+    dpop_nonce: nonce_supplied_by_OAuth_or_resource_server_under_RFC9449
+    operation_nonce: one_time_server_value_bound_to_WRN_actor_grant_action_and_expiry
+    idempotency_key: stable_identifier_for_one_business_operation_across_retries
+  atomicity: >-
+    All accepting replicas must share an authoritative atomic reservation or
+    equivalent consistent mechanism. A local best-effort cache is insufficient
+    for concurrent acceptance. Consume nonce together with durable operation
+    reservation; a crash must leave a recoverable pending operation record.
+  retries: >-
+    Use a fresh DPoP proof and operation nonce while retaining the same
+    idempotency key and action digest. Return or reconcile the prior operation
+    when identity and action match. Reject reuse of an idempotency key for a
+    different actor, grant context or action. Never deduplicate only by prose.
+  state_changes: >-
+    Compare expected_head_digest and policy/grant revision at the actual resource
+    transition. Append a new immutable node and authorized pointer transition;
+    do not overwrite submitted content. Concurrent conflicting heads fail CAS.
+  uncertain_external_effect: >-
+    Record unknown when an external request may have taken effect before a
+    timeout. Reconcile observed state before retrying. No global exactly-once
+    guarantee is claimed for arbitrary external services.
+  revocation_race: >-
+    Serialize authorization and local mutation where possible. For external
+    services, define an explicit dispatch boundary and reconciliation policy;
+    revocation cannot undo an effect already committed outside that boundary.
+
+receipts_and_privacy:
+  record_separately: [authentication, signature_integrity, authorization, execution_status, observed_effect, current_validity]
+  permitted_receipt_fields:
+    - request_and_action_commitments
+    - issuer_actor_delegator_and_instance_references_under_access_control
+    - grant_and_policy_revisions_used
+    - selected_resource_and_expected_new_heads
+    - authorization_reason_and_effect_evidence_references
+  never_log: [raw_access_tokens, refresh_tokens, private_keys, recovery_secrets, biometric_material]
+  public_checkpoint_policy: >-
+    Public log inclusion should commit to encrypted signed-core bytes or an
+    explicitly privacy-reviewed public record. Do not publish sensitive
+    plaintext hashes, identity graphs, resource paths or grants by default.
+    Inclusion proves membership relative to the trusted checkpoint, not claim
+    truth, consent, completeness, current permission or plaintext erasure.
+
+validation_limits:
+  - These YAML rules describe intended checks and require an implementation.
+  - JSON Schema validates selected shapes only; format checks require an enabled implementation.
+  - Digest, signature, key-custody, replay, authorization and revocation behavior have not been tested here.
+  - Identity proofing and deployment assurance levels remain unselected.
+  - Labels, intended purpose and output restrictions require enforceable resource-specific semantics.
+  - Permissions cannot retract plaintext already disclosed to an authorized recipient.
+  - A compromised owner authenticator, signing broker or trusted resource service remains a material threat.
+
+primary_references:
+  - https://www.rfc-editor.org/rfc/rfc9449.html
+  - https://www.rfc-editor.org/rfc/rfc9396.html
+  - https://www.rfc-editor.org/rfc/rfc8693.html
+  - https://www.rfc-editor.org/rfc/rfc9700.html
+  - https://www.rfc-editor.org/rfc/rfc9421.html
+  - https://www.rfc-editor.org/rfc/rfc9530.html
+  - https://www.rfc-editor.org/rfc/rfc8785.html
+  - https://www.w3.org/TR/webauthn-3/
+  - https://www.w3.org/TR/vc-data-model-2.0/
+  - https://www.w3.org/TR/did-core/

@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:wrn:passport-coexistence:0.2:sealed-submission",
+  "title": "Proposed WRN Passport 0.2 sealed submission and branch transition",
+  "description": "Design contract, not an implemented protocol or established standard. This private authorized representation describes immutable submitted bytes and append-only transitions. Schema validity does not establish signature validity, authority, completeness, storage retention, inclusion, freshness, or correctness.",
+  "x-status": "design_only",
+  "x-profile-status": "proposed_not_established_standard",
+  "x-execution-enabled": false,
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["profile", "content", "content_digest", "digest_scope", "detached_signature_refs", "encrypted_core", "checkpoint_receipts"],
+  "properties": {
+    "profile": {"const": "WRN-PASSPORT-COEXISTENCE-0.2"},
+    "content": {"oneOf": [{"$ref": "#/$defs/seal_content"}, {"$ref": "#/$defs/branch_transition_content"}]},
+    "content_digest": {"$ref": "#/$defs/digest"},
+    "digest_scope": {"const": "H(UTF8('WRNPC0.2-RECORD\\n') || RFC8785(content)); H is the algorithm named by content_digest; excludes outer digest, signatures, encrypted_core and checkpoint_receipts"},
+    "detached_signature_refs": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}, "description": "Resolve and verify detached signatures under independently provisioned receiver trust. Each must bind this content digest and its domain/profile; no signature reference grants authority."},
+    "encrypted_core": {"$ref": "#/$defs/encrypted_core"},
+    "checkpoint_receipts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/checkpoint_receipt"}}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^(sha256:[0-9a-f]{64}|sha512:[0-9a-f]{128})$"},
+    "identifier": {"type": "string", "minLength": 1, "maxLength": 256},
+    "utc_time": {"type": "string", "format": "date-time", "pattern": "Z$"},
+    "digest_list": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}},
+    "immutable_locator": {
+      "description": "A locator identifies a declared immutable storage version; it is not proof of immutability or availability. Resolve only through an authorized storage adapter and compare actual bytes. A floating URL, branch name, latest tag or object key without version is insufficient.",
+      "oneOf": [
+        {"type": "object", "additionalProperties": false, "required": ["kind", "store_id", "object_key", "version_id"], "properties": {"kind": {"const": "object_version"}, "store_id": {"$ref": "#/$defs/identifier"}, "object_key": {"type": "string", "minLength": 1, "maxLength": 2048}, "version_id": {"type": "string", "minLength": 1, "maxLength": 1024}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "store_id", "object_digest"], "properties": {"kind": {"const": "content_address"}, "store_id": {"$ref": "#/$defs/identifier"}, "object_digest": {"$ref": "#/$defs/digest"}}},
+        {"type": "object", "additionalProperties": false, "required": ["kind", "bundle_digest", "entry_id"], "properties": {"kind": {"const": "included_bundle_entry"}, "bundle_digest": {"$ref": "#/$defs/digest"}, "entry_id": {"$ref": "#/$defs/identifier"}}}
+      ]
+    },
+    "encrypted_core": {
+      "type": "object", "additionalProperties": false,
+      "required": ["core_encoding", "byte_representation", "stored_byte_digest", "stored_byte_length", "immutable_locator", "key_envelope_ref", "encryption_profile_ref", "public_disclosure"],
+      "properties": {
+        "core_encoding": {"const": "AEAD encryption of RFC8785({profile,content,content_digest,digest_scope,detached_signature_refs}); excludes encrypted_core and checkpoint_receipts"},
+        "byte_representation": {"const": "aead_ciphertext"},
+        "stored_byte_digest": {"$ref": "#/$defs/digest"},
+        "stored_byte_length": {"type": "integer", "minimum": 1},
+        "immutable_locator": {"$ref": "#/$defs/immutable_locator"},
+        "key_envelope_ref": {"$ref": "#/$defs/digest"},
+        "encryption_profile_ref": {"$ref": "#/$defs/digest", "description": "Must resolve to an owner-approved interoperable AEAD/key-management profile. Algorithm, nonces, associated data and key wrapping are not implemented by this schema."},
+        "public_disclosure": {"const": "ciphertext_commitment_only_no_plaintext_hash_names_or_personal_identity"}
+      }
+    },
+    "checkpoint_receipt": {
+      "type": "object", "additionalProperties": false,
+      "required": ["log_id", "checkpoint_ref", "tree_size", "logged_ciphertext_digest", "inclusion_proof_ref", "witness_cosignature_refs", "verification_status"],
+      "properties": {
+        "log_id": {"$ref": "#/$defs/identifier"},
+        "checkpoint_ref": {"$ref": "#/$defs/digest"},
+        "tree_size": {"type": "integer", "minimum": 1},
+        "logged_ciphertext_digest": {"$ref": "#/$defs/digest", "description": "Must equal encrypted_core.stored_byte_digest; the log profile separately defines Merkle leaf encoding and domain separation."},
+        "inclusion_proof_ref": {"$ref": "#/$defs/digest"},
+        "witness_cosignature_refs": {"$ref": "#/$defs/digest_list"},
+        "verification_status": {"const": "requires_receiver_verification", "description": "Imported receipt assertions never self-authorize. The receiver supplies trusted log/witness keys, quorum, bootstrap checkpoint and freshness bounds."}
+      }
+    },
+    "scope_category": {
+      "type": "object", "additionalProperties": false,
+      "required": ["disposition", "artifact_ids"],
+      "properties": {
+        "disposition": {"enum": ["included", "none_in_declared_scope"]},
+        "artifact_ids": {"type": "array", "uniqueItems": true, "items": {"$ref": "#/$defs/identifier"}},
+        "none_reason": {"type": "string", "minLength": 1, "maxLength": 1024}
+      },
+      "allOf": [
+        {"if": {"properties": {"disposition": {"const": "included"}}}, "then": {"properties": {"artifact_ids": {"minItems": 1}}, "not": {"required": ["none_reason"]}}},
+        {"if": {"properties": {"disposition": {"const": "none_in_declared_scope"}}}, "then": {"required": ["none_reason"], "properties": {"artifact_ids": {"maxItems": 0}}}}
+      ]
+    },
+    "submitted_scope": {
+      "type": "object", "additionalProperties": false,
+      "required": ["scope_id", "statement", "code", "data", "closure"],
+      "properties": {
+        "scope_id": {"$ref": "#/$defs/identifier"},
+        "statement": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "code": {"$ref": "#/$defs/scope_category"},
+        "data": {"$ref": "#/$defs/scope_category"},
+        "closure": {"const": "all_declared_submitted_code_and_data_bytes_included_no_floating_substitutes"}
+      },
+      "anyOf": [
+        {"properties": {"code": {"properties": {"disposition": {"const": "included"}}}}},
+        {"properties": {"data": {"properties": {"disposition": {"const": "included"}}}}}
+      ],
+      "description": "The admission validator checks every listed ID against exactly one artifact and rejects missing required bytes. Narrow scope is explicit and cannot claim complete runtime/model/service reproducibility. External services cannot substitute for submitted code or data."
+    },
+    "private_plaintext": {
+      "type": "object", "additionalProperties": false,
+      "required": ["digest", "byte_length", "disclosure"],
+      "properties": {"digest": {"$ref": "#/$defs/digest"}, "byte_length": {"type": "integer", "minimum": 0}, "disclosure": {"const": "inside_encrypted_manifest_only"}},
+      "description": "Optional private plaintext integrity value; separate from the stored ciphertext hash. Never publish a bare hash of predictable personal data."
+    },
+    "artifact": {
+      "type": "object", "additionalProperties": false,
+      "required": ["artifact_id", "role", "logical_name", "media_type", "classification", "payload_status", "byte_representation", "stored_byte_digest", "stored_byte_length", "immutable_locator"],
+      "properties": {
+        "artifact_id": {"$ref": "#/$defs/identifier"},
+        "role": {"enum": ["code", "data", "configuration", "model_weights", "evidence", "other"]},
+        "logical_name": {"type": "string", "minLength": 1, "maxLength": 2048, "description": "Potentially sensitive metadata; protected with the manifest."},
+        "media_type": {"type": "string", "minLength": 3, "maxLength": 255},
+        "classification": {"enum": ["public", "internal", "confidential", "restricted_personal"]},
+        "payload_status": {"const": "included_in_sealed_storage"},
+        "byte_representation": {"enum": ["plaintext", "aead_ciphertext"]},
+        "stored_byte_digest": {"$ref": "#/$defs/digest"},
+        "stored_byte_length": {"type": "integer", "minimum": 0},
+        "immutable_locator": {"$ref": "#/$defs/immutable_locator"},
+        "private_plaintext": {"$ref": "#/$defs/private_plaintext"},
+        "key_envelope_ref": {"$ref": "#/$defs/digest"},
+        "encryption_profile_ref": {"$ref": "#/$defs/digest"}
+      },
+      "allOf": [
+        {"if": {"properties": {"byte_representation": {"const": "aead_ciphertext"}}}, "then": {"required": ["key_envelope_ref", "encryption_profile_ref"], "properties": {"stored_byte_length": {"minimum": 1}}}, "else": {"not": {"anyOf": [{"required": ["private_plaintext"]}, {"required": ["key_envelope_ref"]}, {"required": ["encryption_profile_ref"]}]}}},
+        {"if": {"properties": {"classification": {"enum": ["confidential", "restricted_personal"]}}}, "then": {"properties": {"byte_representation": {"const": "aead_ciphertext"}}}}
+      ]
+    },
+    "retention_snapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["policy_ref", "scope", "mode", "retain_until", "hold_status", "storage_receipt_ref", "snapshot_only"],
+      "properties": {
+        "policy_ref": {"$ref": "#/$defs/digest"},
+        "scope": {"const": "all_manifest_payload_versions"},
+        "mode": {"enum": ["bounded_worm", "owner_managed_append_only", "legal_hold"]},
+        "retain_until": {"anyOf": [{"$ref": "#/$defs/utc_time"}, {"type": "null"}]},
+        "hold_status": {"enum": ["none", "active"]},
+        "storage_receipt_ref": {"$ref": "#/$defs/digest"},
+        "snapshot_only": {"const": true}
+      },
+      "allOf": [
+        {"if": {"properties": {"mode": {"const": "bounded_worm"}}}, "then": {"properties": {"retain_until": {"$ref": "#/$defs/utc_time"}}}},
+        {"if": {"properties": {"mode": {"const": "legal_hold"}}}, "then": {"properties": {"hold_status": {"const": "active"}}}}
+      ],
+      "description": "Provider-enforced WORM and an application append-only policy have different threat models. Later retention, availability and lawful disposal events append to history; this historical declaration is not live state or an indefinite availability guarantee."
+    },
+    "availability_snapshot": {
+      "type": "object", "additionalProperties": false,
+      "required": ["as_of", "status", "verification_receipt_ref", "future_availability"],
+      "properties": {
+        "as_of": {"$ref": "#/$defs/utc_time"},
+        "status": {"const": "all_declared_submitted_payloads_present_at_ingest"},
+        "verification_receipt_ref": {"$ref": "#/$defs/digest"},
+        "future_availability": {"const": "recheck_current_payload_and_key_availability"}
+      }
+    },
+    "external_service_limitation": {
+      "type": "object", "additionalProperties": false,
+      "required": ["service_id", "role", "observed_version", "limitation", "submitted_bytes_substitute", "reexecution_guaranteed"],
+      "properties": {
+        "service_id": {"$ref": "#/$defs/identifier"},
+        "role": {"enum": ["model_api", "tool_api", "data_source", "execution_service", "other"]},
+        "observed_version": {"anyOf": [{"type": "string", "minLength": 1, "maxLength": 1024}, {"type": "null"}]},
+        "limitation": {"type": "string", "minLength": 1, "maxLength": 4096},
+        "submitted_bytes_substitute": {"const": false},
+        "reexecution_guaranteed": {"const": false},
+        "observation_receipt_refs": {"$ref": "#/$defs/digest_list"}
+      }
+    },
+    "seal_content": {
+      "type": "object", "additionalProperties": false,
+      "required": ["record_kind", "seal_id", "owner_principal_id", "submitter_principal_id", "branch_id", "parent_record_digests", "expected_head_digest", "policy_revision_digest", "authority_grant_ref", "created_at", "submitted_scope", "artifacts", "external_service_limitations", "retention_snapshot", "availability_snapshot", "semantic_status"],
+      "properties": {
+        "record_kind": {"const": "sealed_submission"},
+        "seal_id": {"$ref": "#/$defs/identifier"},
+        "owner_principal_id": {"$ref": "#/$defs/identifier"},
+        "submitter_principal_id": {"$ref": "#/$defs/identifier"},
+        "agent_instance_id": {"$ref": "#/$defs/identifier"},
+        "agent_artifact_digest": {"$ref": "#/$defs/digest"},
+        "entitlement_ref": {"$ref": "#/$defs/digest", "description": "Optional commercial entitlement evidence; conveys no authority to data or tools."},
+        "branch_id": {"$ref": "#/$defs/identifier"},
+        "parent_record_digests": {"$ref": "#/$defs/digest_list"},
+        "expected_head_digest": {"anyOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+        "policy_revision_digest": {"$ref": "#/$defs/digest"},
+        "authority_grant_ref": {"$ref": "#/$defs/digest"},
+        "created_at": {"$ref": "#/$defs/utc_time"},
+        "submitted_scope": {"$ref": "#/$defs/submitted_scope"},
+        "artifacts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/artifact"}},
+        "external_service_limitations": {"type": "array", "items": {"$ref": "#/$defs/external_service_limitation"}},
+        "retention_snapshot": {"$ref": "#/$defs/retention_snapshot"},
+        "availability_snapshot": {"$ref": "#/$defs/availability_snapshot"},
+        "semantic_status": {"const": "submitted_bytes_recorded_not_independently_accepted"}
+      },
+      "dependentRequired": {"agent_instance_id": ["agent_artifact_digest"], "agent_artifact_digest": ["agent_instance_id"]}
+    },
+    "branch_transition_content": {
+      "type": "object", "additionalProperties": false,
+      "required": ["record_kind", "transition_id", "transition_type", "owner_principal_id", "submitter_principal_id", "branch_id", "parent_transition_digests", "expected_head_digest", "new_head_digest", "policy_revision_digest", "authority_grant_ref", "approval_decision_ref", "created_at", "state_effect"],
+      "properties": {
+        "record_kind": {"const": "branch_transition"},
+        "transition_id": {"$ref": "#/$defs/identifier"},
+        "transition_type": {"enum": ["create", "advance", "merge", "rollback", "archive"]},
+        "owner_principal_id": {"$ref": "#/$defs/identifier"},
+        "submitter_principal_id": {"$ref": "#/$defs/identifier"},
+        "branch_id": {"$ref": "#/$defs/identifier"},
+        "parent_transition_digests": {"$ref": "#/$defs/digest_list"},
+        "expected_head_digest": {"anyOf": [{"$ref": "#/$defs/digest"}, {"type": "null"}]},
+        "new_head_digest": {"$ref": "#/$defs/digest", "description": "The content digest of the target sealed submission; a branch alias or mutable URI is forbidden."},
+        "merge_source_seal_digests": {"$ref": "#/$defs/digest_list"},
+        "policy_revision_digest": {"$ref": "#/$defs/digest"},
+        "authority_grant_ref": {"$ref": "#/$defs/digest"},
+        "approval_decision_ref": {"$ref": "#/$defs/digest"},
+        "created_at": {"$ref": "#/$defs/utc_time"},
+        "state_effect": {"const": "derive_head_only_after_current_policy_and_compare_and_swap_validation"}
+      },
+      "allOf": [
+        {"if": {"properties": {"transition_type": {"const": "create"}}}, "then": {"properties": {"expected_head_digest": {"type": "null"}, "parent_transition_digests": {"maxItems": 0}}}, "else": {"properties": {"expected_head_digest": {"$ref": "#/$defs/digest"}, "parent_transition_digests": {"minItems": 1}}}},
+        {"if": {"properties": {"transition_type": {"const": "merge"}}}, "then": {"required": ["merge_source_seal_digests"], "properties": {"merge_source_seal_digests": {"minItems": 2}}}, "else": {"not": {"required": ["merge_source_seal_digests"]}}}
+      ],
+      "description": "Transition DAG and head/policy state are checked by the policy kernel. A rollback is a new authorized event selecting an older seal, never deletion or rewinding of the audit log. Merging content does not merge permissions or imply semantic approval."
+    }
+  }
+}

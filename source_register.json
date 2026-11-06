@@ -1,0 +1,200 @@
+{
+  "proposal": "WRN Passport and Coexistence",
+  "profile_version": "0.2",
+  "status": "design_not_implemented",
+  "accessed_on": "2026-11-05",
+  "sources": [
+    {
+      "id": "S1",
+      "author_year": "W3C 2025",
+      "title": "Verifiable Credentials Data Model 2.0",
+      "url": "https://www.w3.org/TR/vc-data-model-2.0/",
+      "doi": null,
+      "scope_and_limit": "Recommendation 15 May 2025. Credentials express issuer claims; verification does not establish truth or resource authorization."
+    },
+    {
+      "id": "S2",
+      "author_year": "W3C 2022",
+      "title": "Decentralized Identifiers v1.0",
+      "url": "https://www.w3.org/TR/did-core/",
+      "doi": null,
+      "scope_and_limit": "Recommendation 19 July 2022. Identifier and verification-method framework; identity proofing, rotation and recovery depend on the chosen method and trust arrangements."
+    },
+    {
+      "id": "S3",
+      "author_year": "W3C 2026",
+      "title": "Web Authentication Level 3",
+      "url": "https://www.w3.org/TR/webauthn-3/",
+      "doi": null,
+      "scope_and_limit": "Recommendation 25 August 2026. Public-key authentication; a successful ceremony alone does not prove understanding of business terms."
+    },
+    {
+      "id": "S4",
+      "author_year": "Temoshok et al 2025",
+      "title": "NIST SP 800-63-4 Digital Identity Guidelines",
+      "url": "https://csrc.nist.gov/pubs/sp/800/63/4/final",
+      "doi": "10.6028/NIST.SP.800-63-4",
+      "scope_and_limit": "Separates identity proofing, authentication and federation. Assurance choices require an application-specific assessment."
+    },
+    {
+      "id": "S5",
+      "author_year": "Fett et al 2023",
+      "title": "OAuth 2.0 Demonstrating Proof of Possession RFC 9449",
+      "url": "https://www.rfc-editor.org/rfc/rfc9449.html",
+      "doi": "10.17487/RFC9449",
+      "scope_and_limit": "Sender-constrained tokens; DPoP does not cover the request body or general headers and does not itself decide authorization."
+    },
+    {
+      "id": "S6",
+      "author_year": "Backman Richer and Sporny 2024",
+      "title": "HTTP Message Signatures RFC 9421",
+      "url": "https://www.rfc-editor.org/rfc/rfc9421.html",
+      "doi": "10.17487/RFC9421",
+      "scope_and_limit": "Signatures over selected HTTP components. Applications must choose and enforce the required coverage and replay controls."
+    },
+    {
+      "id": "S7",
+      "author_year": "Polli and Pardue 2024",
+      "title": "Digest Fields RFC 9530",
+      "url": "https://www.rfc-editor.org/rfc/rfc9530.html",
+      "doi": "10.17487/RFC9530",
+      "scope_and_limit": "Content-Digest and Repr-Digest. A digest requires recomputation and authenticated binding; it is not an access grant."
+    },
+    {
+      "id": "S8",
+      "author_year": "Jones et al 2020",
+      "title": "OAuth 2.0 Token Exchange RFC 8693",
+      "url": "https://www.rfc-editor.org/rfc/rfc8693.html",
+      "doi": "10.17487/RFC8693",
+      "scope_and_limit": "Delegation and impersonation are distinct. Revocation propagation is not an automatic property of token exchange."
+    },
+    {
+      "id": "S9",
+      "author_year": "Lodderstedt Richer and Campbell 2023",
+      "title": "OAuth 2.0 Rich Authorization Requests RFC 9396",
+      "url": "https://www.rfc-editor.org/rfc/rfc9396.html",
+      "doi": "10.17487/RFC9396",
+      "scope_and_limit": "Fine-grained authorization_details. WRN would need a defined application profile and permission-containment semantics."
+    },
+    {
+      "id": "S10",
+      "author_year": "Laurie Messeri and Stradling 2021",
+      "title": "Certificate Transparency Version 2.0 RFC 9162",
+      "url": "https://www.rfc-editor.org/rfc/rfc9162.html",
+      "doi": "10.17487/RFC9162",
+      "scope_and_limit": "Experimental RFC. Merkle inclusion and consistency concepts; the specification explicitly identifies inconsistent log views as a limitation."
+    },
+    {
+      "id": "S11",
+      "author_year": "C2SP community",
+      "title": "Transparency Log Witness Protocol",
+      "url": "https://c2sp.org/tlog-witness@v1.1.0",
+      "doi": null,
+      "scope_and_limit": "Version 1.1.0 observed. Witness cosignatures support checkpoint consistency; trust, independence and availability remain assumptions."
+    },
+    {
+      "id": "S12",
+      "author_year": "Amazon Web Services documentation",
+      "title": "Locking objects with Object Lock",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+      "doi": null,
+      "scope_and_limit": "WORM protection applies to specified object versions; new versions and delete markers are still possible. Product example, not a required provider."
+    },
+    {
+      "id": "S13",
+      "author_year": "IPFS documentation",
+      "title": "Privacy and encryption",
+      "url": "https://docs.ipfs.tech/concepts/privacy-and-encryption/",
+      "doi": null,
+      "scope_and_limit": "Public IPFS exposes metadata; content requires application encryption for confidentiality. A content identifier is not an authorization credential."
+    },
+    {
+      "id": "S14",
+      "author_year": "IPFS documentation",
+      "title": "Persistence",
+      "url": "https://docs.ipfs.tech/concepts/persistence/",
+      "doi": null,
+      "scope_and_limit": "Availability requires retention, pinning and storage arrangements. Content addressing does not promise perpetual availability."
+    },
+    {
+      "id": "S15",
+      "author_year": "Hyperledger Fabric documentation",
+      "title": "Private Data",
+      "url": "https://hyperledger-fabric.readthedocs.io/en/latest/private-data-arch.html",
+      "doi": null,
+      "scope_and_limit": "Collection membership and distribution require explicit design; adding members can expose historical collection data. A ledger alone does not implement personal sharing rules."
+    },
+    {
+      "id": "S16",
+      "author_year": "Fett Yasuda and Campbell 2025",
+      "title": "Selective Disclosure for JSON Web Tokens RFC 9901",
+      "url": "https://www.rfc-editor.org/rfc/rfc9901.html",
+      "doi": "10.17487/RFC9901",
+      "scope_and_limit": "Standards Track RFC, November 2025. Selective claim disclosure does not by itself ensure unlinkability, truth or fresh authorization."
+    },
+    {
+      "id": "S17",
+      "author_year": "Amazon Web Services documentation",
+      "title": "Object Lock considerations",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock-managing.html",
+      "doi": null,
+      "scope_and_limit": "Object Lock does not prevent loss or deletion of encryption keys; retained ciphertext can become unreadable. Recovery must protect decryption material separately."
+    },
+    {
+      "id": "P1",
+      "author_year": "Crabtree et al 2018",
+      "title": "Building accountability into the Internet of Things The IoT Databox model",
+      "url": "https://link.springer.com/article/10.1007/s40860-018-0054-5",
+      "doi": "10.1007/s40860-018-0054-5",
+      "scope_and_limit": "Journal of Reliable Intelligent Environments 4, 39–55. Prior art for personal stores, app manifests, fine-grained consent, isolated processing and audit."
+    },
+    {
+      "id": "P2",
+      "author_year": "Vizgirda Zhao and Goel 2024",
+      "title": "SocialGenPod Privacy Friendly Generative AI Social Web Applications with Decentralised Personal Data Stores",
+      "url": "https://www.cs.ox.ac.uk/publications/publication16241-abstract.html",
+      "doi": "10.1145/3589335.3651251",
+      "scope_and_limit": "WWW 2024 Companion, 1067–1070. Prototype combining Solid personal stores, interchangeable LLMs and retrieval over permitted private documents."
+    },
+    {
+      "id": "P3",
+      "author_year": "Pang et al 2019",
+      "title": "Zanzibar Googles Consistent Global Authorization System",
+      "url": "https://www.usenix.org/conference/atc19/presentation/pang",
+      "doi": null,
+      "scope_and_limit": "USENIX ATC 2019, 33–46. Authorization/content causal consistency. Reported Google performance must not be assigned to this proposed system."
+    },
+    {
+      "id": "P4",
+      "author_year": "Wust and Gervais 2018",
+      "title": "Do you Need a Blockchain",
+      "url": "https://doi.org/10.1109/CVCBT.2018.00011",
+      "doi": "10.1109/CVCBT.2018.00011",
+      "scope_and_limit": "CVCBT 2018, 45–54. Method for deciding between conventional storage, permissioned and permissionless systems based on trust and writers."
+    },
+    {
+      "id": "P5",
+      "author_year": "Myers and Liskov 2000",
+      "title": "Protecting privacy using the decentralized label model",
+      "url": "https://www.cs.yale.edu/homes/dsc5/papers/iflow-tosem.pdf",
+      "doi": "10.1145/363516.363526",
+      "scope_and_limit": "ACM TOSEM 9(4), 410–442. Information-flow labels and owner-controlled declassification; not a proof for unrestricted language-model outputs."
+    },
+    {
+      "id": "T1",
+      "author_year": "Ford Hutchinson 2005",
+      "title": "Securing FTP with TLS RFC 4217",
+      "url": "https://www.rfc-editor.org/info/rfc4217/",
+      "doi": "10.17487/RFC4217",
+      "scope_and_limit": "Explains FTPS terminology. A secure transfer protocol is distinct from a personal identity or decentralized work platform."
+    },
+    {
+      "id": "T2",
+      "author_year": "Entriken Shirley Evans and Sachs 2018",
+      "title": "ERC 721 Non Fungible Token Standard",
+      "url": "https://eips.ethereum.org/EIPS/eip-721",
+      "doi": null,
+      "scope_and_limit": "Tracks and transfers token ownership. A separate application policy must determine any relationship between a token and data access."
+    }
+  ]
+}
