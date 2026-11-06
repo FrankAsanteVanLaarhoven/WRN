@@ -31,7 +31,7 @@ interface UserRecord {
 export const AuthView: React.FC = () => {
   const containerRef = useStaggerEntrance();
   const [users, setUsers] = useState<UserRecord[]>([
-    { id: 'usr_01', name: 'Frank Van Laarhoven', email: 'frank@openmeta.io', role: 'Owner', provider: 'Passkey', status: 'active', mfa: true, lastSeen: 'Just now', createdAt: '2026-08-01' },
+    { id: 'usr_01', name: 'Frank Van Laarhoven', email: 'frank@wrn.network', role: 'Owner', provider: 'Passkey', status: 'active', mfa: true, lastSeen: 'Just now', createdAt: '2026-08-01' },
     { id: 'usr_02', name: 'Maya Chen', email: 'maya@orbit.dev', role: 'Admin', provider: 'GitHub', status: 'active', mfa: true, lastSeen: '4 mins ago', createdAt: '2026-08-15' },
     { id: 'usr_03', name: 'Luis Romero', email: 'luis@northwind.io', role: 'Developer', provider: 'Google', status: 'active', mfa: false, lastSeen: '12 mins ago', createdAt: '2026-08-20' },
     { id: 'usr_04', name: 'Priya Shah', email: 'priya@folio.app', role: 'Analyst', provider: 'Magic Link', status: 'pending', mfa: false, lastSeen: '2 hours ago', createdAt: '2026-08-25' },

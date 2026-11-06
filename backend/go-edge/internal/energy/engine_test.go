@@ -35,3 +35,4 @@ func TestEnergyEngine(t *testing.T) {
 		t.Fatalf("expected 1 queued job, got %d", len(queue))
 	}
 }
+

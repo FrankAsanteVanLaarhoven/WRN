@@ -4,6 +4,7 @@ all: test build
 
 build:
 	go build -o bin/wrn-edge-server cmd/server/main.go
+	go build -o bin/wrn cmd/wrn/main.go
 
 test:
 	go test -v ./...

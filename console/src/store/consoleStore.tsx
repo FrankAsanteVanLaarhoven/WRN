@@ -162,7 +162,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
     return {
       id: 'usr_client_01',
       name: 'Frank Van Laarhoven',
-      email: 'frank@openmeta.io',
+      email: 'frank@wrn.network',
       role: 'Owner',
       avatarInitials: 'FL',
       organization: 'Personal projects'

@@ -15,6 +15,7 @@ import (
 
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/cache"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/energy"
+	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/gitengine"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/iac"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/stepfunctions"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/waf"
@@ -73,7 +74,7 @@ func main() {
 
 	state := &ServerState{
 		users: []User{
-			{ID: "usr_01", Name: "Frank Van Laarhoven", Email: "frank@openmeta.io", Role: "Owner", Provider: "Passkey", Status: "active", MFA: true, LastSeen: "Just now", CreatedAt: "2026-08-01"},
+			{ID: "usr_01", Name: "Frank Van Laarhoven", Email: "frank@wrn.network", Role: "Owner", Provider: "Passkey", Status: "active", MFA: true, LastSeen: "Just now", CreatedAt: "2026-08-01"},
 			{ID: "usr_02", Name: "Maya Chen", Email: "maya@orbit.dev", Role: "Admin", Provider: "GitHub", Status: "active", MFA: true, LastSeen: "4 mins ago", CreatedAt: "2026-08-15"},
 			{ID: "usr_03", Name: "Luis Romero", Email: "luis@northwind.io", Role: "Developer", Provider: "Google", Status: "active", MFA: false, LastSeen: "12 mins ago", CreatedAt: "2026-08-20"},
 			{ID: "usr_04", Name: "Priya Shah", Email: "priya@folio.app", Role: "Analyst", Provider: "Magic Link", Status: "pending", MFA: false, LastSeen: "2 hours ago", CreatedAt: "2026-08-25"},
@@ -94,12 +95,12 @@ func main() {
 		logs: []map[string]interface{}{
 			{"id": "log_01", "timestamp": time.Now().Add(-10 * time.Second).Format(time.RFC3339), "level": "INFO", "service": "edge_proxy", "action": "request.allowed", "ip": "194.26.29.110", "duration_ms": 0.4, "status": 200},
 			{"id": "log_02", "timestamp": time.Now().Add(-30 * time.Second).Format(time.RFC3339), "level": "WARN", "service": "waf_firewall", "action": "threat.neutralized", "ip": "185.220.101.5", "payload": "' OR 1=1 --", "status": 403},
-			{"id": "log_03", "timestamp": time.Now().Add(-60 * time.Second).Format(time.RFC3339), "level": "INFO", "service": "rust_kernel", "action": "grant.verified", "grant_id": "grant_openmeta_01", "status": 200},
+			{"id": "log_03", "timestamp": time.Now().Add(-60 * time.Second).Format(time.RFC3339), "level": "INFO", "service": "rust_kernel", "action": "grant.verified", "grant_id": "grant_wrn_01", "status": 200},
 			{"id": "log_04", "timestamp": time.Now().Add(-90 * time.Second).Format(time.RFC3339), "level": "INFO", "service": "redis_cache", "action": "cache.hit", "key": "telemetry:cdn:ttfb", "duration_ms": 0.1, "status": 200},
 		},
 	}
 
-	redisCache.Set("openmeta:config", []byte(`{"zone":"zone_01_core","auth":"rfc9421","tls":"1.3"}`), time.Hour)
+	redisCache.Set("wrn:config", []byte(`{"zone":"zone_01_core","auth":"rfc9421","tls":"1.3"}`), time.Hour)
 	redisCache.Set("telemetry:cdn:ttfb", []byte(`{"ttfb_ms":0.4,"cache_status":"HIT","pop":"FRA-01"}`), time.Hour)
 
 	mux := http.NewServeMux()
@@ -625,6 +626,109 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]interface{}{
 			"count": len(queue),
 			"queue": queue,
+		})
+	}))
+
+	// 11. WRN Native Git & Automated Cloud Deployment Framework
+	gitEngine := gitengine.NewGitEngine()
+
+	// GET /api/v1/git/status: Repository state, active branch, and staged files
+	mux.HandleFunc("/api/v1/git/status", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(gitEngine.Status())
+	}))
+
+	// POST /api/v1/git/add: Stages specified files
+	mux.HandleFunc("/api/v1/git/add", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		var body struct {
+			Files []string `json:"files"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		if len(body.Files) == 0 {
+			body.Files = []string{"."}
+		}
+		res := gitEngine.Add(body.Files)
+		json.NewEncoder(w).Encode(res)
+	}))
+
+	// POST /api/v1/git/commit: Creates cryptographically sealed commit
+	mux.HandleFunc("/api/v1/git/commit", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		var body struct {
+			Message string `json:"message"`
+			Author  string `json:"author"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body.Message == "" {
+			http.Error(w, "Commit message is required", http.StatusBadRequest)
+			return
+		}
+		commit, err := gitEngine.Commit(body.Message, body.Author)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		json.NewEncoder(w).Encode(commit)
+	}))
+
+	// POST /api/v1/git/push: Pushes commits & triggers 5-phase Cloud CI/CD pipeline
+	mux.HandleFunc("/api/v1/git/push", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		var body struct {
+			Remote string `json:"remote"`
+			Branch string `json:"branch"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		pipeline, err := gitEngine.Push(body.Remote, body.Branch)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		json.NewEncoder(w).Encode(pipeline)
+	}))
+
+	// POST /api/v1/git/branch: Switches active working branch
+	mux.HandleFunc("/api/v1/git/branch", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if r.Method != http.MethodPost {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		var body struct {
+			Branch string `json:"branch"`
+		}
+		json.NewDecoder(r.Body).Decode(&body)
+		if body.Branch == "" {
+			http.Error(w, "Branch name is required", http.StatusBadRequest)
+			return
+		}
+		gitEngine.SwitchBranch(body.Branch)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status": "switched",
+			"branch": body.Branch,
+		})
+	}))
+
+	// GET /api/v1/git/commits: Returns commit history with Merkle proofs
+	mux.HandleFunc("/api/v1/git/commits", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		commits := gitEngine.GetCommits()
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"total":   len(commits),
+			"commits": commits,
 		})
 	}))
 

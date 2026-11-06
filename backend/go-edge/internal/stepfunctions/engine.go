@@ -45,7 +45,7 @@ func NewDefaultContext() *StateMachineContext {
 	return &StateMachineContext{
 		AgentID:       "urn:wrn:agent:runtime-01",
 		Role:          "autonomous-worker",
-		Delegator:     "frank@openmeta.io",
+		Delegator:     "frank@wrn.network",
 		Zone:          2,
 		KeyID:         "key_wrn_agent_01",
 		CompartmentID: "comp-sec-01",

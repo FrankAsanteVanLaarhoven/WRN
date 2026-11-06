@@ -11,6 +11,7 @@ export type ProjectServiceTab =
   | 'functions'
   | 'messaging'
   | 'sites'
+  | 'git'
   | 'workflows'
   | 'step-functions'
   | 'iac'

@@ -237,3 +237,4 @@ func (e *EnergyEngine) GetDelayQueue() []map[string]interface{} {
 	defer e.mu.RUnlock()
 	return e.delayQueue
 }
+

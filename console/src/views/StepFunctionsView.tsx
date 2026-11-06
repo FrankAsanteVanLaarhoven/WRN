@@ -57,7 +57,7 @@ export const StepFunctionsView: React.FC = () => {
       input: {
         agentId: 'urn:wrn:agent:runtime-01',
         role: 'autonomous-worker',
-        delegator: 'frank@openmeta.io',
+        delegator: 'frank@wrn.network',
         runtime: 'wasm-isolated-vm'
       },
       output: {

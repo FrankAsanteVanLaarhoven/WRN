@@ -2,7 +2,7 @@
 name = "wrn-kernel-core"
 version = "0.2.0"
 edition = "2021"
-authors = ["Frank Van Laarhoven <frank@openmeta.io>"]
+authors = ["Frank Van Laarhoven <frank@wrn.network>"]
 description = "Military-grade high-assurance RFC 9421 cryptographic kernel and bounded compartment engine for WRN"
 license = "MIT"
 

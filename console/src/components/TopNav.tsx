@@ -215,7 +215,7 @@ export const TopNav: React.FC = () => {
           <span>Upgrade</span>
         </button>
 
-        {/* Client Login & Account Profile (Replaces static openmeta avatar) */}
+        {/* Client Login & Account Profile */}
         {!clientUser ? (
           <button
             onClick={() => setIsAuthModalOpen(true)}

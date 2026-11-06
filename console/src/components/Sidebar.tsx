@@ -21,7 +21,8 @@ import {
   Radio,
   Zap,
   GitMerge,
-  Leaf
+  Leaf,
+  GitBranch
 } from 'lucide-react';
 import { ProjectServiceTab } from '../types/console';
 
@@ -81,7 +82,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
     {
       title: 'DEPLOY',
       items: [
-        { id: 'sites', label: 'Sites', icon: Globe }
+        { id: 'sites', label: 'Sites', icon: Globe },
+        { id: 'git', label: 'Git & CI/CD Framework', icon: GitBranch, badge: 'Native' }
       ]
     },
     {

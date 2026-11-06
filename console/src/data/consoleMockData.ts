@@ -3,7 +3,7 @@ import { DomainItem, ComputePlan, AgentInstance } from '../types/console';
 export const INITIAL_DOMAINS: DomainItem[] = [
   {
     id: 'dom_01',
-    domain: 'openmeta.io',
+    domain: 'wrn.network',
     status: 'verified',
     sslStatus: 'active',
     registrar: 'WRN Edge Registrar',
@@ -15,10 +15,10 @@ export const INITIAL_DOMAINS: DomainItem[] = [
     ],
     proxyConfig: `server {
     listen 443 ssl http2;
-    server_name openmeta.io api.openmeta.io;
+    server_name wrn.network api.wrn.network;
 
-    ssl_certificate /etc/letsencrypt/live/openmeta.io/fullchain.pem;
-    ssl_certificate_key /etc/letsencrypt/live/openmeta.io/privkey.pem;
+    ssl_certificate /etc/letsencrypt/live/wrn.network/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/wrn.network/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers HIGH:!aNULL:!MD5;
 
@@ -133,7 +133,7 @@ export const INITIAL_POSTGRES_USERS = [
   { id: 'usr_luis', name: 'Luis Romero', email: 'luis@northwind.io', role: 'Lead Dev', status: 'Verified' },
   { id: 'usr_priya', name: 'Priya Shah', email: 'priya@folio.app', role: 'Engineer', status: 'Pending' },
   { id: 'usr_jonah', name: 'Jonah Blake', email: 'jonah@kepler.so', role: 'Security Ops', status: 'Verified' },
-  { id: 'usr_frank', name: 'Frank Van Laarhoven', email: 'frank@openmeta.io', role: 'Owner', status: 'Verified' }
+  { id: 'usr_frank', name: 'Frank Van Laarhoven', email: 'frank@wrn.network', role: 'Owner', status: 'Verified' }
 ];
 
 export const MARKETPLACE_TOOLS = [

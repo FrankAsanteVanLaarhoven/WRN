@@ -16,6 +16,7 @@ import { StorageView } from './views/StorageView';
 import { FunctionsView } from './views/FunctionsView';
 import { MessagingView } from './views/MessagingView';
 import { SitesView } from './views/SitesView';
+import { GitWorkflowView } from './views/GitWorkflowView';
 import { WorkflowsView } from './views/WorkflowsView';
 import { StepFunctionsView } from './views/StepFunctionsView';
 import { IaCView } from './views/IaCView';
@@ -103,6 +104,7 @@ const MainLayout: React.FC = () => {
             {projectServiceTab === 'functions' && <FunctionsView />}
             {projectServiceTab === 'messaging' && <MessagingView />}
             {projectServiceTab === 'sites' && <SitesView />}
+            {projectServiceTab === 'git' && <GitWorkflowView />}
             {projectServiceTab === 'workflows' && <WorkflowsView />}
             {projectServiceTab === 'step-functions' && <StepFunctionsView />}
             {projectServiceTab === 'iac' && <IaCView />}

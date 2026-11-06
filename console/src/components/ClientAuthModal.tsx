@@ -254,12 +254,12 @@ export const ClientAuthModal: React.FC = () => {
               <div className="space-y-1.5">
                 <button
                   type="button"
-                  onClick={() => handleQuickLogin('frank@openmeta.io', 'Frank Van Laarhoven', 'Owner')}
+                  onClick={() => handleQuickLogin('frank@wrn.network', 'Frank Van Laarhoven', 'Owner')}
                   className="w-full px-2.5 py-1.5 rounded-lg bg-surface hover:bg-surface-elevated border border-border hover-tube text-xs flex items-center justify-between text-left transition-colors"
                 >
                   <div>
                     <span className="font-semibold text-white">Frank Van Laarhoven</span>
-                    <span className="text-slate-400 text-[11px] block font-mono">frank@openmeta.io</span>
+                    <span className="text-slate-400 text-[11px] block font-mono">frank@wrn.network</span>
                   </div>
                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-illum-muted text-illum font-mono">
                     Owner
