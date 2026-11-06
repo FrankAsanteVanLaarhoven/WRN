@@ -20,7 +20,7 @@ import {
   GitFork,
   Radio
 } from 'lucide-react';
-import { ProjectServiceTab } from '../types/appwrite';
+import { ProjectServiceTab } from '../types/console';
 
 interface SidebarProps {
   onOpenCommission: () => void;
@@ -38,7 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
   } = useConsole();
 
   if (topNavTab !== 'projects') {
-    return null; // When in Marketplace, Domains, Compute, or Settings, full width views are used matching Appwrite
+    return null; // When in AI Experience, Marketplace, Domains, Compute, or Settings, full width views are used
   }
 
   const passedTests = securityResults.filter(s => s.status === 'pass').length;
@@ -68,6 +68,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
     {
       title: 'BUILD',
       items: [
+        { id: 'ai-experience', label: 'AI Experience Studio', icon: Sparkles, badge: 'AI & Flex' },
         { id: 'auth', label: 'Auth', icon: Users },
         { id: 'databases', label: 'Databases', icon: Database, badge: 'Postgres/MySQL' },
         { id: 'storage', label: 'Storage', icon: HardDrive },
@@ -119,7 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
         } w-60 border-r border-border/80 bg-surface flex-col justify-between shrink-0 select-none transition-all duration-200`}
       >
         <div className="p-3 space-y-4 overflow-y-auto">
-          {/* Get Started Progress (Matching Appwrite Screenshot 3) */}
+          {/* Get Started Progress */}
           <div className="p-3 rounded-xl bg-surface-card border border-border/80 space-y-2">
             <div className="flex items-center justify-between text-xs font-mono">
               <span className="font-semibold text-slate-200">Get started</span>
@@ -179,7 +180,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
           <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
             <span className="flex items-center space-x-1">
               <Radio className="w-3 h-3 text-illum animate-pulse" />
-              <span className="text-slate-200">Appwrite OS 1.6</span>
+              <span className="text-slate-200">WRN OS 2.0</span>
             </span>
             <span className="text-illum font-semibold">ONLINE</span>
           </div>

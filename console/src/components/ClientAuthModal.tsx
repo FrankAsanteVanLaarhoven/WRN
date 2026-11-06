@@ -82,7 +82,7 @@ export const ClientAuthModal: React.FC = () => {
           <p className="text-xs text-slate-400">
             {clientUser
               ? `Currently signed in as ${clientUser.email}`
-              : 'Authenticate with Appwrite Auth to manage your projects, agents & deployments'}
+              : 'Authenticate with WRN Auth to manage your projects, agents & deployments'}
           </p>
         </div>
 
@@ -287,9 +287,10 @@ export const ClientAuthModal: React.FC = () => {
         {/* Footer info */}
         <div className="mt-4 pt-3 border-t border-border/40 text-[11px] text-center text-slate-500 flex items-center justify-center space-x-1.5">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Secured with Appwrite Auth & WRN RFC 9421 Passports</span>
+          <span>Secured with WRN Auth & RFC 9421 Passports</span>
         </div>
       </div>
     </div>
   );
 };
+

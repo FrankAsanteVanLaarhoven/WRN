@@ -18,7 +18,7 @@ import {
   Bot
 } from 'lucide-react';
 
-export const AppwriteOverviewView: React.FC = () => {
+export const ConsoleOverviewView: React.FC = () => {
   const { telemetry, setProjectServiceTab, setActiveTab } = useConsole();
   const [timeRange, setTimeRange] = useState('24h');
 
@@ -32,7 +32,7 @@ export const AppwriteOverviewView: React.FC = () => {
             <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-illum-muted text-illum border border-illum-muted">
               6aed448b00010a9c93f6
             </span>
-            <span className="text-xs text-slate-400 font-mono">fra.cloud.appwrite.network</span>
+            <span className="text-xs text-slate-400 font-mono">fra.cloud.wrn.network</span>
           </div>
           <p className="text-xs text-slate-400 mt-1">
             Agent-first & MCP-enabled infrastructure running with WRN bounded coexistence kernel.
@@ -102,7 +102,7 @@ export const AppwriteOverviewView: React.FC = () => {
         </div>
       </div>
 
-      {/* Your Resources Grid (Matching Appwrite Screenshot 3 & 4) */}
+      {/* Your Resources Grid */}
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-slate-200 uppercase font-mono tracking-wider">
           Your Resources
@@ -297,7 +297,7 @@ export const AppwriteOverviewView: React.FC = () => {
         </div>
       </div>
 
-      {/* Connect Apps & API Keys (Matching Appwrite Screenshot 4) */}
+      {/* Connect Apps & API Keys */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
         {/* Apps */}
         <div className="p-5 rounded-xl neon-tube-card space-y-3">

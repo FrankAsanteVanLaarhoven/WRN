@@ -12,9 +12,9 @@ import {
   Palette,
   Check
 } from 'lucide-react';
-import { ILLUMINATION_OPTIONS, IlluminationColor } from '../types/appwrite';
+import { ILLUMINATION_OPTIONS, IlluminationColor } from '../types/console';
 
-export const AppwriteSettingsView: React.FC = () => {
+export const ProjectSettingsView: React.FC = () => {
   const { illuminationColor, setIlluminationColor } = useConsole();
   const [activeSub, setActiveSub] = useState<'General' | 'Members' | 'Billing' | 'Compliance' | 'OAuth apps'>('General');
   const [orgName, setOrgName] = useState('Personal projects');
@@ -48,7 +48,7 @@ export const AppwriteSettingsView: React.FC = () => {
         </span>
       </div>
 
-      {/* Main Split (Matching Appwrite Screenshot 1) */}
+      {/* Main Split */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Subnav */}
         <div className="w-full lg:w-60 border-b lg:border-b-0 lg:border-r border-border p-4 bg-surface/50 space-y-1 font-mono text-xs">
@@ -131,7 +131,7 @@ export const AppwriteSettingsView: React.FC = () => {
           <div className="p-5 rounded-xl neon-tube-card space-y-2">
             <h2 className="text-xs font-bold text-white font-mono uppercase tracking-wider">Organization ID</h2>
             <p className="text-xs text-slate-400">
-              Use this ID when integrating with the Appwrite API, webhooks, or SDKs. Support may also ask for this ID when assisting with issues.
+              Use this ID when integrating with the WRN API, webhooks, or SDKs. Support may also ask for this ID when assisting with issues.
             </p>
             <div className="flex items-center space-x-2 pt-1">
               <div className="p-2.5 rounded-lg bg-surface border border-border font-mono text-xs text-illum flex items-center justify-between flex-1">

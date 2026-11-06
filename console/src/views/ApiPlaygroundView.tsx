@@ -13,7 +13,7 @@ import {
   Users
 } from 'lucide-react';
 
-export const AppwritePlaygroundView: React.FC = () => {
+export const ApiPlaygroundView: React.FC = () => {
   const [protocol, setProtocol] = useState<'REST' | 'Realtime'>('REST');
   const [apiType, setApiType] = useState<'Client API' | 'Server API'>('Client API');
   const [selectedEndpoint, setSelectedEndpoint] = useState({
@@ -65,9 +65,9 @@ export const AppwritePlaygroundView: React.FC = () => {
   };
 
   const copyCurl = () => {
-    const curl = `curl -X ${selectedEndpoint.method} "https://fra.cloud.appwrite.network/v1${selectedEndpoint.path}" \\
-  -H "X-Appwrite-Project: 6aed448b00010a9c93f6" \\
-  -H "X-Appwrite-Key: wrn_secret_key_88f92b..." \\
+    const curl = `curl -X ${selectedEndpoint.method} "https://fra.cloud.wrn.network/v1${selectedEndpoint.path}" \\
+  -H "X-WRN-Project: 6aed448b00010a9c93f6" \\
+  -H "X-WRN-Key: wrn_secret_key_88f92b..." \\
   -H "Content-Type: application/json"`;
     navigator.clipboard.writeText(curl);
     setCopied(true);
@@ -124,7 +124,7 @@ export const AppwritePlaygroundView: React.FC = () => {
         </div>
       </div>
 
-      {/* Main 3-Column Split (Matching Appwrite Screenshot 5) */}
+      {/* Main 3-Column Split */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Left Column: Endpoints List */}
         <div className="w-full lg:w-72 border-b lg:border-b-0 lg:border-r border-border p-3 overflow-y-auto bg-surface/50 space-y-2">
@@ -183,7 +183,7 @@ export const AppwritePlaygroundView: React.FC = () => {
             <div className="p-3 rounded-lg bg-surface border border-border/80 flex items-center space-x-2 font-mono text-xs">
               <span className="text-illum font-bold">{selectedEndpoint.method}</span>
               <span className="text-slate-200 truncate">
-                https://fra.cloud.appwrite.network/v1{selectedEndpoint.path}
+                https://fra.cloud.wrn.network/v1{selectedEndpoint.path}
               </span>
             </div>
 

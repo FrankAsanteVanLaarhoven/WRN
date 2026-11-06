@@ -121,7 +121,7 @@ export const ComputeCostAnalysisView: React.FC = () => {
         {/* Direct Provider Comparison Bar */}
         <div className="grid grid-cols-3 gap-3 pt-3 border-t border-border/80 text-center font-mono text-xs">
           <div className="p-3 rounded-lg bg-surface border border-border">
-            <div className="text-slate-400 text-[11px]">WRN × Appwrite OS</div>
+            <div className="text-slate-400 text-[11px]">WRN Coexistence OS</div>
             <div className="text-lg font-bold text-illum mt-0.5">${ourMonthlyCost.toFixed(2)}</div>
             <div className="text-[10px] text-emerald-400">Included Agent Mesh</div>
           </div>

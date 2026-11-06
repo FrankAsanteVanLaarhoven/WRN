@@ -14,7 +14,7 @@ import {
   Layers
 } from 'lucide-react';
 
-export const AppwriteMarketplaceView: React.FC = () => {
+export const AgentMarketplaceView: React.FC = () => {
   const { marketplaceTools, setProjectServiceTab } = useConsole();
   const [activeCategory, setActiveCategory] = useState<string>('Explore');
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,10 +52,10 @@ export const AppwriteMarketplaceView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <Boxes className="w-5 h-5 text-illum" />
-            <h1 className="text-lg font-bold text-white tracking-tight">Appwrite & Agent Marketplace</h1>
+            <h1 className="text-lg font-bold text-white tracking-tight">WRN Agent & Tool Marketplace</h1>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Discover official apps, CLI tools, and autonomous coding agents wired directly to Appwrite MCP servers.
+            Discover official apps, CLI tools, and autonomous coding agents wired directly to WRN MCP servers.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
 
       {/* Main Split */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* Left Category Sidebar (Matching Appwrite Screenshot 2) */}
+        {/* Left Category Sidebar */}
         <div className="w-full lg:w-64 border-b lg:border-b-0 lg:border-r border-border p-4 overflow-y-auto bg-surface/50 space-y-5 text-xs font-mono">
           <div className="relative">
             <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" />
@@ -125,7 +125,7 @@ export const AppwriteMarketplaceView: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Content Grid (Matching Appwrite Screenshot 2) */}
+        {/* Right Content Grid */}
         <div className="flex-1 p-6 overflow-y-auto space-y-6 bg-background">
           <div>
             <h2 className="text-sm font-bold text-white font-mono uppercase tracking-wider">

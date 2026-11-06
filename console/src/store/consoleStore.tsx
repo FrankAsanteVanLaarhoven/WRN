@@ -29,7 +29,7 @@ import {
   GrokAgentInstance,
   IlluminationColor,
   ILLUMINATION_OPTIONS
-} from '../types/appwrite';
+} from '../types/console';
 import {
   INITIAL_DOMAINS,
   COMPUTE_PLANS,
@@ -37,7 +37,7 @@ import {
   INITIAL_POSTGRES_USERS,
   MARKETPLACE_TOOLS,
   AI_ARENA_BENCHMARK
-} from '../data/appwriteMockData';
+} from '../data/consoleMockData';
 
 export type ActiveTab =
   | 'ontology'
@@ -72,7 +72,7 @@ interface ConsoleContextType {
   illuminationColor: IlluminationColor;
   setIlluminationColor: (color: IlluminationColor) => void;
 
-  // Appwrite Top Navigation
+  // Console Top Navigation
   topNavTab: TopNavTab;
   setTopNavTab: (tab: TopNavTab) => void;
   projectServiceTab: ProjectServiceTab;
@@ -90,7 +90,7 @@ interface ConsoleContextType {
   grokAgents: GrokAgentInstance[];
   executeGrokTask: (prompt: string, model?: 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8') => Promise<void>;
 
-  // Appwrite Databases & Queries
+  // Database Queries & Tables
   lapTimes: any[];
   postgresUsers: any[];
   marketplaceTools: any[];
@@ -239,11 +239,11 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
       model: 'Grok-Build-0.1',
       status: 'idle',
       taskPrompt: "Query Postgres for Friday's new users and verify email conversion rate.",
-      mcpServers: ['mcp.appwrite.io', 'wrn.notary.mcp'],
+      mcpServers: ['mcp.wrn.io', 'wrn.notary.mcp'],
       tokensPerSec: 184,
       costEstimate: 0.04,
       steps: [
-        { id: 's1', type: 'reasoning', text: "Connecting to Appwrite Postgres MCP using skill 'appwrite-postgres'...", timestamp: '03:15:02', status: 'success' },
+        { id: 's1', type: 'reasoning', text: "Connecting to WRN Postgres MCP using skill 'wrn-postgres'...", timestamp: '03:15:02', status: 'success' },
         { id: 's2', type: 'db_query', text: "SELECT * FROM users WHERE created_at >= '2026-08-21'", timestamp: '03:15:04', status: 'success' },
         { id: 's3', type: 'security_gate', text: "Verified 2,184 new rows. Email verification rate at 91.2%. Output bounded to tenant.", timestamp: '03:15:05', status: 'success' }
       ]
@@ -261,7 +261,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
       pricePerYear: 12.00,
       dnsRecords: [
         { type: 'A', host: '@', value: '185.199.108.153', status: 'valid' },
-        { type: 'CNAME', host: 'www', value: `${clean}.edge.appwrite.network`, status: 'valid' },
+        { type: 'CNAME', host: 'www', value: `${clean}.edge.wrn.network`, status: 'valid' },
         { type: 'TXT', host: '_wrn-challenge', value: `wrn-verification=${Math.random().toString(36).substring(2, 12)}`, status: 'valid' }
       ],
       nginxConfig: `server {
@@ -294,12 +294,12 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
       model,
       status: 'running',
       taskPrompt: prompt,
-      mcpServers: ['mcp.appwrite.io', 'postgres.mcp', 'nginx.edge.mcp'],
+      mcpServers: ['mcp.wrn.io', 'postgres.mcp', 'nginx.edge.mcp'],
       tokensPerSec: 210,
       costEstimate: 0.02,
       steps: [
         { id: '1', type: 'reasoning', text: `Analyzing task with ${model}: "${prompt}"`, timestamp: new Date().toLocaleTimeString(), status: 'success' },
-        { id: '2', type: 'tool_call', text: 'Executing MCP tool appwrite.database.queryTables...', timestamp: new Date().toLocaleTimeString(), status: 'success' },
+        { id: '2', type: 'tool_call', text: 'Executing MCP tool wrn.database.queryTables...', timestamp: new Date().toLocaleTimeString(), status: 'success' },
         { id: '3', type: 'security_gate', text: 'Enforcing WRN-COEXISTENCE-0.2 memory compartment boundaries.', timestamp: new Date().toLocaleTimeString(), status: 'success' }
       ]
     };

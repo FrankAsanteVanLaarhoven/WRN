@@ -1,7 +1,8 @@
-export type TopNavTab = 'projects' | 'marketplace' | 'domains' | 'compute' | 'settings';
+export type TopNavTab = 'projects' | 'ai-experience' | 'marketplace' | 'domains' | 'compute' | 'settings';
 
 export type ProjectServiceTab =
   | 'overview'
+  | 'ai-experience'
   | 'apps'
   | 'api-keys'
   | 'playground'
@@ -33,7 +34,7 @@ export const ILLUMINATION_OPTIONS: IlluminationOption[] = [
   { id: 'green', label: 'Cyber Green', hex: '#10B981', rgb: '16, 185, 129', twClass: 'bg-[#10B981]' },
   { id: 'purple', label: 'Amethyst', hex: '#A855F7', rgb: '168, 85, 247', twClass: 'bg-[#A855F7]' },
   { id: 'amber', label: 'Solar Amber', hex: '#F59E0B', rgb: '245, 158, 11', twClass: 'bg-[#F59E0B]' },
-  { id: 'rose', label: 'Appwrite Rose', hex: '#FD366E', rgb: '253, 54, 110', twClass: 'bg-[#FD366E]' }
+  { id: 'rose', label: 'Electric Rose', hex: '#FD366E', rgb: '253, 54, 110', twClass: 'bg-[#FD366E]' }
 ];
 
 export interface DomainItem {
@@ -87,4 +88,3 @@ export interface DatabaseRow {
   $id: string;
   [key: string]: any;
 }
-

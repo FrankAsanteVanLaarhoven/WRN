@@ -14,7 +14,7 @@ import {
   Lock,
   Zap
 } from 'lucide-react';
-import { DomainItem } from '../types/appwrite';
+import { DomainItem } from '../types/console';
 
 export const DomainsNginxView: React.FC = () => {
   const { domains, addDomain, verifyDomainDns } = useConsole();

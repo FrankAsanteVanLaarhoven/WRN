@@ -16,7 +16,7 @@ import {
   LogOut,
   Shield
 } from 'lucide-react';
-import { TopNavTab, ILLUMINATION_OPTIONS, IlluminationColor } from '../types/appwrite';
+import { TopNavTab, ILLUMINATION_OPTIONS, IlluminationColor } from '../types/console';
 
 export const TopNav: React.FC = () => {
   const {
@@ -52,6 +52,7 @@ export const TopNav: React.FC = () => {
 
   const navLinks: { id: TopNavTab; label: string }[] = [
     { id: 'projects', label: 'Projects' },
+    { id: 'ai-experience', label: 'AI Experience & Security' },
     { id: 'marketplace', label: 'Marketplace' },
     { id: 'domains', label: 'Domains & NGINX' },
     { id: 'compute', label: 'Compute & Costs' },
@@ -62,7 +63,7 @@ export const TopNav: React.FC = () => {
 
   return (
     <header className="h-14 border-b border-border/80 bg-surface px-4 flex items-center justify-between select-none z-30 sticky top-0">
-      {/* Left: Brand & Appwrite Project Switcher */}
+      {/* Left: Brand & Project Switcher */}
       <div className="flex items-center space-x-3">
         {/* Mobile Hamburger */}
         <button
@@ -77,7 +78,7 @@ export const TopNav: React.FC = () => {
         <div className="flex items-center space-x-2.5">
           <div
             className="w-7 h-7 rounded-lg bg-surface-elevated border border-border flex items-center justify-center relative group cursor-pointer transition-all hover-tube"
-            title="WRN Appwrite OSS Platform"
+            title="WRN Coexistence Platform"
           >
             <span
               className="w-3.5 h-3.5 rounded-full border-2 border-t-transparent animate-spin"
@@ -100,7 +101,7 @@ export const TopNav: React.FC = () => {
           </div>
         </div>
 
-        {/* Subnav Tabs (Matching Appwrite Screenshots) */}
+        {/* Subnav Tabs */}
         <nav className="hidden lg:flex items-center space-x-1 ml-4 pl-3 border-l border-border/60">
           {navLinks.map(link => {
             const isActive = topNavTab === link.id;

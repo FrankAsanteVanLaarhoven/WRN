@@ -15,7 +15,7 @@ import {
   Layers,
   Code2
 } from 'lucide-react';
-import { AI_ARENA_BENCHMARK } from '../data/appwriteMockData';
+import { AI_ARENA_BENCHMARK } from '../data/consoleMockData';
 
 export const GrokAgentsHarnessView: React.FC = () => {
   const { grokAgents, executeGrokTask, lapTimes, postgresUsers } = useConsole();
@@ -113,15 +113,15 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   rows={3}
                   value={taskPrompt}
                   onChange={e => setTaskPrompt(e.target.value)}
-                  placeholder="Tell your agent what to query, chart, or deploy on Appwrite..."
+                  placeholder="Tell your agent what to query, chart, or deploy on WRN..."
                   className="w-full bg-surface border border-border rounded-lg p-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-illum font-mono transition-colors"
                 />
 
                 <div className="flex items-center justify-between pt-1">
                   <div className="text-[11px] font-mono text-slate-400 flex items-center space-x-2">
-                    <span className="text-illum">MCP: mcp.appwrite.io</span>
+                    <span className="text-illum">MCP: mcp.wrn.io</span>
                     <span>•</span>
-                    <span>Skill: appwrite-postgres</span>
+                    <span>Skill: wrn-postgres</span>
                   </div>
                   <button
                     type="submit"
@@ -171,11 +171,11 @@ export const GrokAgentsHarnessView: React.FC = () => {
             <div className="space-y-4">
               <div className="p-4 rounded-xl neon-tube-card space-y-3">
                 <span className="text-xs font-bold text-white font-mono uppercase tracking-wider">
-                  Appwrite MCP Hub
+                  WRN MCP Hub
                 </span>
                 <div className="p-3 rounded-lg bg-surface border border-border space-y-2 text-xs font-mono">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-300">mcp.appwrite.io</span>
+                    <span className="text-slate-300">mcp.wrn.io</span>
                     <span className="text-emerald-400 font-bold">Connected ✓</span>
                   </div>
                   <div className="text-[11px] text-slate-500">
@@ -303,7 +303,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
           </div>
         )}
 
-        {/* AI Arena Benchmark Table (Matching Appwrite Prompt) */}
+        {/* AI Arena Benchmark Table */}
         {activeTab === 'arena' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -312,7 +312,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   AI Arena Platform Benchmark
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Constantly benchmarked against leading LLMs for Appwrite & WRN compatibility.
+                  Constantly benchmarked against leading LLMs for WRN platform compatibility.
                 </p>
               </div>
               <span className="text-xs font-mono text-emerald-400">

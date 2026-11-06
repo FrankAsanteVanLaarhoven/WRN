@@ -8,14 +8,15 @@ import { NewGrantModal } from './components/NewGrantModal';
 import { NewSealModal } from './components/NewSealModal';
 import { ClientAuthModal } from './components/ClientAuthModal';
 
-// Appwrite UI Views
-import { AppwriteOverviewView } from './views/AppwriteOverviewView';
-import { AppwritePlaygroundView } from './views/AppwritePlaygroundView';
-import { AppwriteMarketplaceView } from './views/AppwriteMarketplaceView';
-import { AppwriteSettingsView } from './views/AppwriteSettingsView';
+// WRN Console Views
+import { ConsoleOverviewView } from './views/ConsoleOverviewView';
+import { ApiPlaygroundView } from './views/ApiPlaygroundView';
+import { AgentMarketplaceView } from './views/AgentMarketplaceView';
+import { ProjectSettingsView } from './views/ProjectSettingsView';
 import { DomainsNginxView } from './views/DomainsNginxView';
 import { ComputeCostAnalysisView } from './views/ComputeCostAnalysisView';
 import { GrokAgentsHarnessView } from './views/GrokAgentsHarnessView';
+import { AiExperienceStudioView } from './views/AiExperienceStudioView';
 
 // WRN Passport Coexistence & Foundry Views
 import { OntologyView } from './views/OntologyView';
@@ -64,13 +65,14 @@ const MainLayout: React.FC = () => {
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-background text-slate-100">
       <TopNav />
 
-      {/* Full-width views for Marketplace, Domains & NGINX, Compute, Settings */}
-      {topNavTab === 'marketplace' && <AppwriteMarketplaceView />}
+      {/* Full-width views for AI Experience, Marketplace, Domains & NGINX, Compute, Settings */}
+      {topNavTab === 'ai-experience' && <AiExperienceStudioView />}
+      {topNavTab === 'marketplace' && <AgentMarketplaceView />}
       {topNavTab === 'domains' && <DomainsNginxView />}
       {topNavTab === 'compute' && <ComputeCostAnalysisView />}
-      {topNavTab === 'settings' && <AppwriteSettingsView />}
+      {topNavTab === 'settings' && <ProjectSettingsView />}
 
-      {/* Projects Console View (with Appwrite Left Sidebar) */}
+      {/* Projects Console View (with WRN Left Sidebar) */}
       {topNavTab === 'projects' && (
         <div className="flex flex-1 overflow-hidden">
           <Sidebar
@@ -79,15 +81,16 @@ const MainLayout: React.FC = () => {
           />
 
           <main className="flex-1 flex flex-col overflow-hidden relative">
-            {projectServiceTab === 'overview' && <AppwriteOverviewView />}
-            {projectServiceTab === 'apps' && <AppwriteOverviewView />}
-            {projectServiceTab === 'api-keys' && <AppwriteOverviewView />}
-            {projectServiceTab === 'playground' && <AppwritePlaygroundView />}
-            {projectServiceTab === 'auth' && <AppwriteOverviewView />}
+            {projectServiceTab === 'overview' && <ConsoleOverviewView />}
+            {projectServiceTab === 'ai-experience' && <AiExperienceStudioView />}
+            {projectServiceTab === 'apps' && <ConsoleOverviewView />}
+            {projectServiceTab === 'api-keys' && <ConsoleOverviewView />}
+            {projectServiceTab === 'playground' && <ApiPlaygroundView />}
+            {projectServiceTab === 'auth' && <ConsoleOverviewView />}
             {projectServiceTab === 'databases' && <GrokAgentsHarnessView />}
-            {projectServiceTab === 'storage' && <AppwriteOverviewView />}
-            {projectServiceTab === 'functions' && <AppwriteOverviewView />}
-            {projectServiceTab === 'messaging' && <AppwriteOverviewView />}
+            {projectServiceTab === 'storage' && <ConsoleOverviewView />}
+            {projectServiceTab === 'functions' && <ConsoleOverviewView />}
+            {projectServiceTab === 'messaging' && <ConsoleOverviewView />}
             {projectServiceTab === 'sites' && <DomainsNginxView />}
             {projectServiceTab === 'activity' && <DevinConsoleView />}
             {projectServiceTab === 'usage' && <ComputeCostAnalysisView />}
