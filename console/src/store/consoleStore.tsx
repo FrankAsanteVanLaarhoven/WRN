@@ -28,7 +28,6 @@ import {
   ComputePlan,
   AgentInstance,
   AgentExecutionTier,
-  GrokAgentInstance,
   IlluminationColor,
   ILLUMINATION_OPTIONS
 } from '../types/console';
@@ -89,8 +88,8 @@ interface ConsoleContextType {
   computePlans: ComputePlan[];
 
   // Agent Harness & MCP Runtime
-  grokAgents: AgentInstance[];
-  executeGrokTask: (prompt: string, model?: AgentExecutionTier) => Promise<void>;
+  agents: AgentInstance[];
+  executeAgentTask: (prompt: string, model?: AgentExecutionTier) => Promise<void>;
 
   // Database Queries & Tables
   lapTimes: any[];
@@ -234,7 +233,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
     compute: '0.84 GBH'
   });
 
-  const [grokAgents, setGrokAgents] = useState<AgentInstance[]>([
+  const [agents, setAgents] = useState<AgentInstance[]>([
     {
       id: 'agent-inst-01',
       name: 'Autonomous Agent',
@@ -266,7 +265,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
         { type: 'CNAME', host: 'www', value: `${clean}.edge.wrn.network`, status: 'valid' },
         { type: 'TXT', host: '_wrn-challenge', value: `wrn-verification=${Math.random().toString(36).substring(2, 12)}`, status: 'valid' }
       ],
-      nginxConfig: `server {
+      proxyConfig: `server {
     listen 443 ssl http2;
     server_name ${clean} www.${clean};
 
@@ -289,7 +288,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
     setDomains(prev => prev.map(d => d.id === id ? { ...d, status: 'verified', sslStatus: 'active' } : d));
   };
 
-  const executeGrokTask = async (prompt: string, model: AgentExecutionTier = 'Edge-Reasoning') => {
+  const executeAgentTask = async (prompt: string, model: AgentExecutionTier = 'Edge-Reasoning') => {
     const newAgent: AgentInstance = {
       id: `agent-${Date.now().toString(36)}`,
       name: `Autonomous Agent`,
@@ -305,7 +304,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
         { id: '3', type: 'security_gate', text: 'Enforcing WRN-COEXISTENCE-0.2 memory compartment boundaries and RFC 9421 Merkle seal.', timestamp: new Date().toLocaleTimeString(), status: 'success' }
       ]
     };
-    setGrokAgents(prev => [newAgent, ...prev]);
+    setAgents(prev => [newAgent, ...prev]);
   };
 
   const [activeTab, setActiveTab] = useState<ActiveTab>('ontology');
@@ -708,8 +707,8 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
         addDomain,
         verifyDomainDns,
         computePlans,
-        grokAgents,
-        executeGrokTask,
+        agents,
+        executeAgentTask,
         lapTimes,
         postgresUsers,
         marketplaceTools,

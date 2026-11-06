@@ -51,7 +51,7 @@ export const DomainsView: React.FC = () => {
   };
 
   const copyProxyConfig = () => {
-    navigator.clipboard.writeText(selectedDomain.nginxConfig);
+    navigator.clipboard.writeText(selectedDomain.proxyConfig);
     setCopiedConfig(true);
     setTimeout(() => setCopiedConfig(false), 2000);
   };
@@ -234,7 +234,7 @@ export const DomainsView: React.FC = () => {
             </p>
 
             <pre className="p-4 rounded-xl bg-surface border border-border text-[11px] font-mono text-slate-200 overflow-x-auto leading-relaxed">
-              {selectedDomain.nginxConfig}
+              {selectedDomain.proxyConfig}
             </pre>
           </div>
         </div>

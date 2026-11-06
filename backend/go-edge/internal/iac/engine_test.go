@@ -82,3 +82,4 @@ func TestStateEngine(t *testing.T) {
 		t.Fatalf("unexpected history or serial")
 	}
 }
+

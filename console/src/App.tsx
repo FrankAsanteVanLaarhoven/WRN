@@ -19,6 +19,7 @@ import { SitesView } from './views/SitesView';
 import { WorkflowsView } from './views/WorkflowsView';
 import { StepFunctionsView } from './views/StepFunctionsView';
 import { IaCView } from './views/IaCView';
+import { EnergyEfficiencyView } from './views/EnergyEfficiencyView';
 import { FirewallView } from './views/FirewallView';
 import { ActivityView } from './views/ActivityView';
 import { ApiPlaygroundView } from './views/ApiPlaygroundView';
@@ -105,10 +106,11 @@ const MainLayout: React.FC = () => {
             {projectServiceTab === 'workflows' && <WorkflowsView />}
             {projectServiceTab === 'step-functions' && <StepFunctionsView />}
             {projectServiceTab === 'iac' && <IaCView />}
+            {projectServiceTab === 'energy' && <EnergyEfficiencyView />}
             {projectServiceTab === 'activity' && <ActivityView />}
             {projectServiceTab === 'usage' && <ComputeCostAnalysisView />}
             {projectServiceTab === 'firewall' && <FirewallView />}
-            {(projectServiceTab === 'agents' || projectServiceTab === 'grok-agents') && <AgentHarnessView />}
+            {projectServiceTab === 'agents' && <AgentHarnessView />}
 
             {/* WRN Passport Coexistence & Foundry Mode */}
             {projectServiceTab === 'passport-foundry' && (

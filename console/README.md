@@ -2,7 +2,7 @@
 
 State-of-the-art operational governance console, cryptographic sealed submissions DAG, and bounded human-agent coexistence platform built for **WRN-PASSPORT-COEXISTENCE-0.2**.
 
-Combining the design aesthetics of **Vercel** (crisp dark mode, edge typography, subtle glow accents), **Linear** (high-velocity keyboard navigation, Cmd+K command palette, granular status badges), and **Devin** (real-time agent reasoning stream, isolated memory compartments, cryptographic tool traces), anchored in a **Palantir Foundry-style** ontology and data lineage graph.
+Combining the design aesthetics of **Vercel** (crisp dark mode, edge typography, subtle glow accents), **Linear** (high-velocity keyboard navigation, Cmd+K command palette, granular status badges), and state-of-the-art **Autonomous Agent Sandboxes** (real-time reasoning stream, isolated memory compartments, cryptographic tool traces), anchored in a **Palantir Foundry-style** ontology and data lineage graph.
 
 ---
 
@@ -44,7 +44,7 @@ The console runs locally at `http://127.0.0.1:3000/`.
 
 1. **Foundry Ontology Explorer**: Live object graph linking Humans (Frank Van Laarhoven, Dr. Aris Thorne), Commissioned Agents (Nova-CodeAssist, Sentinel-Audit), Grants, and Submissions.
 2. **Cryptographic Lineage & Branches**: Visual DAG showing parent hashes, quarantine promotion, and detached witness notary receipts.
-3. **Devin Agent Operations Console**: Real-time reasoning stream, sandbox execution step trigger, memory compartment isolation inspector, and token metrics.
+3. **Autonomous Agent Operations Console**: Real-time reasoning stream, sandbox execution step trigger, memory compartment isolation inspector, and token metrics.
 4. **Access Grants Studio**: Fine-grained grant issuer with pre-consent digest computation and sub-second online revocation trigger.
 5. **Deterministic Security Harness**: Executable runner for all 14 fixtures (SEC-01 to SEC-14) verifying schema, ingestion, signature verifier, policy kernel, and storage boundaries.
 6. **9-Zone Branch Access Matrix**: Visual security perimeter rules and non-equivalence principle breakdown.

@@ -20,7 +20,8 @@ import {
   GitFork,
   Radio,
   Zap,
-  GitMerge
+  GitMerge,
+  Leaf
 } from 'lucide-react';
 import { ProjectServiceTab } from '../types/console';
 
@@ -95,7 +96,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
       title: 'OBSERVE',
       items: [
         { id: 'activity', label: 'Activity', icon: Activity },
-        { id: 'usage', label: 'Usage', icon: BarChart2 }
+        { id: 'usage', label: 'Usage', icon: BarChart2 },
+        { id: 'energy', label: 'Green Grid & Energy', icon: Leaf, badge: 'Eco' }
       ]
     },
     {

@@ -22,20 +22,20 @@ import { AI_ARENA_BENCHMARK } from '../data/consoleMockData';
 import { AgentExecutionTier } from '../types/console';
 
 export const AgentHarnessView: React.FC = () => {
-  const { grokAgents, executeGrokTask, lapTimes, postgresUsers } = useConsole();
+  const { agents, executeAgentTask, lapTimes, postgresUsers } = useConsole();
   const [taskPrompt, setTaskPrompt] = useState("Query Postgres for Friday's new users and compute email conversion rate.");
   const [selectedTier, setSelectedTier] = useState<AgentExecutionTier>('Edge-Reasoning');
   const [activeTab, setActiveTab] = useState<'harness' | 'database' | 'telemetry'>('harness');
   const [activeDbView, setActiveDbView] = useState<'lap_times' | 'postgres_users'>('lap_times');
   const [isExecuting, setIsExecuting] = useState(false);
 
-  const activeAgent = grokAgents[0];
+  const activeAgent = agents[0];
 
   const handleLaunch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!taskPrompt.trim() || isExecuting) return;
     setIsExecuting(true);
-    await executeGrokTask(taskPrompt.trim(), selectedTier);
+    await executeAgentTask(taskPrompt.trim(), selectedTier);
     setIsExecuting(false);
   };
 

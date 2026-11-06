@@ -1,4 +1,4 @@
-import { DomainItem, ComputePlan, GrokAgentInstance } from '../types/console';
+import { DomainItem, ComputePlan, AgentInstance } from '../types/console';
 
 export const INITIAL_DOMAINS: DomainItem[] = [
   {
@@ -13,7 +13,7 @@ export const INITIAL_DOMAINS: DomainItem[] = [
       { type: 'CNAME', host: 'api', value: 'fra.edge.wrn.network', status: 'valid' },
       { type: 'TXT', host: '@', value: 'wrn-verification=f9812a00c6d', status: 'valid' }
     ],
-    nginxConfig: `server {
+    proxyConfig: `server {
     listen 443 ssl http2;
     server_name openmeta.io api.openmeta.io;
 
@@ -51,7 +51,7 @@ export const INITIAL_DOMAINS: DomainItem[] = [
       { type: 'A', host: '@', value: '185.199.109.153', status: 'valid' },
       { type: 'CNAME', host: 'mcp', value: 'mcp.wrn.network', status: 'valid' }
     ],
-    nginxConfig: `server {
+    proxyConfig: `server {
     listen 443 ssl http2;
     server_name agentmesh.dev *.agentmesh.dev;
 

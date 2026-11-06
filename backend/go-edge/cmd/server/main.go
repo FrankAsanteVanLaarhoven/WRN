@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/cache"
+	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/energy"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/iac"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/stepfunctions"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/waf"
@@ -86,7 +87,7 @@ func main() {
 		},
 		workflows: []WorkflowRun{
 			{ID: "wf_01", Name: "CI/CD Deploy & Edge Invalidation", Trigger: "Git Push (main)", Status: "success", DurationMs: 840, ExecutedAt: "1 min ago", StepResults: []string{"Git diff evaluated", "Rust kernel verified", "Vite assets built", "Edge CDN purged"}},
-			{ID: "wf_02", Name: "Agent Execution & RFC 9421 Merkle Sealing", Trigger: "Agent Task Complete", Status: "success", DurationMs: 512, ExecutedAt: "12 mins ago", StepResults: []string{"Grok agent qualification checked", "RFC 9421 signature attached", "Merkle DAG root sealed", "Audit ledger committed"}},
+			{ID: "wf_02", Name: "Agent Execution & RFC 9421 Merkle Sealing", Trigger: "Agent Task Complete", Status: "success", DurationMs: 512, ExecutedAt: "12 mins ago", StepResults: []string{"Autonomous agent qualification checked", "RFC 9421 signature attached", "Merkle DAG root sealed", "Audit ledger committed"}},
 			{ID: "wf_03", Name: "Autonomous WAF Threat Mitigation", Trigger: "High-Entropy Detection", Status: "success", DurationMs: 140, ExecutedAt: "45 mins ago", StepResults: []string{"SQL injection vector detected", "IP blocked at edge", "WAF rate limit updated", "Incident telemetry dispatched"}},
 			{ID: "wf_04", Name: "Stripe Billing & Token Allowance Sync", Trigger: "Stripe Webhook", Status: "success", DurationMs: 290, ExecutedAt: "2 hours ago", StepResults: []string{"Invoice payment verified", "Token quota refreshed (+50M)", "Redis cache updated", "Client notified"}},
 		},
@@ -563,6 +564,68 @@ func main() {
 		}
 		dummyPlan, _ := iacEngine.GeneratePlan(list)
 		w.Write([]byte(dummyPlan.HCLPreview))
+	}))
+
+	// 10. Green Grid & Energy Efficiency Engine (Combating Datacenter Shortage & Power Bottlenecks)
+	energyEngine := energy.NewEnergyEngine()
+
+	// GET /api/v1/energy/metrics: Global power savings & carbon avoided
+	mux.HandleFunc("/api/v1/energy/metrics", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		metrics := energyEngine.GetMetrics()
+		json.NewEncoder(w).Encode(metrics)
+	}))
+
+	// GET /api/v1/energy/regions: Real-time grid carbon intensity and renewable status across edge nodes
+	mux.HandleFunc("/api/v1/energy/regions", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		regions := energyEngine.GetRegions()
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"total":   len(regions),
+			"regions": regions,
+		})
+	}))
+
+	// POST /api/v1/energy/eco-dispatch: Routes request based on carbon optimization or queues for renewable surplus
+	mux.HandleFunc("/api/v1/energy/eco-dispatch", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var body struct {
+			WorkloadType string `json:"workloadType"` // interactive, delay_tolerant, batch_audit
+			MaxLatencyMs int    `json:"maxLatencyMs"`
+			TaskName     string `json:"taskName"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+			body.WorkloadType = "interactive"
+			body.MaxLatencyMs = 100
+		}
+		if body.MaxLatencyMs == 0 {
+			body.MaxLatencyMs = 100
+		}
+
+		bestRegion, reason := energyEngine.DispatchOptimalRoute(body.WorkloadType, body.MaxLatencyMs)
+
+		if body.WorkloadType == "delay_tolerant" || body.WorkloadType == "batch_audit" {
+			energyEngine.EnqueueDelayTolerant(fmt.Sprintf("eco_job_%d", time.Now().UnixNano()), body.TaskName)
+		}
+
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"status":          "ROUTED_OPTIMAL",
+			"selectedRegion":  bestRegion,
+			"routingReason":   reason,
+			"carbonFootprint": fmt.Sprintf("%.1f gCO2e/kWh", bestRegion.CarbonIntensity),
+			"renewableShare":  fmt.Sprintf("%.1f%%", bestRegion.RenewablePercent),
+			"energyReduction": "92.4% vs monolithic container",
+		})
+	}))
+
+	// GET /api/v1/energy/queue: Returns delay-tolerant jobs waiting for renewable energy curtailment peaks
+	mux.HandleFunc("/api/v1/energy/queue", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		queue := energyEngine.GetDelayQueue()
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"count": len(queue),
+			"queue": queue,
+		})
 	}))
 
 	port := os.Getenv("PORT")

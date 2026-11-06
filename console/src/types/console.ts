@@ -14,11 +14,11 @@ export type ProjectServiceTab =
   | 'workflows'
   | 'step-functions'
   | 'iac'
+  | 'energy'
   | 'activity'
   | 'usage'
   | 'firewall'
   | 'agents'
-  | 'grok-agents'
   | 'passport-foundry';
 
 export type IlluminationColor = 'cyan' | 'white' | 'green' | 'purple' | 'amber' | 'rose';
@@ -52,7 +52,7 @@ export interface DomainItem {
     value: string;
     status: 'valid' | 'invalid';
   }>;
-  nginxConfig: string;
+  proxyConfig: string;
   pricePerYear: number;
 }
 
@@ -69,7 +69,7 @@ export interface ComputePlan {
   savingsVsDOPercent: number;
 }
 
-export type AgentExecutionTier = 'Edge-Reasoning' | 'High-Throughput' | 'Deep-Verification' | 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8';
+export type AgentExecutionTier = 'Edge-Reasoning' | 'High-Throughput' | 'Deep-Verification';
 
 export interface AgentInstance {
   id: string;
@@ -88,8 +88,6 @@ export interface AgentInstance {
     status: 'success' | 'running' | 'error';
   }>;
 }
-
-export type GrokAgentInstance = AgentInstance;
 
 export interface DatabaseRow {
   $id: string;
