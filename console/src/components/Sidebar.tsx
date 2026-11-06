@@ -19,7 +19,8 @@ import {
   Sparkles,
   GitFork,
   Radio,
-  Zap
+  Zap,
+  GitMerge
 } from 'lucide-react';
 import { ProjectServiceTab } from '../types/console';
 
@@ -85,7 +86,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
     {
       title: 'AUTOMATION',
       items: [
-        { id: 'workflows', label: 'Workflows & Jobs', icon: Zap, badge: 'Live' }
+        { id: 'workflows', label: 'Workflows & Jobs', icon: Zap, badge: 'Live' },
+        { id: 'step-functions', label: 'Step Functions', icon: GitMerge, badge: 'State Flow' }
       ]
     },
     {

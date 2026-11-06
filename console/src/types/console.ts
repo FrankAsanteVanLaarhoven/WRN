@@ -1,4 +1,4 @@
-export type TopNavTab = 'projects' | 'workflows' | 'marketplace' | 'domains' | 'compute' | 'settings';
+export type TopNavTab = 'projects' | 'workflows' | 'step-functions' | 'marketplace' | 'domains' | 'compute' | 'settings';
 
 export type ProjectServiceTab =
   | 'overview'
@@ -12,6 +12,7 @@ export type ProjectServiceTab =
   | 'messaging'
   | 'sites'
   | 'workflows'
+  | 'step-functions'
   | 'activity'
   | 'usage'
   | 'firewall'
