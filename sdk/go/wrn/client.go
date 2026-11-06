@@ -95,3 +95,4 @@ func (c *Client) QueryDatabase(sql, engine string) (map[string]interface{}, erro
 	}, &result)
 	return result, err
 }
+

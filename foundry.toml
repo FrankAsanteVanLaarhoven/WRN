@@ -12,3 +12,4 @@ mainnet = "https://eth.llamarpc.com"
 arbitrum = "https://arb1.arbitrum.io/rpc"
 base = "https://mainnet.base.org"
 wrn_edge = "http://127.0.0.1:8545"
+

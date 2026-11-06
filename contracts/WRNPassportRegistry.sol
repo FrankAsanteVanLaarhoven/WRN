@@ -128,3 +128,4 @@ contract WRNPassportRegistry {
         return (p.ed25519PublicKey, p.zone, !p.isRevoked && block.timestamp <= p.expiresAt);
     }
 }
+

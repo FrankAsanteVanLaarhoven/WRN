@@ -109,3 +109,4 @@ contract WRNAccessGrantManager {
         return true;
     }
 }
+

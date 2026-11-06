@@ -17,6 +17,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
+import { GlowCard } from '../components/ui/spotlight-card';
 
 interface Deployment {
   id: string;
@@ -303,8 +304,12 @@ export const SitesView: React.FC = () => {
             </div>
           </div>
 
-          {/* Card #3: Theme Swatch */}
-          <div className="w-56 p-4 rounded-xl border border-border/70 bg-surface/80 hover:border-purple-500/50 hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] transition-all duration-300 group cursor-pointer flex flex-col justify-between space-y-3">
+          {/* Card #3: Theme Swatch (Spotlight GlowCard) */}
+          <GlowCard
+            customSize
+            glowColor="purple"
+            className="w-56 p-4 border border-border/70 hover:border-purple-500/50 hover:shadow-[0_0_20px_rgba(168,85,247,0.25)] transition-all duration-300 group cursor-pointer flex flex-col justify-between space-y-3"
+          >
             <div>
               <div className="flex items-center justify-between">
                 <span className="px-2 py-0.5 rounded text-[10px] bg-rose-500/10 text-rose-400 border border-rose-500/20 font-mono">
@@ -323,7 +328,7 @@ export const SitesView: React.FC = () => {
               <span>Interact: Hover</span>
               <ChevronRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </div>
-          </div>
+          </GlowCard>
 
           {/* Card #4: Cloudflare CDN / Edge */}
           <div className="w-56 p-4 rounded-xl border border-border/70 bg-surface/80 hover:border-emerald-500/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all duration-300 group cursor-pointer flex flex-col justify-between space-y-3">

@@ -57,3 +57,4 @@ contract WRNContractsTest {
         require(merkleSettler.isMerkleRootSettled(root), "Root must be marked settled");
     }
 }
+

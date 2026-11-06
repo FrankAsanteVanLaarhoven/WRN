@@ -132,3 +132,4 @@ contract WRNMerkleProofSettler {
         return settledBlocks[blockHeight];
     }
 }
+

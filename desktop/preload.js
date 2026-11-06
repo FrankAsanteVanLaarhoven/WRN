@@ -9,3 +9,4 @@ contextBridge.exposeInMainWorld('wrnDesktop', {
   close: () => ipcRenderer.send('window-close'),
   getEdgeStatus: () => ipcRenderer.invoke('get-edge-status')
 });
+

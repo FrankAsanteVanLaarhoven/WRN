@@ -64,3 +64,4 @@ class WRNClient:
 
     def iac_apply(self) -> Dict[str, Any]:
         return self._request("POST", "/api/v1/iac/apply")
+
