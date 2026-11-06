@@ -87,7 +87,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
       title: 'AUTOMATION',
       items: [
         { id: 'workflows', label: 'Workflows & Jobs', icon: Zap, badge: 'Live' },
-        { id: 'step-functions', label: 'Step Functions', icon: GitMerge, badge: 'State Flow' }
+        { id: 'step-functions', label: 'Step Functions', icon: GitMerge, badge: 'State Flow' },
+        { id: 'iac', label: 'Infrastructure', icon: Boxes, badge: 'Native' }
       ]
     },
     {

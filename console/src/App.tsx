@@ -18,6 +18,7 @@ import { MessagingView } from './views/MessagingView';
 import { SitesView } from './views/SitesView';
 import { WorkflowsView } from './views/WorkflowsView';
 import { StepFunctionsView } from './views/StepFunctionsView';
+import { IaCView } from './views/IaCView';
 import { FirewallView } from './views/FirewallView';
 import { ActivityView } from './views/ActivityView';
 import { ApiPlaygroundView } from './views/ApiPlaygroundView';
@@ -103,6 +104,7 @@ const MainLayout: React.FC = () => {
             {projectServiceTab === 'sites' && <SitesView />}
             {projectServiceTab === 'workflows' && <WorkflowsView />}
             {projectServiceTab === 'step-functions' && <StepFunctionsView />}
+            {projectServiceTab === 'iac' && <IaCView />}
             {projectServiceTab === 'activity' && <ActivityView />}
             {projectServiceTab === 'usage' && <ComputeCostAnalysisView />}
             {projectServiceTab === 'firewall' && <FirewallView />}

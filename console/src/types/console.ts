@@ -13,6 +13,7 @@ export type ProjectServiceTab =
   | 'sites'
   | 'workflows'
   | 'step-functions'
+  | 'iac'
   | 'activity'
   | 'usage'
   | 'firewall'

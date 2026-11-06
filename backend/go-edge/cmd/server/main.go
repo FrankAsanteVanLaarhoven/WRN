@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/cache"
+	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/iac"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/stepfunctions"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/waf"
 )
@@ -409,96 +410,6 @@ func main() {
 		})
 	}))
 
-	// 7. Step Functions State Machine API (ASL Engine with Live Step Execution)
-	mux.HandleFunc("/api/v1/step-functions/definitions", withWAF(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		ctx := stepfunctions.NewDefaultContext()
-		nodes, _, _ := stepfunctions.ExecuteAll(ctx, firewall, redisCache)
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"id":         "sm_merkle_seal_v2",
-			"name":       "Agent Passport Coexistence & Merkle Settlement Pipeline",
-			"comment":    "ASL-compliant Step Function orchestrating agent cryptographic qualification and DAG settlement",
-			"version":    "2.1.0",
-			"startAt":    "VerifyAgentEnvelope",
-			"states":     nodes,
-			"timeoutSec": 300,
-		})
-	}))
-
-	// Execute an individual step by state ID (e.g. VerifyAgentEnvelope, EvaluateZonePolicy, ParallelSecurityChecks)
-	mux.HandleFunc("/api/v1/step-functions/step", withWAF(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		var body struct {
-			StateID string `json:"stateId"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.StateID == "" {
-			body.StateID = "VerifyAgentEnvelope"
-		}
-
-		ctx := stepfunctions.NewDefaultContext()
-		node, err := stepfunctions.ExecuteStep(body.StateID, ctx, firewall, redisCache)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
-			return
-		}
-
-		state.mu.Lock()
-		state.logs = append([]map[string]interface{}{{
-			"id":          fmt.Sprintf("log_%d", time.Now().UnixNano()),
-			"timestamp":   time.Now().Format(time.RFC3339),
-			"level":       "INFO",
-			"service":     "step_functions",
-			"action":      fmt.Sprintf("step.%s", strings.ToLower(node.Name)),
-			"duration_ms": float64(node.DurationMs),
-			"status":      200,
-		}}, state.logs...)
-		state.mu.Unlock()
-
-		json.NewEncoder(w).Encode(node)
-	}))
-
-	// Execute full state machine pipeline (all 6 steps with concurrent parallel evaluation)
-	mux.HandleFunc("/api/v1/step-functions/execute", withWAF(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		ctx := stepfunctions.NewDefaultContext()
-
-		nodes, totalDur, err := stepfunctions.ExecuteAll(ctx, firewall, redisCache)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
-			return
-		}
-
-		state.mu.Lock()
-		state.logs = append([]map[string]interface{}{
-			{
-				"id":          fmt.Sprintf("log_%d", time.Now().UnixNano()),
-				"timestamp":   time.Now().Format(time.RFC3339),
-				"level":       "INFO",
-				"service":     "step_functions",
-				"action":      "pipeline.merkle_seal.completed",
-				"duration_ms": float64(totalDur),
-				"merkle_root": ctx.MerkleRoot,
-				"status":      200,
-			},
-		}, state.logs...)
-		state.mu.Unlock()
-
-		json.NewEncoder(w).Encode(map[string]interface{}{
-			"executionId": ctx.ExecutionID,
-			"status":      "SUCCEEDED",
-			"durationMs":  totalDur,
-			"stepCount":   len(nodes),
-			"states":      nodes,
-			"output": map[string]interface{}{
-				"merkleRoot":  ctx.MerkleRoot,
-				"blockHeight": ctx.BlockHeight,
-				"status":      "COMPLETED_AND_SEALED",
-			},
-		})
-	}))
-
 	// 7. Activity Audit Stream
 	mux.HandleFunc("/api/v1/activity/stream", withWAF(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -519,6 +430,139 @@ func main() {
 			"code":    200,
 			"message": "Clean request passed to upstream",
 		})
+	}))
+
+	// 9. Native Infrastructure as Code (IaC) State Engine (Terraform Replacement)
+	iacEngine := iac.NewStateEngine()
+
+	// GET /api/v1/iac/state: Returns current live state, Merkle state hash, and history
+	mux.HandleFunc("/api/v1/iac/state", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		resources, merkleRoot, serial, history := iacEngine.GetState()
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"lineage":    "lineage-wrn-cloud-production-v2",
+			"serial":     serial,
+			"merkleRoot": merkleRoot,
+			"resources":  resources,
+			"history":    history,
+			"status":     "LOCKED_AND_VERIFIED",
+		})
+	}))
+
+	// POST /api/v1/iac/plan: Computes dry-run diff against live state
+	mux.HandleFunc("/api/v1/iac/plan", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		var body struct {
+			Resources []iac.Resource `json:"resources"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || len(body.Resources) == 0 {
+			// Default template if empty
+			body.Resources = []iac.Resource{
+				{
+					Type: "wrn_database",
+					Name: "primary_postgres",
+					Properties: map[string]interface{}{
+						"engine":     "postgresql",
+						"version":    "16.2",
+						"storage_gb": 50,
+						"high_avail": true,
+					},
+				},
+				{
+					Type: "wrn_storage_bucket",
+					Name: "vault_production",
+					Properties: map[string]interface{}{
+						"encryption":  "AES256_GCM",
+						"compression": "AVIF_AUTO",
+						"public_read": false,
+					},
+				},
+				{
+					Type: "wrn_serverless_function",
+					Name: "agent_merkle_worker",
+					Properties: map[string]interface{}{
+						"runtime": "go1.23",
+						"memory":  256,
+						"timeout": 15,
+					},
+				},
+				{
+					Type: "wrn_step_function",
+					Name: "merkle_settlement_pipeline",
+					Properties: map[string]interface{}{
+						"start_at": "VerifyAgentEnvelope",
+						"timeout":  300,
+					},
+				},
+				{
+					Type: "wrn_custom_domain",
+					Name: "apex_domain",
+					Properties: map[string]interface{}{
+						"domain":      "cloud.wrn.network",
+						"ssl_auto":    true,
+						"cdn_enabled": true,
+					},
+				},
+				{
+					Type: "wrn_firewall_policy",
+					Name: "owasp_strict_shield",
+					Properties: map[string]interface{}{
+						"rate_limit_rpm": 300,
+						"challenge_mode": "interactive",
+					},
+				},
+			}
+		}
+
+		plan, err := iacEngine.GeneratePlan(body.Resources)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
+			return
+		}
+
+		json.NewEncoder(w).Encode(plan)
+	}))
+
+	// POST /api/v1/iac/apply: Applies the plan, seals state with Merkle root, appends to immutable ledger
+	mux.HandleFunc("/api/v1/iac/apply", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		receipt, err := iacEngine.Apply()
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
+			return
+		}
+
+		state.mu.Lock()
+		state.logs = append([]map[string]interface{}{
+			{
+				"id":          fmt.Sprintf("log_%d", time.Now().UnixNano()),
+				"timestamp":   time.Now().Format(time.RFC3339),
+				"level":       "INFO",
+				"service":     "iac_state_engine",
+				"action":      "state.applied",
+				"duration_ms": float64(receipt.DurationMs),
+				"merkle_root": receipt.MerkleRoot,
+				"serial":      receipt.Serial,
+				"status":      200,
+			},
+		}, state.logs...)
+		state.mu.Unlock()
+
+		json.NewEncoder(w).Encode(receipt)
+	}))
+
+	// GET /api/v1/iac/export: Exports standard Terraform HCL for complete interoperability
+	mux.HandleFunc("/api/v1/iac/export", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		resources, _, _, _ := iacEngine.GetState()
+		var list []iac.Resource
+		for _, r := range resources {
+			list = append(list, r)
+		}
+		dummyPlan, _ := iacEngine.GeneratePlan(list)
+		w.Write([]byte(dummyPlan.HCLPreview))
 	}))
 
 	port := os.Getenv("PORT")
