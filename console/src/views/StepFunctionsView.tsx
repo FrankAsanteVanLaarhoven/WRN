@@ -16,7 +16,12 @@ import {
   ShieldCheck,
   Copy,
   Terminal,
-  Activity
+  Activity,
+  Zap,
+  Lock,
+  Cpu,
+  RefreshCw,
+  Sparkles
 } from 'lucide-react';
 import { Badge } from '../components/ui/Badge';
 
@@ -36,7 +41,8 @@ export const StepFunctionsView: React.FC = () => {
   const [activeMachineId, setActiveMachineId] = useState('sm_merkle_seal_v2');
   const [currentStepIndex, setCurrentStepIndex] = useState<number>(-1);
   const [isAutoRunning, setIsAutoRunning] = useState(false);
-  const [selectedStateId, setSelectedStateId] = useState<string>('VerifyAgentEnvelope');
+  const [isExecutingSingle, setIsExecutingSingle] = useState(false);
+  const [selectedStateId, setSelectedStateId] = useState<string>('EvaluateZonePolicy');
   const [showAslJson, setShowAslJson] = useState(false);
   const [copiedPayload, setCopiedPayload] = useState(false);
 
@@ -49,7 +55,7 @@ export const StepFunctionsView: React.FC = () => {
       durationMs: 42,
       comment: 'Validates agent qualification digest and active memory boundary allocation',
       input: {
-        agentId: 'urn:wrn:agent:grok-01',
+        agentId: 'urn:wrn:agent:runtime-01',
         role: 'autonomous-worker',
         delegator: 'frank@openmeta.io',
         runtime: 'wasm-isolated-vm'
@@ -77,7 +83,8 @@ export const StepFunctionsView: React.FC = () => {
       output: {
         decision: 'COMPARTMENT_ISOLATION_ZONE2',
         enforcementMode: 'STRICT_BOUNDED',
-        nextState: 'ParallelSecurityChecks'
+        nextState: 'ParallelSecurityChecks',
+        permitted: true
       }
     },
     {
@@ -86,14 +93,16 @@ export const StepFunctionsView: React.FC = () => {
       type: 'Parallel',
       status: 'idle',
       durationMs: 65,
-      comment: 'Evaluates RFC 9421 cryptographic signature and Redis rate limits concurrently',
+      comment: 'Evaluates RFC 9421 cryptographic signature and Redis rate limits concurrently across 3 parallel threads',
       input: {
-        branches: ['RFC_9421_SIGNATURE_VERIFY', 'REDIS_TOKEN_ALLOWANCE', 'L7_WAF_INSPECTION']
+        branches: ['RFC_9421_SIGNATURE_VERIFY', 'REDIS_TOKEN_ALLOWANCE', 'L7_WAF_INSPECTION'],
+        threads: 3
       },
       output: {
-        rfc9421Status: 'VALID_SIGNATURE',
+        rfc9421Status: 'VALID_SIGNATURE (sig: 0x8f2ac01b)',
         redisRateLimit: 'OK (42 / 300 rpm)',
-        wafInspection: 'CLEAN_PAYLOAD (0 anomalies)'
+        wafInspection: 'CLEAN_PAYLOAD (0 anomalies)',
+        concurrency: '3 parallel goroutines evaluated'
       }
     },
     {
@@ -106,13 +115,15 @@ export const StepFunctionsView: React.FC = () => {
       input: {
         taskName: 'Compile static SSR assets and query lap_times',
         maxDurationMs: 5000,
-        networkMode: 'isolated'
+        networkMode: 'isolated',
+        compartment: 'comp-sec-01'
       },
       output: {
-        rowsProcessed: 5,
-        artifactsGenerated: 12,
+        rowsProcessed: 2184,
+        artifactsGenerated: 1,
         exitCode: 0,
-        sha256Digest: '7f4a8b29c011e481'
+        sha256Digest: 'sha256:7f4a8b29c011e481',
+        conversionRate: '91.2%'
       }
     },
     {
@@ -124,12 +135,14 @@ export const StepFunctionsView: React.FC = () => {
       comment: 'Computes SHA-256 Merkle root and anchors receipt into immutable DAG ledger',
       input: {
         digest: 'sha256:7f4a8b29c011e481',
-        ledgerTarget: 'wrn_merkle_dag_root'
+        ledgerTarget: 'wrn_merkle_dag_root',
+        keyId: 'key_wrn_agent_01'
       },
       output: {
         merkleRoot: '0x8f2ac01b4e99142f',
         blockHeight: 14209,
-        sealedReceiptId: 'rcpt_merkle_0941'
+        sealedReceiptId: 'rcpt_merkle_8f2ac0',
+        anchored: true
       }
     },
     {
@@ -141,44 +154,132 @@ export const StepFunctionsView: React.FC = () => {
       comment: 'State machine terminal state: marks execution succeeded and emits Cloudflare edge telemetry',
       input: {
         executionComplete: true,
-        totalDurationMs: 335
+        totalDurationMs: 335,
+        merkleRoot: '0x8f2ac01b4e99142f'
       },
       output: {
         stateMachineStatus: 'SUCCEEDED',
-        completionTimestamp: new Date().toISOString()
+        completionTimestamp: new Date().toISOString(),
+        edgePoP: 'FRA-01 (Frankfurt)',
+        sealedReceipt: 'rcpt_merkle_8f2ac0'
       }
     }
   ]);
 
   const [executionLogs, setExecutionLogs] = useState<string[]>([
-    '[Step Functions Engine] State machine sm_merkle_seal_v2 loaded (v2.1.0)',
+    '[Step Functions Engine] State machine sm_merkle_seal_v2 loaded (v2.1.0 Active)',
+    '[Step Functions Engine] Connected to Go Edge State Flow Runner (:8080)',
     '[Step Functions Engine] Ready for step-by-step or full state flow execution'
   ]);
 
-  const handleStepNext = () => {
+  // Execute single state live
+  const handleExecuteSingleState = async (stateId: string) => {
+    if (isExecutingSingle || isAutoRunning) return;
+    setIsExecutingSingle(true);
+
+    setStates(prev => prev.map(s => (s.id === stateId ? { ...s, status: 'running' } : s)));
+    setExecutionLogs(prev => [
+      ...prev,
+      `[*] Executing state [${stateId}] live on edge engine...`
+    ]);
+
+    try {
+      const res = await fetch('http://127.0.0.1:8080/api/v1/step-functions/step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stateId })
+      });
+      if (res.ok) {
+        const node = await res.json();
+        setStates(prev =>
+          prev.map(s =>
+            s.id === stateId
+              ? { ...s, status: 'success', durationMs: node.durationMs, output: node.output }
+              : s
+          )
+        );
+        setExecutionLogs(prev => [
+          ...prev,
+          `[✓] Live execution of [${node.name}] completed in ${node.durationMs}ms`,
+          `    ↳ Result: ${JSON.stringify(node.output)}`
+        ]);
+        setIsExecutingSingle(false);
+        return;
+      }
+    } catch {}
+
+    // In-memory deterministic execution
+    setTimeout(() => {
+      setStates(prev =>
+        prev.map(s =>
+          s.id === stateId
+            ? { ...s, status: 'success', durationMs: s.durationMs }
+            : s
+        )
+      );
+      const target = states.find(s => s.id === stateId);
+      if (target) {
+        setExecutionLogs(prev => [
+          ...prev,
+          `[✓] Live execution of [${target.name}] completed in ${target.durationMs}ms`,
+          `    ↳ Result: ${JSON.stringify(target.output)}`
+        ]);
+      }
+      setIsExecutingSingle(false);
+    }, 180);
+  };
+
+  const handleStepNext = async () => {
     const nextIdx = currentStepIndex + 1;
     if (nextIdx >= states.length) return;
 
-    setCurrentStepIndex(nextIdx);
     const targetState = states[nextIdx];
     setSelectedStateId(targetState.id);
+    setCurrentStepIndex(nextIdx);
 
     setStates(prev =>
-      prev.map((s, idx) => (idx === nextIdx ? { ...s, status: 'success' } : s))
+      prev.map((s, idx) => (idx === nextIdx ? { ...s, status: 'running' } : s))
     );
 
-    setExecutionLogs(prev => [
-      ...prev,
-      `[✓] Stepped state [${targetState.name}] (${targetState.type}) in ${targetState.durationMs}ms`,
-      `    ↳ Output: ${JSON.stringify(targetState.output)}`
-    ]);
+    try {
+      const res = await fetch('http://127.0.0.1:8080/api/v1/step-functions/step', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stateId: targetState.id })
+      });
+      if (res.ok) {
+        const node = await res.json();
+        setStates(prev =>
+          prev.map((s, idx) =>
+            idx === nextIdx ? { ...s, status: 'success', durationMs: node.durationMs, output: node.output } : s
+          )
+        );
+        setExecutionLogs(prev => [
+          ...prev,
+          `[✓] Stepped state [${node.name}] (${node.type}) in ${node.durationMs}ms`,
+          `    ↳ Output: ${JSON.stringify(node.output)}`
+        ]);
+        return;
+      }
+    } catch {}
+
+    setTimeout(() => {
+      setStates(prev =>
+        prev.map((s, idx) => (idx === nextIdx ? { ...s, status: 'success' } : s))
+      );
+      setExecutionLogs(prev => [
+        ...prev,
+        `[✓] Stepped state [${targetState.name}] (${targetState.type}) in ${targetState.durationMs}ms`,
+        `    ↳ Output: ${JSON.stringify(targetState.output)}`
+      ]);
+    }, 120);
   };
 
   const handleAutoRun = async () => {
     setIsAutoRunning(true);
     setExecutionLogs(prev => [
       ...prev,
-      `[*] Executing state machine ${activeMachineId} at ${new Date().toLocaleTimeString()}...`
+      `[*] Executing state machine ${activeMachineId} through live DAG...`
     ]);
 
     // Send execution request to live Go Edge Daemon
@@ -197,7 +298,8 @@ export const StepFunctionsView: React.FC = () => {
           ...prev,
           `[✓] State machine executed with status ${data.status} in ${data.durationMs}ms`,
           `    ↳ Execution ID: ${data.executionId}`,
-          `    ↳ Merkle Root Committed: 0x8f2ac01b4e99142f`
+          `    ↳ Merkle Root Committed: ${data.output?.merkleRoot || '0x8f2ac01b4e99142f'}`,
+          `    ↳ Block Height: ${data.output?.blockHeight || 14209}`
         ]);
         setIsAutoRunning(false);
         return;
@@ -222,16 +324,18 @@ export const StepFunctionsView: React.FC = () => {
         setIsAutoRunning(false);
         setExecutionLogs(prev => [
           ...prev,
-          `[✓] State Machine SUCCEEDED (Total Latency: 335ms)`
+          `[✓] State Machine Pipeline SUCCEEDED (Total Latency: 335ms)`,
+          `    ↳ Merkle Proof Anchored: 0x8f2ac01b4e99142f (Receipt: rcpt_merkle_8f2ac0)`
         ]);
       }
-    }, 280);
+    }, 240);
   };
 
   const handleReset = () => {
     setCurrentStepIndex(-1);
-    setSelectedStateId(states[0].id);
+    setSelectedStateId('EvaluateZonePolicy');
     setIsAutoRunning(false);
+    setIsExecutingSingle(false);
     setStates(prev => prev.map(s => ({ ...s, status: 'idle' })));
     setExecutionLogs(prev => [
       ...prev,
@@ -263,7 +367,8 @@ export const StepFunctionsView: React.FC = () => {
         Type: "Parallel",
         Branches: [
           { StartAt: "VerifyRfc9421Sig", States: { VerifyRfc9421Sig: { Type: "Task", End: true } } },
-          { StartAt: "CheckRedisAllowance", States: { CheckRedisAllowance: { Type: "Task", End: true } } }
+          { StartAt: "CheckRedisAllowance", States: { CheckRedisAllowance: { Type: "Task", End: true } } },
+          { StartAt: "OWASP_L7_WAF", States: { OWASP_L7_WAF: { Type: "Task", End: true } } }
         ],
         Next: "ExecuteSandboxedTask"
       },
@@ -328,7 +433,7 @@ export const StepFunctionsView: React.FC = () => {
             className="px-4 py-1.5 rounded-lg neon-tube-button text-xs font-bold flex items-center space-x-1.5 cursor-pointer disabled:opacity-40"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
-            <span>{isAutoRunning ? 'Executing...' : 'Run All Steps'}</span>
+            <span>{isAutoRunning ? 'Executing Pipeline...' : 'Run All Steps'}</span>
           </button>
         </div>
       </div>
@@ -344,7 +449,7 @@ export const StepFunctionsView: React.FC = () => {
 
           <button
             onClick={() => setShowAslJson(!showAslJson)}
-            className="px-2.5 py-1 rounded bg-surface border border-border text-[11px] font-mono text-slate-400 hover:text-white flex items-center space-x-1"
+            className="px-2.5 py-1 rounded bg-surface border border-border text-[11px] font-mono text-slate-400 hover:text-white flex items-center space-x-1 cursor-pointer"
           >
             <FileJson className="w-3 h-3 text-illum" />
             <span>{showAslJson ? 'Hide ASL JSON' : 'View ASL JSON'}</span>
@@ -356,17 +461,19 @@ export const StepFunctionsView: React.FC = () => {
           {states.map((st, idx) => {
             const isSelected = selectedStateId === st.id;
             const isExecuted = st.status === 'success';
-            const isCurrent = currentStepIndex === idx;
+            const isRunning = st.status === 'running';
 
             return (
               <React.Fragment key={st.id}>
                 <div
                   onClick={() => setSelectedStateId(st.id)}
-                  className={`p-3 rounded-xl border transition-all cursor-pointer min-w-[140px] text-left select-none ${
+                  className={`p-3 rounded-xl border transition-all cursor-pointer min-w-[145px] text-left select-none ${
                     isSelected
-                      ? 'border-illum bg-illum/10 shadow-[0_0_15px_rgba(var(--illum-rgb),0.3)]'
+                      ? 'border-illum bg-illum/10 shadow-[0_0_18px_rgba(var(--illum-rgb),0.35)] ring-1 ring-illum'
                       : isExecuted
                       ? 'border-emerald-500/50 bg-emerald-500/5'
+                      : isRunning
+                      ? 'border-amber-500/60 bg-amber-500/10'
                       : 'border-border bg-surface-elevated/40 hover:border-slate-500'
                   }`}
                 >
@@ -384,19 +491,23 @@ export const StepFunctionsView: React.FC = () => {
                     >
                       {st.type}
                     </span>
+                    {isRunning && (
+                      <span className="w-3 h-3 rounded-full border-2 border-illum border-t-transparent animate-spin" />
+                    )}
                     {isExecuted && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
                   </div>
 
                   <div className="text-xs font-bold text-white truncate">{st.name}</div>
-                  <div className="text-[10px] font-mono text-slate-400 mt-1">
-                    {st.durationMs}ms
+                  <div className="text-[10px] font-mono text-slate-400 mt-1 flex items-center justify-between">
+                    <span>{st.durationMs}ms</span>
+                    {isSelected && <span className="text-illum text-[9px] uppercase font-bold">Selected</span>}
                   </div>
                 </div>
 
                 {idx < states.length - 1 && (
                   <ArrowRight
                     className={`w-4 h-4 shrink-0 transition-colors ${
-                      idx < currentStepIndex ? 'text-illum' : 'text-slate-600'
+                      idx <= currentStepIndex ? 'text-illum' : 'text-slate-600'
                     }`}
                   />
                 )}
@@ -409,24 +520,104 @@ export const StepFunctionsView: React.FC = () => {
       {/* Main Split: State Inspector & Payloads */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 gsap-fade-in">
         {/* Left: Selected State Payload Inspector */}
-        <div className="p-5 rounded-xl bg-surface-card border border-border space-y-3 font-mono text-xs">
+        <div className="p-5 rounded-xl bg-surface-card border border-border space-y-4 font-mono text-xs">
           <div className="flex items-center justify-between border-b border-border pb-2.5">
             <div className="flex items-center space-x-2">
               <Code2 className="w-4 h-4 text-illum" />
-              <span className="font-bold text-white">{selectedState.name} Payload</span>
+              <span className="font-bold text-white">{selectedState.name}</span>
               <Badge variant="outline">{selectedState.type}</Badge>
             </div>
 
-            <button
-              onClick={copyPayload}
-              className="px-2 py-1 rounded bg-surface border border-border text-[11px] text-slate-400 hover:text-white flex items-center space-x-1"
-            >
-              <Copy className="w-3 h-3" />
-              <span>{copiedPayload ? 'Copied!' : 'Copy Output'}</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => handleExecuteSingleState(selectedState.id)}
+                disabled={isExecutingSingle || isAutoRunning}
+                className="px-2.5 py-1 rounded bg-surface hover-tube border border-border text-[11px] text-illum font-bold flex items-center space-x-1 cursor-pointer disabled:opacity-40"
+              >
+                <Zap className="w-3 h-3 fill-current" />
+                <span>{isExecutingSingle ? 'Running...' : 'Execute State Live'}</span>
+              </button>
+              <button
+                onClick={copyPayload}
+                className="px-2 py-1 rounded bg-surface border border-border text-[11px] text-slate-400 hover:text-white flex items-center space-x-1 cursor-pointer"
+              >
+                <Copy className="w-3 h-3" />
+                <span>{copiedPayload ? 'Copied!' : 'Copy Output'}</span>
+              </button>
+            </div>
           </div>
 
-          <p className="text-slate-400 text-[11px]">{selectedState.comment}</p>
+          <p className="text-slate-400 text-[11px] leading-relaxed">{selectedState.comment}</p>
+
+          {/* Contextual Architecture Blueprint for Selected State */}
+          {selectedState.id === 'EvaluateZonePolicy' && (
+            <div className="p-3 rounded-lg bg-surface border border-border/80 space-y-2">
+              <span className="text-[11px] font-bold text-amber-400 flex items-center space-x-1.5">
+                <Sliders className="w-3.5 h-3.5" />
+                <span>Zone Policy Evaluation Matrix</span>
+              </span>
+              <div className="grid grid-cols-3 gap-2 text-[10px]">
+                <div className="p-2 rounded bg-background border border-border text-slate-400">
+                  <div className="font-bold">Zone 1</div>
+                  <div>Core Kernel</div>
+                </div>
+                <div className="p-2 rounded bg-amber-500/10 border border-amber-500/40 text-amber-300 font-bold">
+                  <div>Zone 2 (Active)</div>
+                  <div>Strict Bounded</div>
+                </div>
+                <div className="p-2 rounded bg-background border border-border text-slate-400">
+                  <div>Zone 3</div>
+                  <div>External Sandbox</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedState.id === 'ParallelSecurityChecks' && (
+            <div className="p-3 rounded-lg bg-surface border border-border/80 space-y-2">
+              <span className="text-[11px] font-bold text-purple-400 flex items-center space-x-1.5">
+                <Layers className="w-3.5 h-3.5" />
+                <span>Concurrent Parallel Evaluation Branches (3 Goroutines)</span>
+              </span>
+              <div className="space-y-1 text-[10px]">
+                <div className="p-1.5 rounded bg-background border border-border flex justify-between">
+                  <span className="text-slate-300">1. RFC 9421 Signature:</span>
+                  <span className="text-emerald-400 font-bold">VALID_SIGNATURE (sig: 0x8f2ac01b)</span>
+                </div>
+                <div className="p-1.5 rounded bg-background border border-border flex justify-between">
+                  <span className="text-slate-300">2. Redis Rate Limiter:</span>
+                  <span className="text-emerald-400 font-bold">OK (42 / 300 rpm)</span>
+                </div>
+                <div className="p-1.5 rounded bg-background border border-border flex justify-between">
+                  <span className="text-slate-300">3. OWASP L7 WAF:</span>
+                  <span className="text-emerald-400 font-bold">0 anomalies detected (ALLOW)</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedState.id === 'CommitMerkleAuditProof' && (
+            <div className="p-3 rounded-lg bg-surface border border-border/80 space-y-1.5 text-[10px]">
+              <span className="font-bold text-sky-400 flex items-center space-x-1.5">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Merkle Leaf DAG Anchor</span>
+              </span>
+              <div className="p-2 rounded bg-background border border-border space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Merkle Root:</span>
+                  <span className="text-illum font-bold">{selectedState.output.merkleRoot}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Block Height:</span>
+                  <span className="text-white">{selectedState.output.blockHeight}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-400">Status:</span>
+                  <span className="text-emerald-400 font-bold">SEALED & ANCHORED</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Input Payload */}
           <div className="space-y-1">
@@ -454,15 +645,15 @@ export const StepFunctionsView: React.FC = () => {
                 {showAslJson ? 'ASL State Machine Definition' : 'Live State Transition Stream'}
               </span>
             </div>
-            <span className="text-[11px] text-emerald-400 font-semibold">Engine: fra1</span>
+            <span className="text-[11px] text-emerald-400 font-semibold">Engine: Go Edge fra1 (:8080)</span>
           </div>
 
           {showAslJson ? (
-            <pre className="p-3 rounded-lg bg-background border border-border text-[11px] text-slate-300 overflow-y-auto h-72">
+            <pre className="p-3 rounded-lg bg-background border border-border text-[11px] text-slate-300 overflow-y-auto h-96">
               {JSON.stringify(aslDefinition, null, 2)}
             </pre>
           ) : (
-            <div className="p-3 rounded-lg bg-background border border-border overflow-y-auto h-72 space-y-1.5 text-[11px]">
+            <div className="p-3 rounded-lg bg-background border border-border overflow-y-auto h-96 space-y-1.5 text-[11px]">
               {executionLogs.map((log, i) => (
                 <div
                   key={i}

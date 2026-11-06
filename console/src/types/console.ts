@@ -16,6 +16,7 @@ export type ProjectServiceTab =
   | 'activity'
   | 'usage'
   | 'firewall'
+  | 'agents'
   | 'grok-agents'
   | 'passport-foundry';
 
@@ -67,10 +68,12 @@ export interface ComputePlan {
   savingsVsDOPercent: number;
 }
 
-export interface GrokAgentInstance {
+export type AgentExecutionTier = 'Edge-Reasoning' | 'High-Throughput' | 'Deep-Verification' | 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8';
+
+export interface AgentInstance {
   id: string;
   name: string;
-  model: 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8';
+  model: AgentExecutionTier;
   status: 'idle' | 'running' | 'completed' | 'paused';
   taskPrompt: string;
   mcpServers: string[];
@@ -84,6 +87,8 @@ export interface GrokAgentInstance {
     status: 'success' | 'running' | 'error';
   }>;
 }
+
+export type GrokAgentInstance = AgentInstance;
 
 export interface DatabaseRow {
   $id: string;

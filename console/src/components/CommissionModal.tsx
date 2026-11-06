@@ -53,7 +53,7 @@ export const CommissionModal: React.FC<CommissionModalProps> = ({ isOpen, onClos
             <input
               type="text"
               required
-              placeholder="e.g. Claude-Coder-v3, Sentinel-Sec-v1"
+              placeholder="e.g. Agent-Worker-01, Sentinel-Sec-v1"
               value={name}
               onChange={e => setName(e.target.value)}
               className="w-full bg-surface border border-border rounded-md px-3 py-2 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-primary font-mono text-xs"

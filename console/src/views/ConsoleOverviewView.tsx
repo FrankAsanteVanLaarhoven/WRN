@@ -332,7 +332,7 @@ export const ConsoleOverviewView: React.FC = () => {
             <Badge variant="outline">Scoped Access</Badge>
           </div>
           <p className="text-xs text-slate-400">
-            Give backend microservices, Grok agents, and CI/CD pipelines scoped authority under WRN grants.
+            Give backend microservices, autonomous agents, and CI/CD pipelines scoped authority under WRN grants.
           </p>
           <div className="flex flex-wrap gap-2 text-xs font-mono">
             {['Node.js', 'Python', 'Go', 'Rust', 'Deno', 'Bun', 'PHP'].map(lang => (

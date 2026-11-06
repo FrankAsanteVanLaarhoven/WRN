@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { DomainItem } from '../types/console';
 
-export const DomainsNginxView: React.FC = () => {
+export const DomainsView: React.FC = () => {
   const { domains, addDomain, verifyDomainDns } = useConsole();
   const [searchDomainInput, setSearchDomainInput] = useState('');
   const [searching, setSearching] = useState(false);
@@ -50,7 +50,7 @@ export const DomainsNginxView: React.FC = () => {
     setSearchDomainInput('');
   };
 
-  const copyNginx = () => {
+  const copyProxyConfig = () => {
     navigator.clipboard.writeText(selectedDomain.nginxConfig);
     setCopiedConfig(true);
     setTimeout(() => setCopiedConfig(false), 2000);
@@ -66,7 +66,7 @@ export const DomainsNginxView: React.FC = () => {
             <h1 className="text-lg font-bold text-white tracking-tight">Domains & DNS</h1>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Real-time live domain search, purchase integration, edge DNS verification, and auto-generated reverse proxy configurations.
+            Real-time live domain search, edge DNS verification, automated wildcard SSL, and edge reverse proxy routing.
           </p>
         </div>
 
@@ -88,7 +88,7 @@ export const DomainsNginxView: React.FC = () => {
                 <ShoppingCart className="w-3.5 h-3.5 text-illum" />
                 <span>Buy & Register Domains</span>
               </span>
-              <span className="text-[10px] text-illum font-mono">Live WHOIS API</span>
+              <span className="text-[10px] text-illum font-mono">Live Registry API</span>
             </div>
 
             <form onSubmit={handleSearch} className="relative">
@@ -103,28 +103,35 @@ export const DomainsNginxView: React.FC = () => {
               />
               <button
                 type="submit"
-                disabled={searching}
-                className="absolute right-2 top-2 text-illum hover:text-white"
+                aria-label="Search Domain Availability"
+                className="absolute right-2 top-2 text-slate-400 hover:text-white"
               >
-                {searching ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                <Search className="w-4 h-4" />
               </button>
             </form>
 
+            {searching && (
+              <div className="text-xs font-mono text-slate-400 flex items-center space-x-2">
+                <div className="w-3 h-3 border-2 border-illum border-t-transparent rounded-full animate-spin" />
+                <span>Checking global TLD registries...</span>
+              </div>
+            )}
+
             {searchResult && (
-              <div className="p-3 rounded-lg bg-surface border border-border space-y-2 text-xs font-mono animate-in fade-in">
-                <div className="flex items-center justify-between text-white font-bold">
-                  <span className="text-illum">{searchResult.domain}</span>
-                  <span className="text-emerald-400">${searchResult.price.toFixed(2)}/yr</span>
-                </div>
-                <div className="text-[11px] text-slate-300">
-                  Status: Available for instant edge provisioning & DNS binding.
+              <div className="p-3 rounded-lg bg-surface border border-border/80 flex items-center justify-between text-xs font-mono">
+                <div>
+                  <div className="font-bold text-white flex items-center space-x-1">
+                    <span>{searchResult.domain}</span>
+                    <span className="text-emerald-400 text-[10px]">Available</span>
+                  </div>
+                  <div className="text-slate-400 text-[11px]">${searchResult.price.toFixed(2)}/yr with Free DNS & SSL</div>
                 </div>
                 <button
                   onClick={handleBuy}
-                  className="w-full py-1.5 rounded-lg neon-tube-button font-bold text-xs flex items-center justify-center space-x-1.5 transition-all"
+                  className="px-3 py-1.5 rounded neon-tube-button font-bold text-[11px] flex items-center space-x-1"
                 >
-                  <Zap className="w-3.5 h-3.5 fill-current" />
-                  <span>Purchase & Provision Instantly</span>
+                  <Plus className="w-3 h-3" />
+                  <span>Purchase</span>
                 </button>
               </div>
             )}
@@ -132,9 +139,9 @@ export const DomainsNginxView: React.FC = () => {
 
           {/* Registered Domains List */}
           <div className="space-y-2">
-            <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider pb-1 border-b border-border">
+            <span className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider">
               Configured Domains ({domains.length})
-            </div>
+            </span>
 
             {domains.map(dom => {
               const isSelected = selectedDomain.id === dom.id;
@@ -142,22 +149,25 @@ export const DomainsNginxView: React.FC = () => {
                 <div
                   key={dom.id}
                   onClick={() => setSelectedDomain(dom)}
-                  className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                  className={`p-3 rounded-lg border transition-all cursor-pointer font-mono text-xs ${
                     isSelected
-                      ? 'bg-surface-elevated border-illum'
-                      : 'bg-surface-card border-border hover:border-slate-600'
+                      ? 'bg-surface-elevated border-illum/60 text-white shadow-xs'
+                      : 'bg-surface border-border text-slate-300 hover:border-slate-600'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-bold text-xs text-white font-mono">
-                      {dom.domain}
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold flex items-center space-x-1.5">
+                      <Globe className="w-3.5 h-3.5 text-illum" />
+                      <span>{dom.domain}</span>
                     </span>
-                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40">
-                      SSL Active ✓
+                    <span className="flex items-center space-x-1 text-emerald-400 text-[10px] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                      <ShieldCheck className="w-3 h-3" />
+                      <span>SSL Active</span>
                     </span>
                   </div>
-                  <div className="text-[11px] text-slate-400 font-mono truncate">
-                    {dom.registrar}
+                  <div className="text-[11px] text-slate-500 mt-1 flex items-center justify-between">
+                    <span>${dom.pricePerYear}/yr</span>
+                    <span>{dom.registrar}</span>
                   </div>
                 </div>
               );
@@ -165,7 +175,7 @@ export const DomainsNginxView: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Live DNS Records & NGINX Auto-Generator */}
+        {/* Right: Live DNS Records & Edge Reverse Proxy */}
         <div className="flex-1 p-6 overflow-y-auto space-y-6 bg-background">
           {/* Top Domain Info */}
           <div className="p-5 rounded-xl neon-tube-card space-y-3">
@@ -202,25 +212,25 @@ export const DomainsNginxView: React.FC = () => {
             </div>
           </div>
 
-          {/* Auto Built-in NGINX Engine Output */}
+          {/* Edge Reverse Proxy & Route Configuration */}
           <div className="p-5 rounded-xl neon-tube-card space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <Server className="w-4 h-4 text-illum" />
                 <h3 className="text-xs font-bold text-white font-mono uppercase tracking-wider">
-                  Auto Built-in NGINX Reverse Proxy Specification
+                  Edge Reverse Proxy & Route Rules
                 </h3>
               </div>
               <button
-                onClick={copyNginx}
-                className="flex items-center space-x-1.5 text-xs text-illum hover:underline font-mono"
+                onClick={copyProxyConfig}
+                className="flex items-center space-x-1.5 text-xs text-illum hover:underline font-mono cursor-pointer"
               >
                 <Copy className="w-3.5 h-3.5" />
                 <span>{copiedConfig ? 'Copied!' : 'Copy Config'}</span>
               </button>
             </div>
             <p className="text-xs text-slate-400">
-              Generated in real time for edge routing, WebSocket upgrades, rate limiting, and Let's Encrypt TLS.
+              Active edge routing specification for SSL termination, HTTP/2, WebSocket proxying, and DDoS rate limiting.
             </p>
 
             <pre className="p-4 rounded-xl bg-surface border border-border text-[11px] font-mono text-slate-200 overflow-x-auto leading-relaxed">

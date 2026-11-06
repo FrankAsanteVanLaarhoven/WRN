@@ -26,6 +26,8 @@ import {
   ProjectServiceTab,
   DomainItem,
   ComputePlan,
+  AgentInstance,
+  AgentExecutionTier,
   GrokAgentInstance,
   IlluminationColor,
   ILLUMINATION_OPTIONS
@@ -78,7 +80,7 @@ interface ConsoleContextType {
   projectServiceTab: ProjectServiceTab;
   setProjectServiceTab: (tab: ProjectServiceTab) => void;
 
-  // Domains & NGINX
+  // Domains & Routing
   domains: DomainItem[];
   addDomain: (domain: string) => Promise<void>;
   verifyDomainDns: (id: string) => Promise<void>;
@@ -86,9 +88,9 @@ interface ConsoleContextType {
   // Compute & Cost Analysis
   computePlans: ComputePlan[];
 
-  // Grok Agent Harness
-  grokAgents: GrokAgentInstance[];
-  executeGrokTask: (prompt: string, model?: 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8') => Promise<void>;
+  // Agent Harness & MCP Runtime
+  grokAgents: AgentInstance[];
+  executeGrokTask: (prompt: string, model?: AgentExecutionTier) => Promise<void>;
 
   // Database Queries & Tables
   lapTimes: any[];
@@ -232,14 +234,14 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
     compute: '0.84 GBH'
   });
 
-  const [grokAgents, setGrokAgents] = useState<GrokAgentInstance[]>([
+  const [grokAgents, setGrokAgents] = useState<AgentInstance[]>([
     {
-      id: 'grok-inst-01',
-      name: 'Grok Launch Agent',
-      model: 'Grok-Build-0.1',
+      id: 'agent-inst-01',
+      name: 'Autonomous Agent',
+      model: 'Edge-Reasoning',
       status: 'idle',
       taskPrompt: "Query Postgres for Friday's new users and verify email conversion rate.",
-      mcpServers: ['mcp.wrn.io', 'wrn.notary.mcp'],
+      mcpServers: ['mcp.wrn.io', 'postgres.mcp', 'edge.proxy.mcp'],
       tokensPerSec: 184,
       costEstimate: 0.04,
       steps: [
@@ -271,7 +273,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
     ssl_certificate /etc/letsencrypt/live/${clean}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/${clean}/privkey.pem;
 
-    # Built-in Auto NGINX Reverse Proxy
+    # Edge Reverse Proxy & Route Rules
     location / {
         proxy_pass http://upstream_app;
         proxy_set_header Host $host;
@@ -287,20 +289,20 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
     setDomains(prev => prev.map(d => d.id === id ? { ...d, status: 'verified', sslStatus: 'active' } : d));
   };
 
-  const executeGrokTask = async (prompt: string, model: 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8' = 'Grok-Build-0.1') => {
-    const newAgent: GrokAgentInstance = {
-      id: `grok-${Date.now().toString(36)}`,
-      name: `${model} Harness`,
+  const executeGrokTask = async (prompt: string, model: AgentExecutionTier = 'Edge-Reasoning') => {
+    const newAgent: AgentInstance = {
+      id: `agent-${Date.now().toString(36)}`,
+      name: `Autonomous Agent`,
       model,
       status: 'running',
       taskPrompt: prompt,
-      mcpServers: ['mcp.wrn.io', 'postgres.mcp', 'nginx.edge.mcp'],
+      mcpServers: ['mcp.wrn.io', 'postgres.mcp', 'edge.proxy.mcp'],
       tokensPerSec: 210,
       costEstimate: 0.02,
       steps: [
-        { id: '1', type: 'reasoning', text: `Analyzing task with ${model}: "${prompt}"`, timestamp: new Date().toLocaleTimeString(), status: 'success' },
-        { id: '2', type: 'tool_call', text: 'Executing MCP tool wrn.database.queryTables...', timestamp: new Date().toLocaleTimeString(), status: 'success' },
-        { id: '3', type: 'security_gate', text: 'Enforcing WRN-COEXISTENCE-0.2 memory compartment boundaries.', timestamp: new Date().toLocaleTimeString(), status: 'success' }
+        { id: '1', type: 'reasoning', text: `Analyzing task with execution tier [${model}]: "${prompt}"`, timestamp: new Date().toLocaleTimeString(), status: 'success' },
+        { id: '2', type: 'tool_call', text: 'Executing MCP tool wrn.database.queryTables via Model Context Protocol...', timestamp: new Date().toLocaleTimeString(), status: 'success' },
+        { id: '3', type: 'security_gate', text: 'Enforcing WRN-COEXISTENCE-0.2 memory compartment boundaries and RFC 9421 Merkle seal.', timestamp: new Date().toLocaleTimeString(), status: 'success' }
       ]
     };
     setGrokAgents(prev => [newAgent, ...prev]);

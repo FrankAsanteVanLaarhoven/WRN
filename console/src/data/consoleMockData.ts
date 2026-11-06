@@ -139,25 +139,20 @@ export const INITIAL_POSTGRES_USERS = [
 export const MARKETPLACE_TOOLS = [
   { id: 'wrn-cli', name: 'WRN CLI', desc: 'Manage WRN services, contracts, and deployments from your terminal.', category: 'Developer tools', stars: '4.9k', installs: '180k' },
   { id: 'wrn-preview', name: 'WRN Preview', desc: 'Sign in to protected WRN site previews and edge environments.', category: 'Developer tools', stars: '1.2k', installs: '45k' },
-  { id: 'claude-code', name: 'Claude Code', desc: 'Use WRN from Claude Code CLI.', category: 'Developer tools', stars: '12.4k', installs: '320k' },
-  { id: 'claude-desktop', name: 'Claude Desktop', desc: 'Use WRN from Claude Desktop MCP.', category: 'Developer tools', stars: '8.9k', installs: '210k' },
-  { id: 'cline', name: 'Cline', desc: 'Autonomous coding agent powered by WRN MCP.', category: 'Developer tools', stars: '15.1k', installs: '410k' },
-  { id: 'codex', name: 'Codex', desc: 'Use WRN from OpenAI Codex.', category: 'Developer tools', stars: '7.8k', installs: '190k' },
-  { id: 'cursor', name: 'Cursor', desc: 'Use WRN directly from Cursor editor.', category: 'Developer tools', stars: '28.3k', installs: '850k' },
-  { id: 'gemini-cli', name: 'Gemini CLI', desc: 'Use WRN from Gemini CLI.', category: 'Developer tools', stars: '6.4k', installs: '120k' },
-  { id: 'github-copilot', name: 'GitHub Copilot CLI', desc: 'Use WRN from GitHub Copilot CLI.', category: 'Developer tools', stars: '19.2k', installs: '620k' },
-  { id: 'google-antigravity', name: 'Google Antigravity', desc: 'Full agent orchestration on WRN.', category: 'Developer tools', stars: '21.5k', installs: '740k' },
-  { id: 'jetbrains', name: 'JetBrains AI Assistant', desc: 'WRN integration for IntelliJ, PyCharm, and WebStorm.', category: 'Developer tools', stars: '9.8k', installs: '260k' },
-  { id: 'opencode', name: 'OpenCode', desc: 'Open-source agent harness with WRN backend.', category: 'Developer tools', stars: '5.2k', installs: '95k' },
-  { id: 'vscode', name: 'Visual Studio Code', desc: 'Official WRN extension for VS Code.', category: 'Developer tools', stars: '45.1k', installs: '1.8M' },
-  { id: 'warp', name: 'Warp', desc: 'Terminal with built-in WRN workflows.', category: 'Developer tools', stars: '18.9k', installs: '540k' },
-  { id: 'zed', name: 'Zed', desc: 'Lightning-fast collaborative editor with WRN RPC.', category: 'Developer tools', stars: '11.3k', installs: '280k' }
+  { id: 'mcp-client-sdk', name: 'MCP Client SDK', desc: 'Standard Model Context Protocol client for autonomous agent delegation.', category: 'Agent protocols', stars: '14.2k', installs: '380k' },
+  { id: 'mcp-server-kit', name: 'MCP Server Kit', desc: 'Expose local and cloud databases as sandboxed MCP tool servers.', category: 'Agent protocols', stars: '11.8k', installs: '290k' },
+  { id: 'vscode-extension', name: 'Visual Studio Code', desc: 'Official WRN language server and state machine studio extension.', category: 'Developer tools', stars: '45.1k', installs: '1.8M' },
+  { id: 'cursor-extension', name: 'Cursor IDE Kit', desc: 'Direct MCP context integration and bounded policy verification.', category: 'Developer tools', stars: '28.3k', installs: '850k' },
+  { id: 'github-actions', name: 'GitHub Actions', desc: 'Continuous integration, cryptographic passport checks, and edge deploy.', category: 'Automation', stars: '19.2k', installs: '620k' },
+  { id: 'jetbrains-plugin', name: 'JetBrains IDE Suite', desc: 'WRN integration for IntelliJ, PyCharm, WebStorm, and RustRover.', category: 'Developer tools', stars: '9.8k', installs: '260k' },
+  { id: 'neovim-plugin', name: 'Neovim Lua Plugin', desc: 'Zero-latency Lua RPC binding for WRN contracts and edge logs.', category: 'Developer tools', stars: '6.4k', installs: '120k' },
+  { id: 'warp-workflows', name: 'Warp Workflows', desc: 'Pre-configured terminal command playbooks and audit stream tailing.', category: 'Developer tools', stars: '18.9k', installs: '540k' }
 ];
 
 export const AI_ARENA_BENCHMARK = [
-  { model: 'Grok Build 0.1', costPer1M: '$1.00', overall: '96.7%', auth: '92.0%', tablesDb: '96.3%', functions: '100%', storage: '93.5%', sites: '99.7%', messaging: '100%' },
-  { model: 'GPT 5.5', costPer1M: '$5.00', overall: '97.7%', auth: '98.5%', tablesDb: '96.5%', functions: '99.5%', storage: '94.3%', sites: '100%', messaging: '100%' },
-  { model: 'Claude Opus 4.8', costPer1M: '$5.00', overall: '97.1%', auth: '99.3%', tablesDb: '96.1%', functions: '95.0%', storage: '94.3%', sites: '100%', messaging: '100%' },
-  { model: 'Claude Opus 4.7', costPer1M: '$5.00', overall: '97.1%', auth: '99.0%', tablesDb: '91.3%', functions: '100%', storage: '94.8%', sites: '100%', messaging: '100%' }
+  { model: 'Edge Reasoning Profile', costPer1M: '$0.20', overall: '99.4%', auth: '99.5%', tablesDb: '98.8%', functions: '100%', storage: '99.2%', sites: '100%', messaging: '100%' },
+  { model: 'Balanced Coexistence Profile', costPer1M: '$0.80', overall: '98.9%', auth: '99.8%', tablesDb: '99.1%', functions: '99.5%', storage: '98.6%', sites: '100%', messaging: '100%' },
+  { model: 'Deep Formal Verification', costPer1M: '$2.40', overall: '99.8%', auth: '100%', tablesDb: '99.7%', functions: '100%', storage: '99.8%', sites: '100%', messaging: '100%' },
+  { model: 'Cryptographic Proof Sealer', costPer1M: '$0.50', overall: '100.0%', auth: '100%', tablesDb: '100%', functions: '100%', storage: '100%', sites: '100%', messaging: '100%' }
 ];
 

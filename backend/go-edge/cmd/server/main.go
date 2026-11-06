@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/cache"
+	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/stepfunctions"
 	"github.com/FrankAsanteVanLaarhoven/WRN/backend/go-edge/internal/waf"
 )
 
@@ -318,97 +319,93 @@ func main() {
 		})
 	}))
 
-	// 7. Step Functions State Machine API
-	type StepNode struct {
-		Name       string                 `json:"name"`
-		Type       string                 `json:"type"` // Task, Choice, Parallel, Pass, Wait, Succeed, Fail
-		Status     string                 `json:"status"`
-		DurationMs int                    `json:"durationMs"`
-		Input      map[string]interface{} `json:"input"`
-		Output     map[string]interface{} `json:"output"`
-	}
-
-	stateMachineStates := []StepNode{
-		{
-			Name:       "VerifyAgentEnvelope",
-			Type:       "Task",
-			Status:     "success",
-			DurationMs: 42,
-			Input:      map[string]interface{}{"agentId": "urn:wrn:agent:grok-01", "role": "autonomous-worker", "caller": "frank@openmeta.io"},
-			Output:     map[string]interface{}{"verified": true, "keyId": "key_wrn_agent_01", "zone": 2, "memoryCompartment": "comp-sec-01"},
-		},
-		{
-			Name:       "EvaluateZonePolicy",
-			Type:       "Choice",
-			Status:     "success",
-			DurationMs: 8,
-			Input:      map[string]interface{}{"zone": 2, "permittedOps": []string{"read", "derive", "write"}},
-			Output:     map[string]interface{}{"decision": "COMPARTMENT_ISOLATION_ZONE2", "next": "ParallelSecurityChecks"},
-		},
-		{
-			Name:       "ParallelSecurityChecks",
-			Type:       "Parallel",
-			Status:     "success",
-			DurationMs: 65,
-			Input:      map[string]interface{}{"checks": []string{"RFC_9421_SIG", "REDIS_RATE_LIMIT", "OWASP_WAF"}},
-			Output:     map[string]interface{}{"rfc9421": "VALID", "rateLimit": "OK (42/300 rpm)", "wafScore": 0},
-		},
-		{
-			Name:       "ExecuteSandboxedTask",
-			Type:       "Task",
-			Status:     "success",
-			DurationMs: 180,
-			Input:      map[string]interface{}{"task": "Build SSR static artifacts and query lap_times", "timeoutMs": 5000},
-			Output:     map[string]interface{}{"rowsProcessed": 5, "artifactsGenerated": 12, "exitCode": 0},
-		},
-		{
-			Name:       "CommitMerkleAuditProof",
-			Type:       "Task",
-			Status:     "success",
-			DurationMs: 38,
-			Input:      map[string]interface{}{"digest": "sha256:7f4a...92b1", "ledgerTarget": "wrn_dag_root"},
-			Output:     map[string]interface{}{"merkleRoot": "0x8f2ac01b4e99142f", "blockHeight": 14209, "sealed": true},
-		},
-		{
-			Name:       "PipelineSuccess",
-			Type:       "Succeed",
-			Status:     "success",
-			DurationMs: 2,
-			Input:      map[string]interface{}{"sealed": true, "durationTotalMs": 335},
-			Output:     map[string]interface{}{"stateMachineStatus": "SUCCEEDED", "completionTimestamp": time.Now().Format(time.RFC3339)},
-		},
-	}
-
+	// 7. Step Functions State Machine API (ASL Engine with Live Step Execution)
 	mux.HandleFunc("/api/v1/step-functions/definitions", withWAF(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		ctx := stepfunctions.NewDefaultContext()
+		nodes, _, _ := stepfunctions.ExecuteAll(ctx, firewall, redisCache)
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"id":          "sm_merkle_seal_v2",
-			"name":        "Agent Passport Coexistence & Merkle Settlement Pipeline",
-			"comment":     "ASL-compliant Step Function orchestrating agent cryptographic qualification and DAG settlement",
-			"version":     "2.1.0",
-			"startAt":     "VerifyAgentEnvelope",
-			"states":      stateMachineStates,
-			"timeoutSec":  300,
+			"id":         "sm_merkle_seal_v2",
+			"name":       "Agent Passport Coexistence & Merkle Settlement Pipeline",
+			"comment":    "ASL-compliant Step Function orchestrating agent cryptographic qualification and DAG settlement",
+			"version":    "2.1.0",
+			"startAt":    "VerifyAgentEnvelope",
+			"states":     nodes,
+			"timeoutSec": 300,
 		})
 	}))
 
-	mux.HandleFunc("/api/v1/step-functions/execute", withWAF(func(w http.ResponseWriter, r *http.Request) {
+	// Execute an individual step by state ID (e.g. VerifyAgentEnvelope, EvaluateZonePolicy, ParallelSecurityChecks)
+	mux.HandleFunc("/api/v1/step-functions/step", withWAF(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		var body struct {
-			StepIndex int `json:"stepIndex"` // -1 for all, or 0..N for single step
+			StateID string `json:"stateId"`
 		}
-		json.NewDecoder(r.Body).Decode(&body)
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.StateID == "" {
+			body.StateID = "VerifyAgentEnvelope"
+		}
 
-		start := time.Now()
-		dur := int(time.Since(start).Milliseconds()) + 335
+		ctx := stepfunctions.NewDefaultContext()
+		node, err := stepfunctions.ExecuteStep(body.StateID, ctx, firewall, redisCache)
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
+			return
+		}
+
+		state.mu.Lock()
+		state.logs = append([]map[string]interface{}{{
+			"id":          fmt.Sprintf("log_%d", time.Now().UnixNano()),
+			"timestamp":   time.Now().Format(time.RFC3339),
+			"level":       "INFO",
+			"service":     "step_functions",
+			"action":      fmt.Sprintf("step.%s", strings.ToLower(node.Name)),
+			"duration_ms": float64(node.DurationMs),
+			"status":      200,
+		}}, state.logs...)
+		state.mu.Unlock()
+
+		json.NewEncoder(w).Encode(node)
+	}))
+
+	// Execute full state machine pipeline (all 6 steps with concurrent parallel evaluation)
+	mux.HandleFunc("/api/v1/step-functions/execute", withWAF(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		ctx := stepfunctions.NewDefaultContext()
+
+		nodes, totalDur, err := stepfunctions.ExecuteAll(ctx, firewall, redisCache)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			json.NewEncoder(w).Encode(map[string]interface{}{"error": err.Error()})
+			return
+		}
+
+		state.mu.Lock()
+		state.logs = append([]map[string]interface{}{
+			{
+				"id":          fmt.Sprintf("log_%d", time.Now().UnixNano()),
+				"timestamp":   time.Now().Format(time.RFC3339),
+				"level":       "INFO",
+				"service":     "step_functions",
+				"action":      "pipeline.merkle_seal.completed",
+				"duration_ms": float64(totalDur),
+				"merkle_root": ctx.MerkleRoot,
+				"status":      200,
+			},
+		}, state.logs...)
+		state.mu.Unlock()
 
 		json.NewEncoder(w).Encode(map[string]interface{}{
-			"executionId": fmt.Sprintf("exec_%d", time.Now().UnixNano()),
+			"executionId": ctx.ExecutionID,
 			"status":      "SUCCEEDED",
-			"durationMs":  dur,
-			"stepCount":   len(stateMachineStates),
-			"states":      stateMachineStates,
-			"output":      map[string]interface{}{"merkleRoot": "0x8f2ac01b4e99142f", "status": "COMPLETED_AND_SEALED"},
+			"durationMs":  totalDur,
+			"stepCount":   len(nodes),
+			"states":      nodes,
+			"output": map[string]interface{}{
+				"merkleRoot":  ctx.MerkleRoot,
+				"blockHeight": ctx.BlockHeight,
+				"status":      "COMPLETED_AND_SEALED",
+			},
 		})
 	}))
 

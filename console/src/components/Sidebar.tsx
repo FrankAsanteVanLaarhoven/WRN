@@ -106,7 +106,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGra
     {
       title: 'AGENTS & MCP',
       items: [
-        { id: 'grok-agents', label: 'AI Agents', icon: Bot, badge: 'Harness' },
+        { id: 'agents', label: 'AI Agents', icon: Bot, badge: 'Harness' },
         { id: 'passport-foundry', label: 'WRN Passport', icon: GitFork, badge: `${passedTests}/14 Pass` }
       ]
     }

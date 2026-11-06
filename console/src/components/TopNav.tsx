@@ -55,7 +55,7 @@ export const TopNav: React.FC = () => {
     { id: 'workflows', label: 'Workflows' },
     { id: 'step-functions', label: 'Step Functions' },
     { id: 'marketplace', label: 'Marketplace' },
-    { id: 'domains', label: 'Domains & DNS' },
+    { id: 'domains', label: 'Domains' },
     { id: 'compute', label: 'Compute & Costs' },
     { id: 'settings', label: 'Settings' }
   ];

@@ -23,9 +23,9 @@ import { ActivityView } from './views/ActivityView';
 import { ApiPlaygroundView } from './views/ApiPlaygroundView';
 import { AgentMarketplaceView } from './views/AgentMarketplaceView';
 import { ProjectSettingsView } from './views/ProjectSettingsView';
-import { DomainsNginxView } from './views/DomainsNginxView';
+import { DomainsView } from './views/DomainsView';
 import { ComputeCostAnalysisView } from './views/ComputeCostAnalysisView';
-import { GrokAgentsHarnessView } from './views/GrokAgentsHarnessView';
+import { AgentHarnessView } from './views/AgentHarnessView';
 
 // WRN Passport Coexistence & Foundry Views
 import { OntologyView } from './views/OntologyView';
@@ -78,7 +78,7 @@ const MainLayout: React.FC = () => {
       {topNavTab === 'workflows' && <WorkflowsView />}
       {topNavTab === 'step-functions' && <StepFunctionsView />}
       {topNavTab === 'marketplace' && <AgentMarketplaceView />}
-      {topNavTab === 'domains' && <DomainsNginxView />}
+      {topNavTab === 'domains' && <DomainsView />}
       {topNavTab === 'compute' && <ComputeCostAnalysisView />}
       {topNavTab === 'settings' && <ProjectSettingsView />}
 
@@ -106,7 +106,7 @@ const MainLayout: React.FC = () => {
             {projectServiceTab === 'activity' && <ActivityView />}
             {projectServiceTab === 'usage' && <ComputeCostAnalysisView />}
             {projectServiceTab === 'firewall' && <FirewallView />}
-            {projectServiceTab === 'grok-agents' && <GrokAgentsHarnessView />}
+            {(projectServiceTab === 'agents' || projectServiceTab === 'grok-agents') && <AgentHarnessView />}
 
             {/* WRN Passport Coexistence & Foundry Mode */}
             {projectServiceTab === 'passport-foundry' && (

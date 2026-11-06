@@ -13,15 +13,19 @@ import {
   Plus,
   Shield,
   Layers,
-  Code2
+  Code2,
+  Cpu,
+  Lock,
+  Activity
 } from 'lucide-react';
 import { AI_ARENA_BENCHMARK } from '../data/consoleMockData';
+import { AgentExecutionTier } from '../types/console';
 
-export const GrokAgentsHarnessView: React.FC = () => {
+export const AgentHarnessView: React.FC = () => {
   const { grokAgents, executeGrokTask, lapTimes, postgresUsers } = useConsole();
   const [taskPrompt, setTaskPrompt] = useState("Query Postgres for Friday's new users and compute email conversion rate.");
-  const [selectedModel, setSelectedModel] = useState<'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8'>('Grok-Build-0.1');
-  const [activeTab, setActiveTab] = useState<'harness' | 'arena' | 'database'>('harness');
+  const [selectedTier, setSelectedTier] = useState<AgentExecutionTier>('Edge-Reasoning');
+  const [activeTab, setActiveTab] = useState<'harness' | 'database' | 'telemetry'>('harness');
   const [activeDbView, setActiveDbView] = useState<'lap_times' | 'postgres_users'>('lap_times');
   const [isExecuting, setIsExecuting] = useState(false);
 
@@ -31,9 +35,15 @@ export const GrokAgentsHarnessView: React.FC = () => {
     e.preventDefault();
     if (!taskPrompt.trim() || isExecuting) return;
     setIsExecuting(true);
-    await executeGrokTask(taskPrompt.trim(), selectedModel);
+    await executeGrokTask(taskPrompt.trim(), selectedTier);
     setIsExecuting(false);
   };
+
+  const executionTiers: { id: AgentExecutionTier; label: string; desc: string }[] = [
+    { id: 'Edge-Reasoning', label: 'Edge-Reasoning', desc: 'Sub-5ms deterministic reasoning' },
+    { id: 'High-Throughput', label: 'High-Throughput', desc: 'Massive parallel state processing' },
+    { id: 'Deep-Verification', label: 'Deep-Verification', desc: 'Formal cryptographic proof validation' }
+  ];
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-background">
@@ -41,17 +51,17 @@ export const GrokAgentsHarnessView: React.FC = () => {
       <div className="p-4 border-b border-border bg-surface flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center space-x-3">
           <div className="w-9 h-9 rounded-lg bg-surface-elevated border border-border flex items-center justify-center hover-tube">
-            <Bot className="w-5 h-5 text-illum" />
+            <Cpu className="w-5 h-5 text-illum" />
           </div>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="text-base font-bold text-white tracking-tight">Grok Bot & Agent Harness</h1>
+              <h1 className="text-base font-bold text-white tracking-tight">Autonomous Agent Harness</h1>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-illum-muted text-illum border border-illum-muted">
                 MCP Client v2.4 Active
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
-              Client execution harness powered by Grok Build 0.1, GPT-5.5, and Claude with bounded memory sandboxes.
+              Autonomous execution harness with Model Context Protocol (MCP) tool integration, sandboxed runtime, and RFC 9421 cryptographic execution sealing.
             </p>
           </div>
         </div>
@@ -59,9 +69,9 @@ export const GrokAgentsHarnessView: React.FC = () => {
         {/* Tab switch */}
         <div className="flex items-center space-x-1 p-1 rounded-lg bg-surface-elevated border border-border text-xs font-mono">
           {[
-            { id: 'harness', label: 'Agent Harness' },
-            { id: 'database', label: 'Live Databases' },
-            { id: 'arena', label: 'AI Arena Benchmark' }
+            { id: 'harness', label: 'Agent Workspace' },
+            { id: 'database', label: 'Live Data' },
+            { id: 'telemetry', label: 'Runtime Telemetry' }
           ].map(t => (
             <button
               key={t.id}
@@ -92,18 +102,19 @@ export const GrokAgentsHarnessView: React.FC = () => {
                     <span>Create & Launch Agent Work</span>
                   </span>
                   <div className="flex items-center space-x-1 text-xs font-mono">
-                    {(['Grok-Build-0.1', 'GPT-5.5', 'Claude-Opus-4.8'] as const).map(m => (
+                    {executionTiers.map(tier => (
                       <button
                         type="button"
-                        key={m}
-                        onClick={() => setSelectedModel(m)}
+                        key={tier.id}
+                        onClick={() => setSelectedTier(tier.id)}
                         className={`px-2.5 py-0.5 rounded transition-all ${
-                          selectedModel === m
+                          selectedTier === tier.id
                             ? 'active-tube-pill font-semibold'
                             : 'text-slate-400 hover:text-white'
                         }`}
+                        title={tier.desc}
                       >
-                        {m}
+                        {tier.label}
                       </button>
                     ))}
                   </div>
@@ -113,7 +124,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   rows={3}
                   value={taskPrompt}
                   onChange={e => setTaskPrompt(e.target.value)}
-                  placeholder="Tell your agent what to query, chart, or deploy on WRN..."
+                  placeholder="Describe the task for the autonomous agent harness..."
                   className="w-full bg-surface border border-border rounded-lg p-3 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-illum font-mono transition-colors"
                 />
 
@@ -122,6 +133,8 @@ export const GrokAgentsHarnessView: React.FC = () => {
                     <span className="text-illum">MCP: mcp.wrn.io</span>
                     <span>•</span>
                     <span>Skill: wrn-postgres</span>
+                    <span>•</span>
+                    <span className="text-emerald-400">Sandbox: Memory Compartment #01</span>
                   </div>
                   <button
                     type="submit"
@@ -141,16 +154,21 @@ export const GrokAgentsHarnessView: React.FC = () => {
                     <div className="flex items-center space-x-2">
                       <Terminal className="w-4 h-4 text-illum" />
                       <h3 className="text-xs font-bold text-white font-mono uppercase tracking-wider">
-                        {activeAgent.name} • Execution Trace
+                        AUTONOMOUS AGENT • EXECUTION TRACE
                       </h3>
                     </div>
-                    <span className="text-[10px] font-mono text-illum bg-illum-muted px-2 py-0.5 rounded border border-illum-muted">
-                      Tokens/sec: {activeAgent.tokensPerSec}
-                    </span>
+                    <div className="flex items-center space-x-2">
+                      <span className="text-[10px] font-mono text-slate-400">
+                        Profile: <span className="text-white font-bold">{activeAgent.model}</span>
+                      </span>
+                      <span className="text-[10px] font-mono text-illum bg-illum-muted px-2 py-0.5 rounded border border-illum-muted">
+                        Throughput: {activeAgent.tokensPerSec} t/s
+                      </span>
+                    </div>
                   </div>
 
                   <div className="space-y-2.5 font-mono text-xs">
-                    {activeAgent.steps.map((st, i) => (
+                    {activeAgent.steps.map((st: any, i: number) => (
                       <div key={i} className="p-3 rounded-lg bg-surface border border-border/80 flex items-start space-x-2.5">
                         <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                         <div className="flex-1">
@@ -171,7 +189,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
             <div className="space-y-4">
               <div className="p-4 rounded-xl neon-tube-card space-y-3">
                 <span className="text-xs font-bold text-white font-mono uppercase tracking-wider">
-                  WRN MCP Hub
+                  Model Context Protocol (MCP) Hub
                 </span>
                 <div className="p-3 rounded-lg bg-surface border border-border space-y-2 text-xs font-mono">
                   <div className="flex items-center justify-between">
@@ -183,21 +201,37 @@ export const GrokAgentsHarnessView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="text-[11px] text-slate-400 space-y-1">
+                <div className="text-[11px] text-slate-400 space-y-1 font-mono">
+                  <div className="text-slate-300 font-semibold mb-1">Active MCP Tools:</div>
                   <div>• postgresql.createExecution</div>
                   <div>• tablesdb.queryRows</div>
                   <div>• storage.createFile</div>
-                  <div>• nginx.reloadProxy</div>
+                  <div>• edge.reloadProxyRules</div>
+                  <div>• crypto.merkleSeal</div>
                 </div>
               </div>
 
               <div className="p-4 rounded-xl bg-surface-card border border-border/80 space-y-2 text-xs">
-                <span className="font-bold text-white font-mono uppercase tracking-wider">
-                  Bounded Delegation Guard
-                </span>
+                <div className="flex items-center space-x-1.5">
+                  <Lock className="w-3.5 h-3.5 text-illum" />
+                  <span className="font-bold text-white font-mono uppercase tracking-wider">
+                    Bounded Execution Isolation
+                  </span>
+                </div>
                 <p className="text-slate-400 text-[11px] leading-relaxed">
-                  Every Grok Bot execution inherits strict WRN-PASSPORT-0.2 authority limits. Operations outside declared resource scopes are rejected at the edge kernel.
+                  Every agent execution inherits strict WRN-PASSPORT-0.2 authority limits. Memory compartments, RPC grants, and cryptographic keys are strictly bounded to declared tenant scopes.
                 </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-surface-card border border-border/80 space-y-2 text-xs font-mono">
+                <span className="font-bold text-white uppercase tracking-wider text-[11px]">
+                  State Proof Envelope
+                </span>
+                <div className="p-2.5 rounded bg-surface border border-border/70 text-[10px] text-slate-300 space-y-1">
+                  <div>Envelope: urn:wrn:seal:agent-01</div>
+                  <div>Merkle Root: 0x8f2ac01b4e99142f</div>
+                  <div className="text-emerald-400 font-bold">Proof Status: SECURE_AND_VERIFIED</div>
+                </div>
               </div>
             </div>
           </div>
@@ -303,20 +337,20 @@ export const GrokAgentsHarnessView: React.FC = () => {
           </div>
         )}
 
-        {/* AI Arena Benchmark Table */}
-        {activeTab === 'arena' && (
+        {/* Runtime Telemetry Table */}
+        {activeTab === 'telemetry' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
-                  AI Arena Platform Benchmark
+                  Agent Runtime Telemetry & Capability Benchmark
                 </h3>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Constantly benchmarked against leading LLMs for WRN platform compatibility.
+                  Real-time execution performance across edge execution profiles and memory sandboxes.
                 </p>
               </div>
               <span className="text-xs font-mono text-emerald-400">
-                Grok Build 0.1: #1 Cost/Performance Leader
+                Sandboxed Execution Engine: Healthy
               </span>
             </div>
 
@@ -324,7 +358,7 @@ export const GrokAgentsHarnessView: React.FC = () => {
               <table className="w-full text-left">
                 <thead className="bg-surface text-slate-400 border-b border-border text-[11px]">
                   <tr>
-                    <th className="p-3">Model</th>
+                    <th className="p-3">Execution Profile</th>
                     <th className="p-3">Cost/1M</th>
                     <th className="p-3">Overall</th>
                     <th className="p-3">Auth</th>
@@ -360,4 +394,3 @@ export const GrokAgentsHarnessView: React.FC = () => {
     </div>
   );
 };
-

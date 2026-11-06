@@ -15,24 +15,24 @@ import {
 } from 'lucide-react';
 
 export const AgentMarketplaceView: React.FC = () => {
-  const { marketplaceTools, setProjectServiceTab } = useConsole();
+  const { marketplaceTools, setProjectServiceTab, setTopNavTab } = useConsole();
   const [activeCategory, setActiveCategory] = useState<string>('Explore');
   const [searchQuery, setSearchQuery] = useState('');
   const [installedMap, setInstalledMap] = useState<Record<string, boolean>>({
-    'google-antigravity': true,
-    'cursor': true,
-    'claude-code': true
+    'wrn-cli': true,
+    'mcp-client-sdk': true,
+    'vscode-extension': true
   });
 
   const categories = [
-    { name: 'Explore', count: 15 },
+    { name: 'Explore', count: 10 },
     { name: 'Authentication', count: 0 },
     { name: 'Storage', count: 0 },
     { name: 'Analytics', count: 0 },
     { name: 'Payments', count: 0 },
-    { name: 'AI & ML', count: 4 },
-    { name: 'Messaging', count: 0 },
-    { name: 'Developer tools', count: 15 }
+    { name: 'Agent protocols', count: 2 },
+    { name: 'Automation', count: 1 },
+    { name: 'Developer tools', count: 7 }
   ];
 
   const toggleInstall = (id: string) => {
@@ -52,19 +52,22 @@ export const AgentMarketplaceView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <Boxes className="w-5 h-5 text-illum" />
-            <h1 className="text-lg font-bold text-white tracking-tight">WRN Agent & Tool Marketplace</h1>
+            <h1 className="text-lg font-bold text-white tracking-tight">Agent & Protocol Marketplace</h1>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Discover official apps, CLI tools, and autonomous coding agents wired directly to WRN MCP servers.
+            Discover official developer tools, CLI utilities, and Model Context Protocol (MCP) integrations.
           </p>
         </div>
 
         <button
-          onClick={() => setProjectServiceTab('grok-agents')}
+          onClick={() => {
+            setTopNavTab('projects');
+            setProjectServiceTab('agents');
+          }}
           className="flex items-center space-x-1.5 px-3 py-1.5 rounded-lg neon-tube-button text-xs font-bold transition-all"
         >
           <Sparkles className="w-3.5 h-3.5 fill-current" />
-          <span>Launch Grok Bot Harness</span>
+          <span>Launch Agent Harness</span>
         </button>
       </div>
 
