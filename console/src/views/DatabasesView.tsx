@@ -197,3 +197,4 @@ export const DatabasesView: React.FC = () => {
     </div>
   );
 };
+

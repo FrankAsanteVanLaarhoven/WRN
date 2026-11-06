@@ -29,7 +29,7 @@ import { GrokAgentsHarnessView } from './views/GrokAgentsHarnessView';
 // WRN Passport Coexistence & Foundry Views
 import { OntologyView } from './views/OntologyView';
 import { LineageDagView } from './views/LineageDagView';
-import { DevinConsoleView } from './views/DevinConsoleView';
+import { AgentTraceView } from './views/AgentTraceView';
 import { AccessGrantsView } from './views/AccessGrantsView';
 import { SecurityHarnessView } from './views/SecurityHarnessView';
 import { PolicyMatrixView } from './views/PolicyMatrixView';
@@ -59,7 +59,7 @@ const MainLayout: React.FC = () => {
   const passportTabs = [
     { id: 'ontology' as const, label: 'Ontology', icon: Boxes },
     { id: 'lineage' as const, label: 'Sealed DAG', icon: GitFork },
-    { id: 'devin-console' as const, label: 'Devin Trace', icon: Terminal },
+    { id: 'agent-trace' as const, label: 'Agent Trace', icon: Terminal },
     { id: 'grants' as const, label: 'Grants Studio', icon: KeyRound },
     { id: 'request-verifier' as const, label: 'RFC 9421', icon: FileCheck2 },
     { id: 'security-harness' as const, label: '14 Fixtures', icon: ShieldCheck },
@@ -134,7 +134,7 @@ const MainLayout: React.FC = () => {
                 <div className="flex-1 overflow-hidden">
                   {activeTab === 'ontology' && <OntologyView />}
                   {activeTab === 'lineage' && <LineageDagView onOpenNewSeal={() => setIsNewSealOpen(true)} />}
-                  {activeTab === 'devin-console' && <DevinConsoleView />}
+                  {activeTab === 'agent-trace' && <AgentTraceView />}
                   {activeTab === 'grants' && <AccessGrantsView onOpenNewGrant={() => setIsNewGrantOpen(true)} />}
                   {activeTab === 'request-verifier' && <RequestVerifierView />}
                   {activeTab === 'security-harness' && <SecurityHarnessView />}

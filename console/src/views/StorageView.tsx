@@ -180,3 +180,4 @@ export const StorageView: React.FC = () => {
     </div>
   );
 };
+

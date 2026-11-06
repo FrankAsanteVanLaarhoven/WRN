@@ -174,3 +174,4 @@ export const MessagingView: React.FC = () => {
     </div>
   );
 };
+

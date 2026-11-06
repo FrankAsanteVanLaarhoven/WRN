@@ -251,3 +251,4 @@ export const FirewallView: React.FC = () => {
     </div>
   );
 };
+

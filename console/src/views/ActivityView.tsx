@@ -126,3 +126,4 @@ export const ActivityView: React.FC = () => {
     </div>
   );
 };
+

@@ -42,7 +42,7 @@ import {
 export type ActiveTab =
   | 'ontology'
   | 'lineage'
-  | 'devin-console'
+  | 'agent-trace'
   | 'grants'
   | 'request-verifier'
   | 'schemas'
@@ -400,7 +400,7 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
     setPassports(prev => [newPassport, ...prev]);
     setInstances(prev => [newInstance, ...prev]);
 
-    // Append Devin audit step
+    // Append Agent audit step
     setActivityLogs(prev => [
       {
         stepId: `act-${Date.now()}`,

@@ -63,10 +63,10 @@ export const DomainsNginxView: React.FC = () => {
         <div>
           <div className="flex items-center space-x-2">
             <Globe className="w-5 h-5 text-illum" />
-            <h1 className="text-lg font-bold text-white tracking-tight">Domains & Built-in NGINX Engine</h1>
+            <h1 className="text-lg font-bold text-white tracking-tight">Domains & DNS</h1>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Real-time live domain search, purchase integration, edge DNS verification, and auto-generated NGINX configurations.
+            Real-time live domain search, purchase integration, edge DNS verification, and auto-generated reverse proxy configurations.
           </p>
         </div>
 

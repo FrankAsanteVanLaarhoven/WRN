@@ -49,7 +49,7 @@ export const WorkflowsView: React.FC = () => {
       status: 'idle',
       lastRun: '12 mins ago',
       durationMs: 512,
-      description: 'Checks Grok/Devin agent qualification, verifies RFC 9421 cryptographic headers, attaches 9-zone policy seal, commits DAG root.',
+      description: 'Checks autonomous agent qualification, verifies RFC 9421 cryptographic headers, attaches 9-zone policy seal, commits DAG root.',
       steps: ['Evaluate agent execution envelope', 'Verify RFC 9421 HTTP signature', 'Validate 9-zone policy boundaries', 'Commit Merkle proof to audit ledger']
     },
     {
@@ -248,3 +248,4 @@ export const WorkflowsView: React.FC = () => {
     </div>
   );
 };
+

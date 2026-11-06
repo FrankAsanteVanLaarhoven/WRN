@@ -59,11 +59,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       }
     },
     {
-      label: 'Switch to Devin Agent Operations Console',
+      label: 'Switch to Agent Operations Console',
       category: 'Navigation',
       icon: Terminal,
       action: () => {
-        setActiveTab('devin-console');
+        setActiveTab('agent-trace');
         setIsCmdKOpen(false);
       }
     },
@@ -168,12 +168,12 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
       }
     },
     {
-      label: 'Step Devin Agent Sandbox Execution',
+      label: 'Step Agent Sandbox Execution',
       category: 'Runtime',
       icon: Terminal,
       action: () => {
         setIsCmdKOpen(false);
-        setActiveTab('devin-console');
+        setActiveTab('agent-trace');
         runAgentTaskStep();
       }
     }
