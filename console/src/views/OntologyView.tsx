@@ -12,16 +12,12 @@ import {
   CheckCircle,
   Copy,
   ChevronRight,
-  Database,
-  Network,
-  List
+  Database
 } from 'lucide-react';
-import { OntologyGraphCanvas } from './OntologyGraphCanvas';
 
 export const OntologyView: React.FC = () => {
   const { passports, instances, grants, submissions, revokeGrant } = useConsole();
   const [selectedEntity, setSelectedEntity] = useState<any>(passports[0]);
-  const [viewMode, setViewMode] = useState<'list' | 'graph'>('list');
   const [filterType, setFilterType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -63,133 +59,101 @@ export const OntologyView: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          {/* View Mode Toggle */}
-          <div className="flex items-center space-x-1 bg-surface-elevated p-1 rounded-lg border border-border text-xs">
+        {/* Filter Pills */}
+        <div className="flex items-center space-x-1.5 bg-surface-elevated p-1 rounded-lg border border-border text-xs">
+          {(['all', 'passport', 'instance', 'grant', 'submission'] as const).map(type => (
             <button
-              onClick={() => setViewMode('list')}
-              className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md font-medium transition-colors ${
-                viewMode === 'list' ? 'bg-primary text-white shadow-sm' : 'text-slate-400 hover:text-slate-200'
+              key={type}
+              onClick={() => setFilterType(type)}
+              className={`px-2.5 py-1 rounded-md capitalize font-medium transition-colors ${
+                filterType === type
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-slate-400 hover:text-slate-200'
               }`}
             >
-              <List className="w-3.5 h-3.5" />
-              <span>List</span>
+              {type === 'all' ? 'All Objects' : `${type}s`}
             </button>
-            <button
-              onClick={() => setViewMode('graph')}
-              className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md font-medium transition-colors ${
-                viewMode === 'graph' ? 'bg-foundry-cyan text-slate-950 font-semibold shadow-sm' : 'text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              <Network className="w-3.5 h-3.5" />
-              <span>Foundry Graph</span>
-            </button>
-          </div>
-
-          {/* Filter Pills */}
-          {viewMode === 'list' && (
-            <div className="flex items-center space-x-1.5 bg-surface-elevated p-1 rounded-lg border border-border text-xs">
-              {(['all', 'passport', 'instance', 'grant', 'submission'] as const).map(type => (
-                <button
-                  key={type}
-                  onClick={() => setFilterType(type)}
-                  className={`px-2.5 py-1 rounded-md capitalize font-medium transition-colors ${
-                    filterType === type
-                      ? 'bg-primary text-white shadow-sm'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {type === 'all' ? 'All Objects' : `${type}s`}
-                </button>
-              ))}
-            </div>
-          )}
+          ))}
         </div>
       </div>
 
-      {/* Main Workspace Split: Left Explorer / Canvas, Right Deep Object Detail */}
+      {/* Main Workspace Split: Left Explorer List, Right Deep Object Detail */}
       <div className="flex-1 flex overflow-hidden">
-        {viewMode === 'graph' ? (
-          <div className="flex-1 relative overflow-hidden border-r border-border">
-            <OntologyGraphCanvas onSelectEntity={setSelectedEntity} />
-          </div>
-        ) : (
-          /* Left List */
-          <div className="w-full md:w-5/12 lg:w-4/12 border-r border-border flex flex-col overflow-hidden bg-surface/50">
-            <div className="p-3 border-b border-border">
-              <div className="relative">
-                <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" />
-                <input
-                  id="ontology-search-input"
-                  name="ontologySearch"
-                  type="text"
-                  placeholder="Search URNs, instance IDs, keys..."
-                  value={searchQuery}
-                  onChange={e => setSearchQuery(e.target.value)}
-                  className="w-full bg-surface-elevated border border-border rounded-md pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary font-mono"
-                />
-              </div>
-              <div className="flex items-center justify-between mt-2 text-[11px] text-slate-400 font-mono">
-                <span>Showing {filteredObjects.length} entities</span>
-                <span>Profile WRN 0.2</span>
-              </div>
+        {/* Left List */}
+        <div className="w-full md:w-5/12 lg:w-4/12 border-r border-border flex flex-col overflow-hidden bg-surface/50">
+          <div className="p-3 border-b border-border">
+            <div className="relative">
+              <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" />
+              <input
+                id="ontology-search-input"
+                name="ontologySearch"
+                type="text"
+                placeholder="Search URNs, instance IDs, keys..."
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                className="w-full bg-surface-elevated border border-border rounded-md pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-primary font-mono"
+              />
             </div>
+            <div className="flex items-center justify-between mt-2 text-[11px] text-slate-400 font-mono">
+              <span>Showing {filteredObjects.length} entities</span>
+              <span>Profile WRN 0.2</span>
+            </div>
+          </div>
 
-            <div className="flex-1 overflow-y-auto divide-y divide-border/60">
-              {filteredObjects.map(obj => {
-                const id = obj.id || obj.instanceId || obj.grantId || obj.sealId;
-                const isSelected = (selectedEntity?.id || selectedEntity?.instanceId || selectedEntity?.grantId || selectedEntity?.sealId) === id;
-                const isAgent = obj.entityCategory === 'instance' || obj.type === 'agent';
-                const isGrant = obj.entityCategory === 'grant';
-                const isSubmission = obj.entityCategory === 'submission';
+          <div className="flex-1 overflow-y-auto divide-y divide-border/60">
+            {filteredObjects.map(obj => {
+              const id = obj.id || obj.instanceId || obj.grantId || obj.sealId;
+              const isSelected = (selectedEntity?.id || selectedEntity?.instanceId || selectedEntity?.grantId || selectedEntity?.sealId) === id;
+              const isAgent = obj.entityCategory === 'instance' || obj.type === 'agent';
+              const isGrant = obj.entityCategory === 'grant';
+              const isSubmission = obj.entityCategory === 'submission';
 
-                return (
-                  <button
-                    key={id}
-                    onClick={() => setSelectedEntity(obj)}
-                    className={`w-full text-left p-3 transition-colors flex items-start justify-between ${
-                      isSelected
-                        ? 'bg-surface-elevated border-l-2 border-l-primary'
-                        : 'hover:bg-surface-elevated/40'
+              return (
+                <button
+                  key={id}
+                  onClick={() => setSelectedEntity(obj)}
+                  className={`w-full text-left p-3 transition-colors flex items-start justify-between ${
+                    isSelected
+                      ? 'bg-surface-elevated border-l-2 border-l-primary'
+                      : 'hover:bg-surface-elevated/40'
+                  }`}
+                >
+                  <div className="min-w-0 pr-2">
+                    <div className="flex items-center space-x-1.5 mb-1">
+                      {isAgent ? (
+                        <Bot className="w-3.5 h-3.5 text-foundry-cyan shrink-0" />
+                      ) : isGrant ? (
+                        <Key className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
+                      ) : isSubmission ? (
+                        <FileCheck className="w-3.5 h-3.5 text-foundry-emerald shrink-0" />
+                      ) : (
+                        <User className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      )}
+                      <span className="text-xs font-semibold text-slate-200 truncate">
+                        {obj.displayName || obj.name || obj.title || obj.grantId}
+                      </span>
+                    </div>
+                    <div className="text-[11px] font-mono text-slate-400 truncate">
+                      {id}
+                    </div>
+                  </div>
+
+                  <span
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded border uppercase shrink-0 ${
+                      obj.status === 'active' || obj.status === 'accepted'
+                        ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                        : obj.status === 'quarantined'
+                        ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
+                        : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
                     }`}
                   >
-                    <div className="min-w-0 pr-2">
-                      <div className="flex items-center space-x-1.5 mb-1">
-                        {isAgent ? (
-                          <Bot className="w-3.5 h-3.5 text-foundry-cyan shrink-0" />
-                        ) : isGrant ? (
-                          <Key className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-                        ) : isSubmission ? (
-                          <FileCheck className="w-3.5 h-3.5 text-foundry-emerald shrink-0" />
-                        ) : (
-                          <User className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        )}
-                        <span className="text-xs font-semibold text-slate-200 truncate">
-                          {obj.displayName || obj.name || obj.title || obj.grantId}
-                        </span>
-                      </div>
-                      <div className="text-[11px] font-mono text-slate-400 truncate">
-                        {id}
-                      </div>
-                    </div>
-
-                    <span
-                      className={`text-[10px] font-mono px-1.5 py-0.5 rounded border uppercase shrink-0 ${
-                        obj.status === 'active' || obj.status === 'accepted'
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                          : obj.status === 'quarantined'
-                          ? 'bg-amber-500/10 text-amber-400 border-amber-500/30'
-                          : 'bg-rose-500/10 text-rose-400 border-rose-500/30'
-                      }`}
-                    >
-                      {obj.status}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                    {obj.status}
+                  </span>
+                </button>
+              );
+            })}
           </div>
-        )}
+        </div>
 
         {/* Right Object Inspector */}
         <div className="hidden md:flex flex-1 flex-col overflow-y-auto p-6 bg-background">

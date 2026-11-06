@@ -8,19 +8,27 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#090A0F',
-        surface: '#0F111A',
-        'surface-elevated': '#161926',
-        'surface-card': '#121420',
-        border: '#1E2333',
-        'border-focus': '#3B4261',
+        background: '#0A0B10',
+        surface: '#0F121C',
+        'surface-elevated': '#151926',
+        'surface-card': '#111420',
+        border: '#1E2538',
+        'border-focus': '#00E5FF',
         primary: {
-          DEFAULT: '#6366F1',
-          foreground: '#FFFFFF',
-          glow: 'rgba(99, 102, 241, 0.15)',
+          DEFAULT: '#00E5FF',
+          foreground: '#0A0B10',
+          glow: 'rgba(0, 229, 255, 0.25)',
+        },
+        neon: {
+          blue: '#00E5FF',
+          tube: '#00B0FF',
+          cyan: '#38BDF8',
+          halo: 'rgba(0, 229, 255, 0.28)',
+          glow: '#0284C7',
+          deep: '#0B1528'
         },
         foundry: {
-          cyan: '#06B6D4',
+          cyan: '#00E5FF',
           emerald: '#10B981',
           amber: '#F59E0B',
           rose: '#F43F5E',
@@ -34,9 +42,12 @@ export default {
         mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
       },
       boxShadow: {
-        'glow-primary': '0 0 20px -3px rgba(99, 102, 241, 0.25)',
-        'glow-cyan': '0 0 20px -3px rgba(6, 182, 212, 0.25)',
+        'glow-primary': '0 0 20px -3px rgba(0, 229, 255, 0.35)',
+        'glow-cyan': '0 0 20px -3px rgba(0, 229, 255, 0.35)',
         'glow-emerald': '0 0 20px -3px rgba(16, 185, 129, 0.25)',
+        'neon-tube': '0 0 10px rgba(0, 229, 255, 0.45), 0 0 25px rgba(0, 176, 255, 0.25), inset 0 0 8px rgba(0, 229, 255, 0.15)',
+        'neon-halo': '0 0 25px 2px rgba(0, 229, 255, 0.35)',
+        'neon-button': '0 0 18px rgba(0, 229, 255, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.6)',
         'foundry-card': '0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4)',
       },
       animation: {

@@ -1,74 +1,104 @@
 import React from 'react';
-import { useConsole, ActiveTab } from '../store/consoleStore';
+import { useConsole } from '../store/consoleStore';
 import {
-  Boxes,
-  GitFork,
+  LayoutDashboard,
+  Smartphone,
+  Key,
   Terminal,
-  KeyRound,
-  ShieldCheck,
-  LayoutGrid,
-  BarChart3,
-  BookOpen,
-  Plus,
-  Radio,
-  FileCheck2,
-  FileJson
+  Users,
+  Database,
+  HardDrive,
+  Cpu,
+  Send,
+  Globe,
+  Activity,
+  BarChart2,
+  ShieldAlert,
+  Bot,
+  Boxes,
+  Sparkles,
+  GitFork,
+  Radio
 } from 'lucide-react';
+import { ProjectServiceTab } from '../types/appwrite';
 
 interface SidebarProps {
   onOpenCommission: () => void;
   onOpenNewGrant: () => void;
-  onOpenNewSeal: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  onOpenCommission,
-  onOpenNewGrant
-}) => {
-  const { activeTab, setActiveTab, securityResults, submissions, grants, isMobileMenuOpen, setIsMobileMenuOpen } = useConsole();
+export const Sidebar: React.FC<SidebarProps> = ({ onOpenCommission, onOpenNewGrant }) => {
+  const {
+    topNavTab,
+    projectServiceTab,
+    setProjectServiceTab,
+    isMobileMenuOpen,
+    setIsMobileMenuOpen,
+    securityResults
+  } = useConsole();
+
+  if (topNavTab !== 'projects') {
+    return null; // When in Marketplace, Domains, Compute, or Settings, full width views are used matching Appwrite
+  }
 
   const passedTests = securityResults.filter(s => s.status === 'pass').length;
-  const quarantinedSeals = submissions.filter(s => s.status === 'quarantined').length;
-  const activeGrants = grants.filter(g => g.status === 'active').length;
 
   const navGroups: {
-    title: string;
+    title?: string;
     items: {
-      id: ActiveTab;
+      id: ProjectServiceTab;
       label: string;
       icon: React.ComponentType<{ className?: string }>;
       badge?: string | number;
-      badgeColor?: string;
     }[];
   }[] = [
     {
-      title: 'FOUNDRY ONTOLOGY',
       items: [
-        { id: 'ontology', label: 'Object Explorer', icon: Boxes },
-        { id: 'lineage', label: 'Cryptographic DAG', icon: GitFork, badge: quarantinedSeals > 0 ? `${quarantinedSeals} Quarantine` : undefined, badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
-        { id: 'grants', label: 'Delegation & Grants', icon: KeyRound, badge: activeGrants, badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' },
+        { id: 'overview', label: 'Overview', icon: LayoutDashboard }
       ]
     },
     {
-      title: 'DEVIN RUNTIME',
+      title: 'CONNECT',
       items: [
-        { id: 'devin-console', label: 'Agent Operations', icon: Terminal, badge: 'Live Stream', badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' }
+        { id: 'apps', label: 'Apps', icon: Smartphone },
+        { id: 'api-keys', label: 'API Keys', icon: Key },
+        { id: 'playground', label: 'Playground', icon: Terminal, badge: 'REST/Realtime' }
       ]
     },
     {
-      title: 'SECURITY & POLICIES',
+      title: 'BUILD',
       items: [
-        { id: 'request-verifier', label: 'RFC 9421 Verifier', icon: FileCheck2, badge: '9 Gates', badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30' },
-        { id: 'security-harness', label: 'Security Fixtures (14)', icon: ShieldCheck, badge: `${passedTests}/14 Pass`, badgeColor: passedTests === 14 ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-300 border-border' },
-        { id: 'policy-matrix', label: '9-Zone Branch Matrix', icon: LayoutGrid },
-        { id: 'schemas', label: 'Contract Schemas', icon: FileJson }
+        { id: 'auth', label: 'Auth', icon: Users },
+        { id: 'databases', label: 'Databases', icon: Database, badge: 'Postgres/MySQL' },
+        { id: 'storage', label: 'Storage', icon: HardDrive },
+        { id: 'functions', label: 'Functions', icon: Cpu },
+        { id: 'messaging', label: 'Messaging', icon: Send }
       ]
     },
     {
-      title: 'STANDARDS & RESEARCH',
+      title: 'DEPLOY',
       items: [
-        { id: 'evaluation', label: '6-Week Evaluation Plan', icon: BarChart3, badge: '7 KPIs', badgeColor: 'bg-purple-500/10 text-purple-400 border-purple-500/30' },
-        { id: 'sources', label: 'Primary Source Register', icon: BookOpen, badge: '24 Docs', badgeColor: 'bg-slate-800 text-slate-400 border-border' }
+        { id: 'sites', label: 'Sites', icon: Globe }
+      ]
+    },
+    {
+      title: 'OBSERVE',
+      items: [
+        { id: 'activity', label: 'Activity', icon: Activity },
+        { id: 'usage', label: 'Usage', icon: BarChart2 }
+      ]
+    },
+    {
+      title: 'PROTECT',
+      items: [
+        { id: 'firewall', label: 'Firewall', icon: ShieldAlert, badge: 'Edge Rules' }
+      ]
+    },
+    {
+      title: 'AGENTS & MCP',
+      items: [
+        { id: 'grok-agents', label: 'Grok Bot & MCP', icon: Bot, badge: 'Live Harness' },
+        { id: 'passport-foundry', label: 'WRN Coexistence & DAG', icon: GitFork, badge: `${passedTests}/14 Pass` }
       ]
     }
   ];
@@ -86,83 +116,78 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <aside
         className={`${
           isMobileMenuOpen ? 'fixed left-0 top-14 bottom-0 z-40 flex' : 'hidden md:flex'
-        } w-64 border-r border-border bg-surface flex-col justify-between shrink-0 select-none transition-all duration-200`}
+        } w-60 border-r border-border/80 bg-surface flex-col justify-between shrink-0 select-none transition-all duration-200`}
       >
-      <div className="p-3 space-y-6 overflow-y-auto">
-        {/* Quick Action Buttons */}
-        <div className="grid grid-cols-2 gap-1.5 pt-1">
-          <button
-            onClick={onOpenCommission}
-            className="flex items-center justify-center space-x-1.5 px-2.5 py-1.5 rounded-md bg-primary hover:bg-primary/90 text-white text-xs font-medium transition-all shadow-glow-primary"
-            title="Commission a new distinct agent instance"
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span>Commission</span>
-          </button>
-          <button
-            onClick={onOpenNewGrant}
-            className="flex items-center justify-center space-x-1.5 px-2.5 py-1.5 rounded-md bg-surface-elevated hover:bg-surface-elevated/80 border border-border text-slate-200 text-xs font-medium transition-colors"
-            title="Issue bounded delegation grant"
-          >
-            <KeyRound className="w-3.5 h-3.5 text-indigo-400" />
-            <span>New Grant</span>
-          </button>
-        </div>
-
-        {/* Navigation Sections */}
-        {navGroups.map(group => (
-          <div key={group.title} className="space-y-1">
-            <h2 className="px-2 text-[10px] font-mono font-semibold tracking-wider text-slate-500 uppercase">
-              {group.title}
-            </h2>
-            <nav className="space-y-0.5">
-              {group.items.map(item => {
-                const Icon = item.icon;
-                const isActive = activeTab === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      setActiveTab(item.id);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
-                      isActive
-                        ? 'bg-surface-elevated text-white border border-primary/40 shadow-sm'
-                        : 'text-slate-400 hover:text-slate-200 hover:bg-surface-elevated/40'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-2.5 min-w-0">
-                      <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-primary' : 'text-slate-400'}`} />
-                      <span className="truncate">{item.label}</span>
-                    </div>
-                    {item.badge !== undefined && (
-                      <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded border ${item.badgeColor || 'bg-slate-800 text-slate-400 border-border'}`}>
-                        {item.badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </nav>
+        <div className="p-3 space-y-4 overflow-y-auto">
+          {/* Get Started Progress (Matching Appwrite Screenshot 3) */}
+          <div className="p-3 rounded-xl bg-surface-card border border-border/80 space-y-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <span className="font-semibold text-slate-200">Get started</span>
+              <span className="text-neon-blue font-bold">4 / 16</span>
+            </div>
+            <div className="w-full h-1.5 rounded-full bg-surface border border-border overflow-hidden">
+              <div className="w-1/4 h-full bg-neon-blue shadow-neon-tube rounded-full" />
+            </div>
           </div>
-        ))}
-      </div>
 
-      {/* Footer Status */}
-      <div className="p-3 border-t border-border bg-surface-card">
-        <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
-          <span className="flex items-center space-x-1">
-            <Radio className="w-3 h-3 text-emerald-400 animate-pulse" />
-            <span className="text-slate-300">Enforcement Kernel</span>
-          </span>
-          <span className="text-emerald-400 font-semibold">ONLINE</span>
+          {/* Nav Groups */}
+          {navGroups.map((group, gIdx) => (
+            <div key={gIdx} className="space-y-1">
+              {group.title && (
+                <div className="px-2 text-[10px] font-mono font-semibold tracking-wider text-slate-500 uppercase">
+                  {group.title}
+                </div>
+              )}
+              <div className="space-y-0.5">
+                {group.items.map(item => {
+                  const Icon = item.icon;
+                  const isActive = projectServiceTab === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      onClick={() => {
+                        setProjectServiceTab(item.id);
+                        setIsMobileMenuOpen(false);
+                      }}
+                      className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                        isActive
+                          ? 'bg-cyan-500/15 text-white border border-cyan-400/40 shadow-neon-tube font-semibold'
+                          : 'text-slate-400 hover:text-slate-200 hover:bg-surface-elevated/40'
+                      }`}
+                    >
+                      <div className="flex items-center space-x-2.5 min-w-0">
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-neon-blue' : 'text-slate-400'}`} />
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded border ${
+                          isActive ? 'bg-cyan-950/80 text-neon-blue border-cyan-500/40' : 'bg-surface text-slate-500 border-border'
+                        }`}>
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
-        <div className="text-[10px] text-slate-500 truncate font-mono">
-          Strict CAS • RFC 9421 • JCS Canonical
+
+        {/* Footer */}
+        <div className="p-3 border-t border-border/80 bg-surface-card">
+          <div className="flex items-center justify-between text-[11px] font-mono text-slate-400 mb-1">
+            <span className="flex items-center space-x-1">
+              <Radio className="w-3 h-3 text-neon-blue animate-pulse" />
+              <span className="text-slate-200">Appwrite OS 1.6</span>
+            </span>
+            <span className="text-neon-blue font-semibold">ONLINE</span>
+          </div>
+          <div className="text-[10px] text-slate-500 font-mono truncate">
+            Edge Proxy • Realtime Sync • MCP
+          </div>
         </div>
-      </div>
-    </aside>
-  </>
+      </aside>
+    </>
   );
 };

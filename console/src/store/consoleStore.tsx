@@ -21,6 +21,15 @@ import {
   sourceRegister
 } from '../data/mockDb';
 import { computeQualifiedDigest, computeGrantTermsDigest } from '../utils/crypto';
+import { TopNavTab, ProjectServiceTab, DomainItem, ComputePlan, GrokAgentInstance } from '../types/appwrite';
+import {
+  INITIAL_DOMAINS,
+  COMPUTE_PLANS,
+  INITIAL_LAP_TIMES,
+  INITIAL_POSTGRES_USERS,
+  MARKETPLACE_TOOLS,
+  AI_ARENA_BENCHMARK
+} from '../data/appwriteMockData';
 
 export type ActiveTab =
   | 'ontology'
@@ -35,6 +44,39 @@ export type ActiveTab =
   | 'sources';
 
 interface ConsoleContextType {
+  // Appwrite Top Navigation
+  topNavTab: TopNavTab;
+  setTopNavTab: (tab: TopNavTab) => void;
+  projectServiceTab: ProjectServiceTab;
+  setProjectServiceTab: (tab: ProjectServiceTab) => void;
+
+  // Domains & NGINX
+  domains: DomainItem[];
+  addDomain: (domain: string) => Promise<void>;
+  verifyDomainDns: (id: string) => Promise<void>;
+
+  // Compute & Cost Analysis
+  computePlans: ComputePlan[];
+
+  // Grok Agent Harness
+  grokAgents: GrokAgentInstance[];
+  executeGrokTask: (prompt: string, model?: 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8') => Promise<void>;
+
+  // Appwrite Databases & Queries
+  lapTimes: any[];
+  postgresUsers: any[];
+  marketplaceTools: any[];
+  aiArenaBenchmarks: any[];
+
+  // Telemetry metrics
+  telemetry: {
+    bandwidth: string;
+    requests: string;
+    storage: string;
+    executions: string;
+    compute: string;
+  };
+
   activeTab: ActiveTab;
   setActiveTab: (tab: ActiveTab) => void;
   activeBranch: string;
@@ -78,6 +120,96 @@ interface ConsoleContextType {
 const ConsoleContext = createContext<ConsoleContextType | null>(null);
 
 export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [topNavTab, setTopNavTab] = useState<TopNavTab>('projects');
+  const [projectServiceTab, setProjectServiceTab] = useState<ProjectServiceTab>('overview');
+  const [domains, setDomains] = useState<DomainItem[]>(INITIAL_DOMAINS);
+  const [computePlans] = useState<ComputePlan[]>(COMPUTE_PLANS);
+  const [lapTimes, setLapTimes] = useState(INITIAL_LAP_TIMES);
+  const [postgresUsers] = useState(INITIAL_POSTGRES_USERS);
+  const [marketplaceTools] = useState(MARKETPLACE_TOOLS);
+  const [aiArenaBenchmarks] = useState(AI_ARENA_BENCHMARK);
+  const [telemetry, setTelemetry] = useState({
+    bandwidth: '48.2 MB',
+    requests: '198.4k',
+    storage: '3.1 GB',
+    executions: '1,420',
+    compute: '0.84 GBH'
+  });
+
+  const [grokAgents, setGrokAgents] = useState<GrokAgentInstance[]>([
+    {
+      id: 'grok-inst-01',
+      name: 'Grok Launch Agent',
+      model: 'Grok-Build-0.1',
+      status: 'idle',
+      taskPrompt: "Query Postgres for Friday's new users and verify email conversion rate.",
+      mcpServers: ['mcp.appwrite.io', 'wrn.notary.mcp'],
+      tokensPerSec: 184,
+      costEstimate: 0.04,
+      steps: [
+        { id: 's1', type: 'reasoning', text: "Connecting to Appwrite Postgres MCP using skill 'appwrite-postgres'...", timestamp: '03:15:02', status: 'success' },
+        { id: 's2', type: 'db_query', text: "SELECT * FROM users WHERE created_at >= '2026-08-21'", timestamp: '03:15:04', status: 'success' },
+        { id: 's3', type: 'security_gate', text: "Verified 2,184 new rows. Email verification rate at 91.2%. Output bounded to tenant.", timestamp: '03:15:05', status: 'success' }
+      ]
+    }
+  ]);
+
+  const addDomain = async (domainName: string) => {
+    const clean = domainName.trim().toLowerCase();
+    const newDom: DomainItem = {
+      id: `dom-${Date.now().toString(36)}`,
+      domain: clean,
+      status: 'verified',
+      sslStatus: 'active',
+      registrar: 'WRN Edge Registrar (Real-time Verified)',
+      pricePerYear: 12.00,
+      dnsRecords: [
+        { type: 'A', host: '@', value: '185.199.108.153', status: 'valid' },
+        { type: 'CNAME', host: 'www', value: `${clean}.edge.appwrite.network`, status: 'valid' },
+        { type: 'TXT', host: '_wrn-challenge', value: `wrn-verification=${Math.random().toString(36).substring(2, 12)}`, status: 'valid' }
+      ],
+      nginxConfig: `server {
+    listen 443 ssl http2;
+    server_name ${clean} www.${clean};
+
+    ssl_certificate /etc/letsencrypt/live/${clean}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${clean}/privkey.pem;
+
+    # Built-in Auto NGINX Reverse Proxy
+    location / {
+        proxy_pass http://upstream_app;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}`
+    };
+    setDomains(prev => [newDom, ...prev]);
+  };
+
+  const verifyDomainDns = async (id: string) => {
+    setDomains(prev => prev.map(d => d.id === id ? { ...d, status: 'verified', sslStatus: 'active' } : d));
+  };
+
+  const executeGrokTask = async (prompt: string, model: 'Grok-Build-0.1' | 'GPT-5.5' | 'Claude-Opus-4.8' = 'Grok-Build-0.1') => {
+    const newAgent: GrokAgentInstance = {
+      id: `grok-${Date.now().toString(36)}`,
+      name: `${model} Harness`,
+      model,
+      status: 'running',
+      taskPrompt: prompt,
+      mcpServers: ['mcp.appwrite.io', 'postgres.mcp', 'nginx.edge.mcp'],
+      tokensPerSec: 210,
+      costEstimate: 0.02,
+      steps: [
+        { id: '1', type: 'reasoning', text: `Analyzing task with ${model}: "${prompt}"`, timestamp: new Date().toLocaleTimeString(), status: 'success' },
+        { id: '2', type: 'tool_call', text: 'Executing MCP tool appwrite.database.queryTables...', timestamp: new Date().toLocaleTimeString(), status: 'success' },
+        { id: '3', type: 'security_gate', text: 'Enforcing WRN-COEXISTENCE-0.2 memory compartment boundaries.', timestamp: new Date().toLocaleTimeString(), status: 'success' }
+      ]
+    };
+    setGrokAgents(prev => [newAgent, ...prev]);
+  };
+
   const [activeTab, setActiveTab] = useState<ActiveTab>('ontology');
   const [activeBranch, setActiveBranch] = useState<string>('candidate/v0.2');
   const [isCmdKOpen, setIsCmdKOpen] = useState<boolean>(false);
@@ -463,6 +595,21 @@ export const ConsoleProvider: React.FC<{ children: ReactNode }> = ({ children })
   return (
     <ConsoleContext.Provider
       value={{
+        topNavTab,
+        setTopNavTab,
+        projectServiceTab,
+        setProjectServiceTab,
+        domains,
+        addDomain,
+        verifyDomainDns,
+        computePlans,
+        grokAgents,
+        executeGrokTask,
+        lapTimes,
+        postgresUsers,
+        marketplaceTools,
+        aiArenaBenchmarks,
+        telemetry,
         activeTab,
         setActiveTab,
         activeBranch,
